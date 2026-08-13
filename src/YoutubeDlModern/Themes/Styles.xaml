@@ -600,6 +600,7 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">
                             <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+                            <Setter Property="Cursor" Value="Arrow" />
                             <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">

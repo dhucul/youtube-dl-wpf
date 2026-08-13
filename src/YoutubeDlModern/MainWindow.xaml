@@ -5,6 +5,9 @@
         Width="1140" Height="780" MinWidth="940" MinHeight="620"
         Background="{StaticResource BackgroundBrush}"
         WindowStartupLocation="CenterScreen">
+    <Window.InputBindings>
+        <KeyBinding Key="F1" Command="{Binding NavigateCommand}" CommandParameter="Help" />
+    </Window.InputBindings>
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </Window.Resources>
@@ -59,6 +62,7 @@
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding SelectedNav}" Value="Queue">
                                         <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+                                        <Setter Property="Cursor" Value="Arrow" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -71,6 +75,7 @@
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding SelectedNav}" Value="History">
                                         <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+                                        <Setter Property="Cursor" Value="Arrow" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -83,6 +88,21 @@
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding SelectedNav}" Value="Settings">
                                         <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+                                        <Setter Property="Cursor" Value="Arrow" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button Content="Help" Tag="&#xE897;" Margin="0,6,0,0"
+                            ToolTip="Help (F1)"
+                            Command="{Binding NavigateCommand}" CommandParameter="Help">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource NavButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedNav}" Value="Help">
+                                        <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+                                        <Setter Property="Cursor" Value="Arrow" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -95,6 +115,7 @@
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding SelectedNav}" Value="About">
                                         <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+                                        <Setter Property="Cursor" Value="Arrow" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>

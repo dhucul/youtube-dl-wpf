@@ -1,0 +1,489 @@
+<UserControl x:Class="YoutubeDlModern.Views.HelpView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Resources>
+        <Style x:Key="HelpBody" TargetType="TextBlock" BasedOn="{StaticResource SecondaryText}">
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="LineHeight" Value="19" />
+        </Style>
+        <Style x:Key="HelpLabel" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,11,0,2" />
+        </Style>
+        <Style x:Key="HelpCard" TargetType="Border" BasedOn="{StaticResource Card}">
+            <Setter Property="Margin" Value="0,0,0,14" />
+        </Style>
+        <Style x:Key="ExampleValue" TargetType="TextBox">
+            <Setter Property="IsReadOnly" Value="True" />
+            <Setter Property="FontFamily" Value="{StaticResource MonoFontFamily}" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
+            <Setter Property="Margin" Value="0,5,0,0" />
+        </Style>
+    </UserControl.Resources>
+
+    <Grid MaxWidth="900">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Margin="0,0,0,12">
+            <TextBlock Text="Help" Style="{StaticResource HeadingText}" />
+            <TextBlock Style="{StaticResource HelpBody}" Margin="0,3,0,0"
+                       Text="Detailed usage for downloads, formats, playlists, authentication, settings, and troubleshooting. Press F1 to open Help at any time." />
+        </StackPanel>
+
+        <TabControl Grid.Row="1">
+            <TabItem Header="Quick start">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Margin="0,14,8,26">
+                        <Border Style="{StaticResource HelpCard}">
+                            <StackPanel>
+                                <TextBlock Text="First-time setup" Style="{StaticResource SectionText}" />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="1. Install yt-dlp" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="The status at the bottom of the navigation rail shows whether the download engine is ready. If it is missing, select Install engine on Downloads. You can update it later from About." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="2. Install ffmpeg when needed" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Open About and select Download ffmpeg if you plan to merge separate video and audio streams, extract audio, convert media, or embed subtitles and artwork. Simple single-stream downloads may not need it." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="3. Check the output folder" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="The default is Downloads\YoutubeDL Modern in your Windows user folder. Change it for one download in its preview, or change the default under Settings > General." />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource HelpCard}">
+                            <StackPanel>
+                                <TextBlock Text="Download one video" Style="{StaticResource SectionText}" />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="1. Paste and analyze" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Paste a complete http or https URL into the box on Downloads. Select Analyze, or press Enter while the URL box has focus. Cancel stops a metadata lookup that is taking too long." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="2. Review the preview" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Confirm the title, uploader, duration, and site. Choose Video + audio, Video only, or Audio only, then choose quality and the output folder. Expand Advanced download options for codecs, containers, filenames, metadata, subtitles, limits, and authentication." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="3. Add to the queue" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Select Add to queue. The download starts automatically when a parallel-download slot is available. Its card shows progress, size, speed, estimated time, status, and the engine log." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="4. Open the result" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="When complete, use Play to open the media or Folder to reveal it in File Explorer. Completed downloads also appear under History." />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource HelpCard}" BorderBrush="{StaticResource InfoBrush}">
+                            <StackPanel>
+                                <TextBlock Text="Analysis depth" Style="{StaticResource SectionText}" />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Quick" />
+                                <TextBlock Style="{StaticResource HelpBody}" Text="Fastest metadata preview. It skips some format availability checks and is the best default for ordinary links." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Full" />
+                                <TextBlock Style="{StaticResource HelpBody}" Text="Performs the normal yt-dlp metadata and format checks. Use it when Quick returns incomplete information." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Playlist" />
+                                <TextBlock Style="{StaticResource HelpBody}" Text="Explicitly requests playlist metadata so you can preview and select playlist entries. Very large previews are bounded to keep the app responsive." />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="Links &amp; playlists">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Margin="0,14,8,26">
+                        <Border Style="{StaticResource HelpCard}">
+                            <StackPanel>
+                                <TextBlock Text="Ways to add links" Style="{StaticResource SectionText}" />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Paste" />
+                                <TextBlock Style="{StaticResource HelpBody}" Text="Copies text from the Windows clipboard into the URL box. Clear removes the current input and preview." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Several URLs at once" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Separate complete URLs with spaces or new lines. Because one preview cannot represent several items, valid links are added directly using the current saved defaults." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Batch file" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Select Batch file... and choose a text file containing one complete URL per line. Blank lines and comment lines beginning with #, ;, or ] are ignored. Duplicate URLs are imported once. A batch may contain up to 1,000 unique URLs and the file may be up to 10 MB." />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource HelpCard}">
+                            <StackPanel>
+                                <TextBlock Text="Playlist downloads" Style="{StaticResource SectionText}" />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Download the whole playlist" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Analyze with Playlist depth when necessary, leave Download playlist selected, and add it to the queue. The playlist is one queue card while yt-dlp processes its entries." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Choose individual entries" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Use Playlist items for comma-separated indexes and ranges, for example 1-3,7,10-12. Playlist start and end in Advanced download options can also limit a continuous range. Positions are the order reported by the site." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Download only the linked item" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Clear Download playlist for the current item. To make single-video behavior the default, enable Never download playlists under Settings > General and save." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Ordering and filtering" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Settings > Network can reverse or randomize playlist order. Settings > Selection can filter entries by title, file size, date, view count, age limit, or a custom yt-dlp match filter." />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource HelpCard}" BorderBrush="{StaticResource WarningBrush}">
+                            <StackPanel>
+                                <TextBlock Text="Before importing a large batch" Style="{StaticResource SectionText}" />
+                                <TextBlock Style="{StaticResource HelpBody}" Margin="0,8,0,0"
+                                           Text="Batch and multi-URL items use saved Settings rather than a per-item preview. Confirm the default output folder, quality, authentication, and parallel-download count first. The queue must have room for the entire import." />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="Formats &amp; extras">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Margin="0,14,8,26">
+                        <Border Style="{StaticResource HelpCard}">
+                            <StackPanel>
+                                <TextBlock Text="Video and audio selection" Style="{StaticResource SectionText}" />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Video + audio" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Chooses the best video and audio matching your quality, codec, and frame-rate limits. Separate streams are merged with ffmpeg. If the site offers one combined stream, yt-dlp may use it as a fallback." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Video only" />
+                                <TextBlock Style="{StaticResource HelpBody}" Text="Downloads a video stream without sound. This is useful for editing workflows that manage audio separately." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Audio only" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Selects the best available audio and asks ffmpeg to extract or convert it to mp3, m4a, opus, flac, wav, vorbis, aac, or the best available format. For MP3 VBR, 0 is best quality; bitrate values such as 192K are fixed targets." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Quality presets" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Best leaves resolution unrestricted. A resolution such as 1080p is a maximum, so yt-dlp can fall back when that exact height is unavailable. Worst favors the smallest format. Codec and frame-rate choices add further limits." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Choose format or use Custom" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Choose format loads the exact streams reported by the site. Custom accepts a yt-dlp -f selector such as bestvideo[height&lt;=1080]+bestaudio. Custom selectors are intended for users familiar with yt-dlp syntax." />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource HelpCard}">
+                            <StackPanel>
+                                <TextBlock Text="Files, subtitles, and metadata" Style="{StaticResource SectionText}" />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Output container" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Auto lets yt-dlp choose. Selecting mp4, mkv, webm, mov, avi, or flv requests that final container and may require remuxing. A container cannot make incompatible codecs compatible, so ffmpeg may still report an error." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Filename template" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Uses yt-dlp output-template fields. The default is %(title)s [%(id)s].%(ext)s. Keep %(ext)s so the correct final extension is used. Invalid templates can prevent the final file path from being reported." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Subtitles" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Download subs requests creator-provided captions in the language list, such as en,de or en.*. Automatic captions requests machine-generated captions. Embedding also downloads subtitles and requires a compatible container plus ffmpeg. Global conversion and format preferences are under Settings > Subtitles." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Artwork and metadata" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Save thumbnail writes a separate image. Embed thumbnail places artwork in the media file when supported. Metadata writes common tags, and Chapters keeps chapter markers. Embedding and conversion normally require ffmpeg." />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource HelpCard}">
+                            <StackPanel>
+                                <TextBlock Text="Advanced transfer options" Style="{StaticResource SectionText}" />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Speed limit" />
+                                <TextBlock Style="{StaticResource HelpBody}" Text="Enter values such as 500K or 4.2M. Leave blank for no app-imposed rate limit." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Retries and concurrent fragments" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Retries controls recovery from transfer failures. Concurrent fragments can speed segmented media but may increase site throttling; start with 1 and raise it carefully, up to 32." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Extra engine arguments" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Arguments are passed to yt-dlp in addition to the visible choices. Per-download arguments follow saved global arguments. Use this only when an option is not exposed elsewhere; conflicting options may override or break the intended behavior." />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="Sign-in &amp; settings">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Margin="0,14,8,26">
+                        <Border Style="{StaticResource HelpCard}">
+                            <StackPanel>
+                                <TextBlock Text="Cookies and authentication" Style="{StaticResource SectionText}" />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Why there are two cookie choices" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Analysis and downloading are separate yt-dlp operations. Set cookies in Analysis options so private metadata can be read, and in Advanced download options so the queued download can access the media. An analyzed item copies the analysis authentication into its download defaults." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Browser cookies" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Choose Brave, Chrome, Chromium, Edge, Firefox, Opera, Safari, Vivaldi, or Whale. The browser profile must exist and be readable by the current Windows user. Close the browser if its cookie database is locked." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Cookies file" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Choose a Netscape-format cookies.txt file. When both methods are set, the file takes priority. Cookies are sensitive: store them privately, do not add them to source control, and replace or delete exported files when no longer needed." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Saved credentials" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Settings > Authentication also supports username, password, netrc, video password, TV-provider credentials, and a one-time two-factor code. Persisted secrets are protected for the current Windows account. Two-factor codes are never saved." />
+                                <TextBlock Style="{StaticResource HelpBody}" Margin="0,10,0,0" Foreground="{StaticResource WarningBrush}"
+                                           Text="Only use credentials and cookies for accounts and media you are authorized to access." />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource HelpCard}">
+                            <StackPanel>
+                                <TextBlock Text="How Settings work" Style="{StaticResource SectionText}" />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Save" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Changes become defaults for downloads added after you select Save. Existing queue items keep the settings snapshot captured when they were added. The parallel-download limit is applied when settings are saved." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Reset to defaults" />
+                                <TextBlock Style="{StaticResource HelpBody}" Text="Restores the editable settings to application defaults. Select Save to persist and apply the reset values." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Important categories" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="General controls output, concurrency, error handling, playlists, archives, and global extra arguments. Files controls naming, sidecars, and cache. Formats &amp; Audio controls quality and conversion. Network controls proxies, retries, fragments, headers, and playlist order. Selection filters media. Post-processing controls ffmpeg, metadata, commands, and SponsorBlock." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Download archive" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="An archive file records media IDs already downloaded by yt-dlp and skips them on later runs. It is separate from the visual History page. Clearing History does not clear the archive, and deleting queue cards does not delete media." />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource HelpCard}">
+                            <StackPanel>
+                                <TextBlock Text="Queue and History" Style="{StaticResource SectionText}" />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Pause, Resume, and Cancel" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Pause stops the running yt-dlp process and keeps the item so Resume can schedule it again. Partial-file behavior depends on Settings; with normal defaults, yt-dlp continues usable .part files. Cancel stops the item. Remove deletes only its queue card." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Start all, Pause all, and Clear completed" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Use the queue toolbar for bulk control. Start all schedules paused items, Pause all stops active or waiting items, and Clear completed removes finished cards. These actions never delete downloaded media." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="History" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Successful downloads are stored in History. Play opens a recorded file, Folder opens its containing folder, Remove deletes one history record, and Clear history removes all records. History actions do not delete media." />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="Examples">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Margin="0,14,8,26">
+                        <Border Style="{StaticResource HelpCard}" BorderBrush="{StaticResource InfoBrush}">
+                            <StackPanel>
+                                <TextBlock Text="How to use these examples" Style="{StaticResource SectionText}" />
+                                <TextBlock Style="{StaticResource HelpBody}" Margin="0,8,0,0"
+                                           Text="Each recipe names the controls to set after analyzing a link. Values shown in boxes can be selected and copied. Start with the recipe as written, then change one option at a time." />
+                            </StackPanel>
+                        </Border>
+
+                        <Grid Margin="0,0,0,14">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="14" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Border Grid.Column="0" Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock Text="1080p MP4 video" Style="{StaticResource SectionText}" />
+                                    <TextBlock Style="{StaticResource HelpBody}" Margin="0,8,0,0"
+                                               Text="A broadly compatible video for ordinary playback." />
+                                    <TextBlock Style="{StaticResource HelpLabel}" Text="Set these preview controls" />
+                                    <TextBox Style="{StaticResource ExampleValue}" Text="Type: Video + audio&#10;Quality: 1080p&#10;Video codec: H.264&#10;Maximum frame rate: 30 fps&#10;Output container: mp4" />
+                                    <TextBlock Style="{StaticResource HelpBody}" Margin="0,8,0,0"
+                                               Text="If the site has no matching H.264 stream, change Video codec to Any. Merging separate streams requires ffmpeg." />
+                                </StackPanel>
+                            </Border>
+
+                            <Border Grid.Column="2" Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock Text="MP3 audio" Style="{StaticResource SectionText}" />
+                                    <TextBlock Style="{StaticResource HelpBody}" Margin="0,8,0,0"
+                                               Text="Extract audio at a conventional fixed bitrate." />
+                                    <TextBlock Style="{StaticResource HelpLabel}" Text="Set these preview controls" />
+                                    <TextBox Style="{StaticResource ExampleValue}" Text="Type: Audio only&#10;Audio format: mp3&#10;Audio quality: 192K" />
+                                    <TextBlock Style="{StaticResource HelpBody}" Margin="0,8,0,0"
+                                               Text="Audio conversion requires ffmpeg. Choose 0 (best VBR) when quality matters more than a predictable bitrate." />
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,14">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="14" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Border Grid.Column="0" Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock Text="Selected playlist entries" Style="{StaticResource SectionText}" />
+                                    <TextBlock Style="{StaticResource HelpBody}" Margin="0,8,0,0"
+                                               Text="Download the first three entries, item seven, and items ten through twelve." />
+                                    <TextBlock Style="{StaticResource HelpLabel}" Text="Playlist items" />
+                                    <TextBox Style="{StaticResource ExampleValue}" Text="1-3,7,10-12" />
+                                    <TextBlock Style="{StaticResource HelpBody}" Margin="0,8,0,0"
+                                               Text="Keep Download playlist selected. Playlist positions refer to the ordering reported by the site." />
+                                </StackPanel>
+                            </Border>
+
+                            <Border Grid.Column="2" Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock Text="English and German subtitles" Style="{StaticResource SectionText}" />
+                                    <TextBlock Style="{StaticResource HelpBody}" Margin="0,8,0,0"
+                                               Text="Request English variants plus German captions." />
+                                    <TextBlock Style="{StaticResource HelpLabel}" Text="Subtitle languages" />
+                                    <TextBox Style="{StaticResource ExampleValue}" Text="en.*,de" />
+                                    <TextBlock Style="{StaticResource HelpBody}" Margin="0,8,0,0"
+                                               Text="Select Download subs. Add Automatic captions only if generated captions are acceptable. Select Embed subtitles to place them in a compatible media container." />
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+
+                        <Border Style="{StaticResource HelpCard}">
+                            <StackPanel>
+                                <TextBlock Text="Custom format selectors" Style="{StaticResource SectionText}" />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Best video up to 1080p and 30 fps, plus best audio" />
+                                <TextBox Style="{StaticResource ExampleValue}"
+                                         Text="bestvideo[height&lt;=1080][fps&lt;=30]+bestaudio/best[height&lt;=1080]" />
+                                <TextBlock Style="{StaticResource HelpBody}" Margin="0,7,0,0"
+                                           Text="Choose Custom under Quality and paste the selector into Format code. The part after / is a fallback combined format." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Prefer MP4 video and M4A audio, with fallbacks" />
+                                <TextBox Style="{StaticResource ExampleValue}"
+                                         Text="bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio/best" />
+                                <TextBlock Style="{StaticResource HelpBody}" Margin="0,7,0,0"
+                                           Text="A custom selector overrides the normal quality selector. Test it on one item before applying it to a playlist or batch." />
+                            </StackPanel>
+                        </Border>
+
+                        <Grid Margin="0,0,0,14">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="14" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Border Grid.Column="0" Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock Text="Organized filenames" Style="{StaticResource SectionText}" />
+                                    <TextBlock Style="{StaticResource HelpBody}" Margin="0,8,0,0"
+                                               Text="Put playlist downloads in a named folder and prefix each file with its playlist position." />
+                                    <TextBlock Style="{StaticResource HelpLabel}" Text="Output filename template" />
+                                    <TextBox Style="{StaticResource ExampleValue}"
+                                             Text="%(playlist_title)s/%(playlist_index)03d - %(title)s [%(id)s].%(ext)s" />
+                                    <TextBlock Style="{StaticResource HelpBody}" Margin="0,8,0,0"
+                                               Text="For a non-playlist link, playlist fields may be empty. Keep the media ID to reduce accidental filename collisions." />
+                                </StackPanel>
+                            </Border>
+
+                            <Border Grid.Column="2" Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock Text="Gentler transfer settings" Style="{StaticResource SectionText}" />
+                                    <TextBlock Style="{StaticResource HelpBody}" Margin="0,8,0,0"
+                                               Text="Limit bandwidth and avoid aggressive fragment concurrency." />
+                                    <TextBlock Style="{StaticResource HelpLabel}" Text="Set these advanced controls" />
+                                    <TextBox Style="{StaticResource ExampleValue}" Text="Speed limit: 4.2M&#10;Retries: 10&#10;Concurrent fragments: 1" />
+                                    <TextBlock Style="{StaticResource HelpBody}" Margin="0,8,0,0"
+                                               Text="Speed suffixes K, M, G, T, and P are accepted. Leave Speed limit blank for unlimited transfer." />
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,14">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="14" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Border Grid.Column="0" Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock Text="Private media with Edge cookies" Style="{StaticResource SectionText}" />
+                                    <TextBlock Style="{StaticResource HelpBody}" Margin="0,8,0,0"
+                                               Text="Use the signed-in Edge profile for both metadata and media access." />
+                                    <TextBlock Style="{StaticResource HelpLabel}" Text="Set in both places" />
+                                    <TextBox Style="{StaticResource ExampleValue}" Text="Analysis options > Browser cookies: edge&#10;Advanced download options > Browser cookies: edge" />
+                                    <TextBlock Style="{StaticResource HelpBody}" Margin="0,8,0,0"
+                                               Text="Close Edge if its cookie database is locked. A selected cookies file takes priority over this browser choice." />
+                                </StackPanel>
+                            </Border>
+
+                            <Border Grid.Column="2" Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock Text="Batch file" Style="{StaticResource SectionText}" />
+                                    <TextBlock Style="{StaticResource HelpBody}" Margin="0,8,0,0"
+                                               Text="Create a plain text file with one complete URL per line." />
+                                    <TextBlock Style="{StaticResource HelpLabel}" Text="videos.txt" />
+                                    <TextBox Style="{StaticResource ExampleValue}"
+                                             Text="# Training videos&#10;https://example.com/video-one&#10;https://example.com/video-two&#10;&#10;; This line is also a comment" />
+                                    <TextBlock Style="{StaticResource HelpBody}" Margin="0,8,0,0"
+                                               Text="Select Batch file... on Downloads. Replace the example addresses with real supported media URLs." />
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+
+                        <Border Style="{StaticResource HelpCard}" BorderBrush="{StaticResource WarningBrush}">
+                            <StackPanel>
+                                <TextBlock Text="Power-user examples" Style="{StaticResource SectionText}" />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Write comments and use Windows-safe filenames" />
+                                <TextBox Style="{StaticResource ExampleValue}" Text="--write-comments --windows-filenames" />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Only download videos shorter than 30 minutes with at least 10,000 views" />
+                                <TextBox Style="{StaticResource ExampleValue}" Text="duration &lt; 1800 &amp; view_count &gt;= 10000" />
+                                <TextBlock Style="{StaticResource HelpBody}" Margin="0,8,0,0"
+                                           Text="Put the first example in Extra engine arguments. Put the second in Settings > Selection > Match filter. These fields use yt-dlp syntax and can change as yt-dlp evolves; test them on one link first." />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="Troubleshooting">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Margin="0,14,8,26">
+                        <Border Style="{StaticResource HelpCard}">
+                            <StackPanel>
+                                <TextBlock Text="Engine and site errors" Style="{StaticResource SectionText}" />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Unsupported URL, extractor error, or a site suddenly stopped working" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Open About and update yt-dlp, then try again. Confirm the URL opens in a browser and is a complete http or https address. Sites change frequently, so an engine update is the most common fix." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Sign-in, age, or bot-confirmation error" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Provide browser cookies or a cookies file for both analysis and downloading. Make sure the selected browser profile is signed in, close the browser if its cookie database is locked, and avoid repeatedly retrying if the site is rate-limiting the account." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Analysis works but the download fails" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Expand Engine log on the queue card. Recheck the advanced download cookie choice, output-folder permissions, free disk space, custom format selector, and extra arguments. The media URL may also have expired; analyze it again and create a new queue item." />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource HelpCard}">
+                            <StackPanel>
+                                <TextBlock Text="ffmpeg and output errors" Style="{StaticResource SectionText}" />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="ffmpeg not found" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Open About and install ffmpeg, or point Settings > Post-processing to a folder containing the ffmpeg executable. Save Settings before adding a replacement queue item." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Requested formats are incompatible" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Return the container to Auto, remove codec restrictions, or choose a different site-provided format. Some codecs cannot be copied into every container. Re-encoding can solve compatibility problems but is slower and can reduce quality." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="File already exists or will not resume" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Review No overwrites, Do not resume partial downloads, Do not use .part files, and the output template under Settings > Files and General. A download archive can also intentionally skip a media ID downloaded earlier." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Cannot find the result" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Use Folder on the queue card or History page. Check the per-item output folder first, then Settings > General. Post-processing can change the final extension from the initially downloaded stream." />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource HelpCard}">
+                            <StackPanel>
+                                <TextBlock Text="Performance and diagnostics" Style="{StaticResource SectionText}" />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Downloads are slow or throttled" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Remove an accidental speed limit, reduce parallel downloads, and return concurrent fragments to 1. Some sites throttle aggressive concurrency. A proxy, sleep interval, external downloader, or custom header in Settings can also affect speed." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="The playlist is too large" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Use playlist items or start/end limits, or clear Download playlist. For future links, enable Never download playlists and save Settings." />
+                                <TextBlock Style="{StaticResource HelpLabel}" Text="Get diagnostic details" />
+                                <TextBlock Style="{StaticResource HelpBody}"
+                                           Text="Expand Engine log on the affected queue card and copy the link. Record the app version, yt-dlp version, ffmpeg status, selected mode and quality, and the exact error. Versions and component paths are shown under About." />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource HelpCard}" BorderBrush="{StaticResource InfoBrush}">
+                            <StackPanel>
+                                <TextBlock Text="Keyboard and data locations" Style="{StaticResource SectionText}" />
+                                <TextBlock Style="{StaticResource HelpBody}" Margin="0,8,0,0" Text="F1 opens Help. Enter in the Downloads URL box starts analysis." />
+                                <TextBlock Style="{StaticResource HelpBody}" Margin="0,7,0,0" Text="Settings and history: %APPDATA%\YoutubeDlModern" />
+                                <TextBlock Style="{StaticResource HelpBody}" Margin="0,7,0,0" Text="Managed engine files: %LOCALAPPDATA%\YoutubeDlModern" />
+                                <TextBlock Style="{StaticResource HelpBody}" Margin="0,7,0,0" Text="Default media: %USERPROFILE%\Downloads\YoutubeDL Modern" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</UserControl>

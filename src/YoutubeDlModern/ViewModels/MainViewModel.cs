@@ -17,6 +17,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public QueueViewModel Queue { get; }
     public SettingsViewModel Settings { get; }
     public HistoryViewModel History { get; }
+    public HelpViewModel Help { get; } = new();
     public AboutViewModel About { get; }
 
     [ObservableProperty] private object? _currentPage;
@@ -103,6 +104,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         {
             "Settings" => Settings,
             "History" => History,
+            "Help" => Help,
             "About" => About,
             _ => Queue
         };
