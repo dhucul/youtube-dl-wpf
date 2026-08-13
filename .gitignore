@@ -1,0 +1,17 @@
+# Visual Studio and user-local state
+.vs/
+*.user
+*.suo
+
+# .NET build output
+**/bin/
+**/obj/
+
+# Published and packaged artifacts
+publish/
+installer/output/
+.installer-staging/
+
+# Local logs and temporary files
+*.log
+*.tmp

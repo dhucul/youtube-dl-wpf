@@ -1,0 +1,505 @@
+<UserControl x:Class="YoutubeDlModern.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Resources>
+        <Style x:Key="FieldLabel" TargetType="TextBlock" BasedOn="{StaticResource SecondaryText}">
+            <Setter Property="Width" Value="210" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style x:Key="FieldRow" TargetType="StackPanel">
+            <Setter Property="Orientation" Value="Horizontal" />
+            <Setter Property="Margin" Value="0,0,0,10" />
+        </Style>
+        <Style x:Key="FieldBox" TargetType="TextBox" BasedOn="{StaticResource ModernTextBox}">
+            <Setter Property="Width" Value="300" />
+        </Style>
+        <Style x:Key="FieldCombo" TargetType="ComboBox">
+            <Setter Property="Width" Value="300" />
+            <Setter Property="SelectedValuePath" Value="Tag" />
+        </Style>
+        <Style x:Key="GroupHeader" TargetType="TextBlock" BasedOn="{StaticResource SectionText}">
+            <Setter Property="Margin" Value="0,4,0,10" />
+        </Style>
+        <Style x:Key="SpacedCheck" TargetType="CheckBox">
+            <Setter Property="Margin" Value="0,0,0,9" />
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Settings" Style="{StaticResource HeadingText}" Margin="0,0,0,4" />
+        <TextBlock Grid.Row="0" Style="{StaticResource SecondaryText}" Margin="0,34,0,10"
+                   Text="Every option group of classic youtube-dl, one click away. Changes apply to new downloads after saving." />
+
+        <TabControl Grid.Row="1" Margin="0,6,0,0">
+
+            <!-- ============ GENERAL ============ -->
+            <TabItem Header="General">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="0,16,20,10">
+                        <TextBlock Style="{StaticResource GroupHeader}" Text="Output" />
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Download folder" />
+                            <TextBox Style="{StaticResource FieldBox}" Text="{Binding S.General.DownloadDirectory}" />
+                            <Button Style="{StaticResource MiniButton}" Margin="6,0,0,0" Content="Browse…" Command="{Binding BrowseDownloadDirCommand}" />
+                            <Button Style="{StaticResource MiniButton}" Margin="6,0,0,0" Content="Open" Command="{Binding OpenDownloadDirCommand}" />
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Filename template (-o)" ToolTip="e.g. %(title)s [%(id)s].%(ext)s — supports all classic template fields" />
+                            <TextBox Style="{StaticResource FieldBox}" Text="{Binding S.General.OutputTemplate}" />
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Parallel downloads" />
+                            <TextBox Width="70" Style="{StaticResource ModernTextBox}" Text="{Binding S.General.MaxConcurrentDownloads}" />
+                        </StackPanel>
+
+                        <TextBlock Style="{StaticResource GroupHeader}" Text="Error handling &amp; playlists" Margin="0,10,0,10" />
+                        <CheckBox Style="{StaticResource SpacedCheck}" Content="Continue on download errors (-i, --ignore-errors)" IsChecked="{Binding S.General.IgnoreErrors}" />
+                        <CheckBox Style="{StaticResource SpacedCheck}" Content="Abort on error (--abort-on-error)" IsChecked="{Binding S.General.AbortOnError}" />
+                        <CheckBox Style="{StaticResource SpacedCheck}" Content="Never download playlists, only single videos (--no-playlist)" IsChecked="{Binding S.General.NoPlaylist}" />
+
+                        <TextBlock Style="{StaticResource GroupHeader}" Text="Download archive" Margin="0,10,0,10" />
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Archive file (--download-archive)" ToolTip="Records IDs of downloaded videos; already-listed videos are skipped" />
+                            <TextBox Style="{StaticResource FieldBox}" Text="{Binding S.General.DownloadArchive}" />
+                            <Button Style="{StaticResource MiniButton}" Margin="6,0,0,0" Content="Browse…" Command="{Binding BrowseArchiveFileCommand}" />
+                        </StackPanel>
+
+                        <TextBlock Style="{StaticResource GroupHeader}" Text="Power user" Margin="0,10,0,10" />
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Extra engine arguments" ToolTip="Appended verbatim to every yt-dlp invocation — any classic option works here" />
+                            <TextBox Width="420" Style="{StaticResource ModernTextBox}" Text="{Binding S.General.ExtraArgs}" />
+                        </StackPanel>
+                        <CheckBox Style="{StaticResource SpacedCheck}"
+                                  Content="Verify the yt-dlp engine version when the application starts"
+                                  IsChecked="{Binding S.General.CheckEngineUpdatesOnStart}" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ============ FILES ============ -->
+            <TabItem Header="Files">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="0,16,20,10">
+                        <TextBlock Style="{StaticResource GroupHeader}" Text="File naming &amp; writing" />
+                        <CheckBox Style="{StaticResource SpacedCheck}" Content="Restrict filenames to ASCII (--restrict-filenames)" IsChecked="{Binding S.General.RestrictFilenames}" />
+                        <CheckBox Style="{StaticResource SpacedCheck}" Content="Do not overwrite existing files (-w)" IsChecked="{Binding S.General.NoOverwrites}" />
+                        <CheckBox Style="{StaticResource SpacedCheck}" Content="Do not resume partial downloads (--no-continue)" IsChecked="{Binding S.General.NoContinue}" />
+                        <CheckBox Style="{StaticResource SpacedCheck}" Content="Do not use .part files (--no-part)" IsChecked="{Binding S.General.NoPart}" />
+                        <CheckBox Style="{StaticResource SpacedCheck}" Content="Do not set file modification time (--no-mtime)" IsChecked="{Binding S.General.NoMtime}" />
+
+                        <TextBlock Style="{StaticResource GroupHeader}" Text="Sidecar files" Margin="0,10,0,10" />
+                        <CheckBox Style="{StaticResource SpacedCheck}" Content="Write description file (--write-description)" IsChecked="{Binding S.General.WriteDescription}" />
+                        <CheckBox Style="{StaticResource SpacedCheck}" Content="Write metadata JSON (--write-info-json)" IsChecked="{Binding S.General.WriteInfoJson}" />
+                        <CheckBox Style="{StaticResource SpacedCheck}" Content="Write thumbnail to disk (--write-thumbnail)" IsChecked="{Binding S.General.WriteThumbnail}" />
+                        <CheckBox Style="{StaticResource SpacedCheck}" Content="Write all thumbnail formats (--write-all-thumbnails)" IsChecked="{Binding S.General.WriteAllThumbnails}" />
+
+                        <TextBlock Style="{StaticResource GroupHeader}" Text="Cache" Margin="0,10,0,10" />
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Cache folder (--cache-dir)" />
+                            <TextBox Style="{StaticResource FieldBox}" Text="{Binding S.General.CacheDir}" />
+                            <Button Style="{StaticResource MiniButton}" Margin="6,0,0,0" Content="Browse…" Command="{Binding BrowseCacheDirCommand}" />
+                        </StackPanel>
+                        <CheckBox Style="{StaticResource SpacedCheck}" Content="Disable filesystem caching (--no-cache-dir)" IsChecked="{Binding S.General.NoCacheDir}" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ============ FORMATS &amp; AUDIO ============ -->
+            <TabItem Header="Formats &amp; Audio">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="0,16,20,10">
+                        <TextBlock Style="{StaticResource GroupHeader}" Text="Format selection (-f)" />
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Default quality" />
+                            <ComboBox Style="{StaticResource FieldCombo}" SelectedValue="{Binding S.Formats.DefaultQuality}">
+                                <ComboBoxItem Content="Best quality (video + audio)" Tag="best" />
+                                <ComboBoxItem Content="2160p (4K)" Tag="2160" />
+                                <ComboBoxItem Content="1440p" Tag="1440" />
+                                <ComboBoxItem Content="1080p" Tag="1080" />
+                                <ComboBoxItem Content="720p" Tag="720" />
+                                <ComboBoxItem Content="480p" Tag="480" />
+                                <ComboBoxItem Content="360p" Tag="360" />
+                                <ComboBoxItem Content="Worst (smallest)" Tag="worst" />
+                                <ComboBoxItem Content="Audio only" Tag="audio" />
+                            </ComboBox>
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Merge output format (--merge-output-format)" />
+                            <ComboBox Style="{StaticResource FieldCombo}" SelectedValue="{Binding S.Formats.MergeOutputFormat}">
+                                <ComboBoxItem Content="(auto)" Tag="" />
+                                <ComboBoxItem Content="mkv" Tag="mkv" />
+                                <ComboBoxItem Content="mp4" Tag="mp4" />
+                                <ComboBoxItem Content="webm" Tag="webm" />
+                                <ComboBoxItem Content="ogg" Tag="ogg" />
+                                <ComboBoxItem Content="flv" Tag="flv" />
+                            </ComboBox>
+                        </StackPanel>
+                        <CheckBox Style="{StaticResource SpacedCheck}" Content="Prefer free containers/codecs (--prefer-free-formats)" IsChecked="{Binding S.Formats.PreferFreeFormats}" />
+
+                        <TextBlock Style="{StaticResource GroupHeader}" Text="Audio extraction (-x)" Margin="0,10,0,10" />
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Audio format (--audio-format)" />
+                            <ComboBox Style="{StaticResource FieldCombo}" SelectedValuePath="Content" SelectedValue="{Binding S.Formats.AudioFormat}">
+                                <ComboBoxItem Content="mp3" /><ComboBoxItem Content="m4a" /><ComboBoxItem Content="opus" />
+                                <ComboBoxItem Content="flac" /><ComboBoxItem Content="wav" /><ComboBoxItem Content="vorbis" />
+                                <ComboBoxItem Content="aac" /><ComboBoxItem Content="best" />
+                            </ComboBox>
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Audio quality (--audio-quality)" ToolTip="0 = best VBR, 9 = worst; or a bitrate like 192K" />
+                            <ComboBox Style="{StaticResource FieldCombo}" SelectedValuePath="Content" SelectedValue="{Binding S.Formats.AudioQuality}">
+                                <ComboBoxItem Content="0" /><ComboBoxItem Content="2" /><ComboBoxItem Content="5" />
+                                <ComboBoxItem Content="128K" /><ComboBoxItem Content="192K" /><ComboBoxItem Content="256K" />
+                                <ComboBoxItem Content="320K" />
+                            </ComboBox>
+                        </StackPanel>
+                        <CheckBox Style="{StaticResource SpacedCheck}" Content="Keep original video after extraction (-k)" IsChecked="{Binding S.Formats.KeepVideo}" />
+
+                        <TextBlock Style="{StaticResource GroupHeader}" Text="Re-encoding" Margin="0,10,0,10" />
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Recode video (--recode-video)" />
+                            <ComboBox Style="{StaticResource FieldCombo}" SelectedValue="{Binding S.Formats.RecodeVideo}">
+                                <ComboBoxItem Content="(off)" Tag="" />
+                                <ComboBoxItem Content="mp4" Tag="mp4" /><ComboBoxItem Content="mkv" Tag="mkv" />
+                                <ComboBoxItem Content="webm" Tag="webm" /><ComboBoxItem Content="avi" Tag="avi" />
+                                <ComboBoxItem Content="flv" Tag="flv" /><ComboBoxItem Content="ogg" Tag="ogg" />
+                            </ComboBox>
+                        </StackPanel>
+                        <CheckBox Style="{StaticResource SpacedCheck}" Content="Do not overwrite post-processed files (--no-post-overwrites)" IsChecked="{Binding S.Formats.NoPostOverwrites}" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ============ SUBTITLES ============ -->
+            <TabItem Header="Subtitles">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="0,16,20,10">
+                        <CheckBox Style="{StaticResource SpacedCheck}" Content="Download subtitles (--write-subs)" IsChecked="{Binding S.Subtitles.WriteSubs}" />
+                        <CheckBox Style="{StaticResource SpacedCheck}" Content="Download auto-generated captions (--write-auto-subs)" IsChecked="{Binding S.Subtitles.WriteAutoSubs}" />
+                        <CheckBox Style="{StaticResource SpacedCheck}" Content="Download every available language (--all-subs)" IsChecked="{Binding S.Subtitles.WriteAllSubs}" />
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Languages (--sub-langs)" ToolTip="Comma separated, e.g. en,de,fr" />
+                            <TextBox Style="{StaticResource FieldBox}" Text="{Binding S.Subtitles.SubLangs}" />
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Preferred format (--sub-format)" ToolTip="e.g. srt, or a preference chain like ass/srt/best" />
+                            <TextBox Style="{StaticResource FieldBox}" Text="{Binding S.Subtitles.SubFormat}" />
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Convert subtitles (--convert-subs)" />
+                            <ComboBox Style="{StaticResource FieldCombo}" SelectedValue="{Binding S.Subtitles.ConvertSubs}">
+                                <ComboBoxItem Content="(off)" Tag="" />
+                                <ComboBoxItem Content="srt" Tag="srt" /><ComboBoxItem Content="vtt" Tag="vtt" />
+                                <ComboBoxItem Content="ass" Tag="ass" /><ComboBoxItem Content="lrc" Tag="lrc" />
+                            </ComboBox>
+                        </StackPanel>
+                        <CheckBox Style="{StaticResource SpacedCheck}" Content="Embed subtitles into the video file (--embed-subs)" IsChecked="{Binding S.Subtitles.EmbedSubs}" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ============ NETWORK ============ -->
+            <TabItem Header="Network">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="0,16,20,10">
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Proxy (--proxy)" ToolTip="HTTP/HTTPS/SOCKS, e.g. socks5://127.0.0.1:1080/" />
+                            <TextBox Style="{StaticResource FieldBox}" Text="{Binding S.Network.Proxy}" />
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Socket timeout (seconds)" />
+                            <TextBox Width="90" Style="{StaticResource ModernTextBox}" Text="{Binding S.Network.SocketTimeout}" />
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Source address to bind (--source-address)" />
+                            <TextBox Style="{StaticResource FieldBox}" Text="{Binding S.Network.SourceAddress}" />
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="IP protocol" />
+                            <ComboBox Style="{StaticResource FieldCombo}" SelectedValue="{Binding S.Network.IpVersion}">
+                                <ComboBoxItem Content="Auto" Tag="auto" />
+                                <ComboBoxItem Content="Force IPv4 (-4)" Tag="4" />
+                                <ComboBoxItem Content="Force IPv6 (-6)" Tag="6" />
+                            </ComboBox>
+                        </StackPanel>
+
+                        <TextBlock Style="{StaticResource GroupHeader}" Text="Throughput &amp; retries" Margin="0,10,0,10" />
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Rate limit (-r)" ToolTip="e.g. 50K or 4.2M — blank for unlimited" />
+                            <TextBox Width="120" Style="{StaticResource ModernTextBox}" Text="{Binding S.Network.RateLimit}" />
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Retries (-R)" />
+                            <TextBox Width="90" Style="{StaticResource ModernTextBox}" Text="{Binding S.Network.Retries}" />
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Fragment retries (--fragment-retries)" />
+                            <TextBox Width="90" Style="{StaticResource ModernTextBox}" Text="{Binding S.Network.FragmentRetries}" />
+                        </StackPanel>
+                        <CheckBox Style="{StaticResource SpacedCheck}" Content="Skip unavailable fragments (DASH/HLS/ISM)" IsChecked="{Binding S.Network.SkipUnavailableFragments}" />
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="HTTP chunk size (--http-chunk-size)" ToolTip="e.g. 10M; can bypass server throttling" />
+                            <TextBox Width="120" Style="{StaticResource ModernTextBox}" Text="{Binding S.Network.HttpChunkSize}" />
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Buffer size (--buffer-size)" />
+                            <TextBox Width="120" Style="{StaticResource ModernTextBox}" Text="{Binding S.Network.BufferSize}" />
+                        </StackPanel>
+                        <CheckBox Style="{StaticResource SpacedCheck}" Content="Do not auto-resize buffer (--no-resize-buffer)" IsChecked="{Binding S.Network.NoResizeBuffer}" />
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Concurrent fragments (-N) ✦ modern" ToolTip="Download HLS/DASH fragments in parallel" />
+                            <TextBox Width="90" Style="{StaticResource ModernTextBox}" Text="{Binding S.Network.ConcurrentFragments}" />
+                        </StackPanel>
+
+                        <TextBlock Style="{StaticResource GroupHeader}" Text="External downloader" Margin="0,10,0,10" />
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Downloader (--downloader)" />
+                            <ComboBox Style="{StaticResource FieldCombo}" SelectedValue="{Binding S.Network.ExternalDownloader}">
+                                <ComboBoxItem Content="Native (default)" Tag="" />
+                                <ComboBoxItem Content="aria2c" Tag="aria2c" /><ComboBoxItem Content="curl" Tag="curl" />
+                                <ComboBoxItem Content="wget" Tag="wget" /><ComboBoxItem Content="axel" Tag="axel" />
+                                <ComboBoxItem Content="httpie" Tag="httpie" /><ComboBoxItem Content="ffmpeg" Tag="ffmpeg" />
+                            </ComboBox>
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Downloader arguments" />
+                            <TextBox Style="{StaticResource FieldBox}" Text="{Binding S.Network.ExternalDownloaderArgs}" />
+                        </StackPanel>
+
+                        <TextBlock Style="{StaticResource GroupHeader}" Text="Throttling &amp; order" Margin="0,10,0,10" />
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Sleep between downloads (s)" />
+                            <TextBox Width="90" Style="{StaticResource ModernTextBox}" Text="{Binding S.Network.SleepInterval}" />
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Max random sleep (s)" />
+                            <TextBox Width="90" Style="{StaticResource ModernTextBox}" Text="{Binding S.Network.MaxSleepInterval}" />
+                        </StackPanel>
+                        <CheckBox Style="{StaticResource SpacedCheck}" Content="Download playlists in reverse order (--playlist-reverse)" IsChecked="{Binding S.Network.PlaylistReverse}" />
+                        <CheckBox Style="{StaticResource SpacedCheck}" Content="Download playlists in random order (--playlist-random)" IsChecked="{Binding S.Network.PlaylistRandom}" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ============ GEO &amp; HEADERS ============ -->
+            <TabItem Header="Geo &amp; Headers">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="0,16,20,10">
+                        <CheckBox Style="{StaticResource SpacedCheck}" Content="Bypass geographic restriction (--geo-bypass)" IsChecked="{Binding S.Network.GeoBypass}" />
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Geo verification proxy" />
+                            <TextBox Style="{StaticResource FieldBox}" Text="{Binding S.Network.GeoVerificationProxy}" />
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Geo-bypass country code" ToolTip="Two-letter ISO 3166-2 code" />
+                            <TextBox Width="90" Style="{StaticResource ModernTextBox}" Text="{Binding S.Network.GeoBypassCountry}" />
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Geo-bypass IP block (CIDR)" />
+                            <TextBox Style="{StaticResource FieldBox}" Text="{Binding S.Network.GeoBypassIpBlock}" />
+                        </StackPanel>
+
+                        <TextBlock Style="{StaticResource GroupHeader}" Text="HTTP identity" Margin="0,10,0,10" />
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="User agent (--user-agent)" />
+                            <TextBox Style="{StaticResource FieldBox}" Text="{Binding S.Network.UserAgent}" />
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Referer (--referer)" />
+                            <TextBox Style="{StaticResource FieldBox}" Text="{Binding S.Network.Referer}" />
+                        </StackPanel>
+                        <CheckBox Style="{StaticResource SpacedCheck}" Content="Suppress HTTPS certificate validation (--no-check-certificate)" IsChecked="{Binding S.Network.NoCheckCertificate}" />
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Custom headers (--add-headers)" ToolTip="One Field:Value per line" />
+                            <TextBox Width="300" Height="64" AcceptsReturn="True" VerticalContentAlignment="Top"
+                                     Style="{StaticResource ModernTextBox}" Text="{Binding S.Network.CustomHeaders}" />
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ============ SELECTION ============ -->
+            <TabItem Header="Selection">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="0,16,20,10">
+                        <TextBlock Style="{StaticResource GroupHeader}" Text="Playlist range" />
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Start at (--playlist-start)" />
+                            <TextBox Width="90" Style="{StaticResource ModernTextBox}" Text="{Binding S.Selection.PlaylistStart}" />
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="End at (--playlist-end)" />
+                            <TextBox Width="90" Style="{StaticResource ModernTextBox}" Text="{Binding S.Selection.PlaylistEnd}" />
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Items (--playlist-items)" ToolTip="e.g. 1-3,7,10-13" />
+                            <TextBox Width="150" Style="{StaticResource ModernTextBox}" Text="{Binding S.Selection.PlaylistItems}" />
+                        </StackPanel>
+
+                        <TextBlock Style="{StaticResource GroupHeader}" Text="Filters" Margin="0,10,0,10" />
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Match title (regex)" />
+                            <TextBox Style="{StaticResource FieldBox}" Text="{Binding S.Selection.MatchTitle}" />
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Reject title (regex)" />
+                            <TextBox Style="{StaticResource FieldBox}" Text="{Binding S.Selection.RejectTitle}" />
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Match filter (--match-filter)" ToolTip="e.g. like_count > 100 &amp; description" />
+                            <TextBox Style="{StaticResource FieldBox}" Text="{Binding S.Selection.MatchFilter}" />
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Max downloads (--max-downloads)" />
+                            <TextBox Width="90" Style="{StaticResource ModernTextBox}" Text="{Binding S.Selection.MaxDownloads}" />
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Min / max filesize" ToolTip="e.g. 50k or 44.6m" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Width="130" Style="{StaticResource ModernTextBox}" Text="{Binding S.Selection.MinFilesize}" />
+                                <TextBox Width="130" Style="{StaticResource ModernTextBox}" Margin="8,0,0,0" Text="{Binding S.Selection.MaxFilesize}" />
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Exact upload date (--date)" ToolTip="YYYYMMDD" />
+                            <TextBox Width="120" Style="{StaticResource ModernTextBox}" Text="{Binding S.Selection.Date}" />
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Uploaded before / after" ToolTip="YYYYMMDD" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Width="130" Style="{StaticResource ModernTextBox}" Text="{Binding S.Selection.DateBefore}" />
+                                <TextBox Width="130" Style="{StaticResource ModernTextBox}" Margin="8,0,0,0" Text="{Binding S.Selection.DateAfter}" />
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Min / max views" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Width="130" Style="{StaticResource ModernTextBox}" Text="{Binding S.Selection.MinViews}" />
+                                <TextBox Width="130" Style="{StaticResource ModernTextBox}" Margin="8,0,0,0" Text="{Binding S.Selection.MaxViews}" />
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Age limit (--age-limit)" />
+                            <TextBox Width="90" Style="{StaticResource ModernTextBox}" Text="{Binding S.Selection.AgeLimit}" />
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ============ AUTH &amp; COOKIES ============ -->
+            <TabItem Header="Auth &amp; Cookies">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="0,16,20,10">
+                        <TextBlock Style="{StaticResource GroupHeader}" Text="Account login" />
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Username (-u)" />
+                            <TextBox Style="{StaticResource FieldBox}" Text="{Binding S.Auth.Username}" />
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Password (-p)" />
+                            <PasswordBox x:Name="AuthPasswordBox" Width="300" PasswordChanged="AuthPasswordBox_PasswordChanged" />
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Two-factor code (-2)" />
+                            <TextBox Width="120" Style="{StaticResource ModernTextBox}" Text="{Binding S.Auth.TwoFactor}" />
+                        </StackPanel>
+                        <CheckBox Style="{StaticResource SpacedCheck}" Content="Use .netrc authentication data (-n)" IsChecked="{Binding S.Auth.UseNetrc}" />
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Video password (--video-password)" />
+                            <PasswordBox x:Name="VideoPasswordBox" Width="300" PasswordChanged="VideoPasswordBox_PasswordChanged" />
+                        </StackPanel>
+
+                        <TextBlock Style="{StaticResource GroupHeader}" Text="Cookies" Margin="0,10,0,10" />
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Cookies file (--cookies)" />
+                            <TextBox Style="{StaticResource FieldBox}" Text="{Binding S.Auth.CookiesFile}" />
+                            <Button Style="{StaticResource MiniButton}" Margin="6,0,0,0" Content="Browse…" Command="{Binding BrowseCookiesFileCommand}" />
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Import cookies from browser ✦ modern" ToolTip="Reads cookies straight from your browser profile (--cookies-from-browser)" />
+                            <ComboBox Style="{StaticResource FieldCombo}" SelectedValue="{Binding S.Auth.CookiesFromBrowser}">
+                                <ComboBoxItem Content="(off)" Tag="none" />
+                                <ComboBoxItem Content="Chrome" Tag="chrome" /><ComboBoxItem Content="Edge" Tag="edge" />
+                                <ComboBoxItem Content="Firefox" Tag="firefox" /><ComboBoxItem Content="Brave" Tag="brave" />
+                                <ComboBoxItem Content="Opera" Tag="opera" /><ComboBoxItem Content="Vivaldi" Tag="vivaldi" />
+                                <ComboBoxItem Content="Chromium" Tag="chromium" />
+                            </ComboBox>
+                        </StackPanel>
+
+                        <TextBlock Style="{StaticResource GroupHeader}" Text="Adobe Pass (TV provider)" Margin="0,10,0,10" />
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="MSO (--ap-mso)" />
+                            <TextBox Style="{StaticResource FieldBox}" Text="{Binding S.Auth.ApMso}" />
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="MSO username" />
+                            <TextBox Style="{StaticResource FieldBox}" Text="{Binding S.Auth.ApUsername}" />
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="MSO password" />
+                            <PasswordBox x:Name="ApPasswordBox" Width="300" PasswordChanged="ApPasswordBox_PasswordChanged" />
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ============ POST-PROCESSING ============ -->
+            <TabItem Header="Post-Processing">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="0,16,20,10">
+                        <CheckBox Style="{StaticResource SpacedCheck}" Content="Embed thumbnail as cover art (--embed-thumbnail)" IsChecked="{Binding S.PostProcess.EmbedThumbnail}" />
+                        <CheckBox Style="{StaticResource SpacedCheck}" Content="Embed chapter markers (--embed-chapters)" IsChecked="{Binding S.PostProcess.EmbedChapters}" />
+                        <CheckBox Style="{StaticResource SpacedCheck}" Content="Write metadata to the file (--add-metadata)" IsChecked="{Binding S.PostProcess.AddMetadata}" />
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Parse metadata (--parse-metadata)" ToolTip="Modern form of --metadata-from-title, e.g. %(artist)s - %(title)s" />
+                            <TextBox Style="{StaticResource FieldBox}" Text="{Binding S.PostProcess.ParseMetadata}" />
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Fixup policy (--fixup)" />
+                            <ComboBox Style="{StaticResource FieldCombo}" SelectedValue="{Binding S.PostProcess.Fixup}">
+                                <ComboBoxItem Content="(default)" Tag="" />
+                                <ComboBoxItem Content="never" Tag="never" /><ComboBoxItem Content="warn" Tag="warn" />
+                                <ComboBoxItem Content="detect_or_warn" Tag="detect_or_warn" />
+                            </ComboBox>
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="SponsorBlock ✦ modern" ToolTip="Mark or cut sponsor segments using the SponsorBlock database" />
+                            <ComboBox Style="{StaticResource FieldCombo}" SelectedValue="{Binding S.PostProcess.SponsorBlock}">
+                                <ComboBoxItem Content="Off" Tag="none" />
+                                <ComboBoxItem Content="Mark chapters" Tag="mark" />
+                                <ComboBoxItem Content="Remove segments" Tag="remove" />
+                            </ComboBox>
+                        </StackPanel>
+
+                        <TextBlock Style="{StaticResource GroupHeader}" Text="ffmpeg" Margin="0,10,0,10" />
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="ffmpeg location (--ffmpeg-location)" ToolTip="Folder containing ffmpeg.exe — blank = auto-detect / app-managed" />
+                            <TextBox Style="{StaticResource FieldBox}" Text="{Binding S.PostProcess.FfmpegLocation}" />
+                            <Button Style="{StaticResource MiniButton}" Margin="6,0,0,0" Content="Browse…" Command="{Binding BrowseFfmpegDirCommand}" />
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Postprocessor arguments" />
+                            <TextBox Style="{StaticResource FieldBox}" Text="{Binding S.PostProcess.PostprocessorArgs}" />
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FieldRow}">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Run after download (--exec)" ToolTip="{} is replaced by the file path" />
+                            <TextBox Style="{StaticResource FieldBox}" Text="{Binding S.PostProcess.ExecCommand}" />
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
+
+        <!-- Bottom action bar -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,14,0,0">
+            <Button Style="{StaticResource AccentButton}" MinWidth="130" Content="Save settings" Command="{Binding SaveCommand}" />
+            <Button Margin="10,0,0,0" Content="Reset to defaults" Command="{Binding ResetToDefaultsCommand}" />
+        </StackPanel>
+    </Grid>
+</UserControl>

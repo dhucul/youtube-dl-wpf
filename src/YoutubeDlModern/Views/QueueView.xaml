@@ -1,0 +1,572 @@
+<UserControl x:Class="YoutubeDlModern.Views.QueueView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="clr-namespace:YoutubeDlModern.Converters"
+             xmlns:vm="clr-namespace:YoutubeDlModern.ViewModels">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <conv:InverseBoolVisibilityConverter x:Key="InverseBoolToVis" />
+        <conv:InverseBoolConverter x:Key="InverseBool" />
+        <conv:NullVisibilityConverter x:Key="NullToVis" />
+        <conv:StatusToBrushConverter x:Key="StatusToBrush" />
+        <conv:ProgressTextConverter x:Key="ProgressText" />
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel>
+            <TextBlock Text="Downloads" Style="{StaticResource HeadingText}" />
+            <TextBlock Style="{StaticResource SecondaryText}"
+                       Margin="0,3,0,16"
+                       Text="Paste a video or playlist link, or several links at once. Powered by the yt-dlp engine and compatible with classic youtube-dl options."
+                       TextWrapping="Wrap" />
+
+            <!-- ===== Engine missing banner ===== -->
+            <Border Style="{StaticResource Card}"
+                    BorderBrush="{StaticResource WarningBrush}"
+                    Margin="0,0,0,14"
+                    Visibility="{Binding IsEngineInstalled, Converter={StaticResource InverseBoolToVis}}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock FontWeight="SemiBold" Text="Download engine not installed" />
+                        <TextBlock Style="{StaticResource SecondaryText}" Margin="0,3,0,0"
+                                   Text="YoutubeDL Modern uses yt-dlp, the maintained successor to youtube-dl. Install it once; later updates take one click."
+                                   TextWrapping="Wrap" />
+                        <TextBlock Style="{StaticResource SecondaryText}" Margin="0,4,0,0"
+                                   Text="{Binding EngineInstallText}" />
+                        <ProgressBar Margin="0,8,0,0" MaxWidth="360" HorizontalAlignment="Left"
+                                     Value="{Binding EngineInstallProgress}"
+                                     Visibility="{Binding IsInstallingEngine, Converter={StaticResource BoolToVis}}" />
+                    </StackPanel>
+                    <Button Grid.Column="1" VerticalAlignment="Center"
+                            Style="{StaticResource AccentButton}"
+                            Content="Install engine"
+                            IsEnabled="{Binding IsInstallingEngine, Converter={StaticResource InverseBool}}"
+                            Command="{Binding InstallEngineCommand}" />
+                </Grid>
+            </Border>
+
+            <!-- ===== URL input ===== -->
+            <Grid Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="UrlBox"
+                         Grid.Column="0"
+                         MinHeight="38"
+                         KeyDown="UrlBox_KeyDown"
+                         Text="{Binding UrlInput, UpdateSourceTrigger=PropertyChanged}"
+                         ToolTip="Enter one URL to analyze, or multiple space/newline-separated URLs to queue directly" />
+                <Button Grid.Column="1" Margin="8,0,0,0" Content="Paste"
+                        ToolTip="Paste URL from clipboard"
+                        Command="{Binding PasteFromClipboardCommand}" />
+                <Button Grid.Column="2" Margin="8,0,0,0" Content="Clear"
+                        ToolTip="Clear pasted URLs and the current preview"
+                        Command="{Binding ClearInputCommand}" />
+                <Button Grid.Column="3" Margin="8,0,0,0" Content="Batch file..."
+                        ToolTip="Import URLs from a text file (classic --batch-file)"
+                        Command="{Binding ImportBatchFileCommand}" />
+                <Button Grid.Column="4" Margin="8,0,0,0" MinWidth="110"
+                        Command="{Binding FetchCommand}">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource AccentButton}">
+                            <Setter Property="Content" Value="Analyze" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsFetching}" Value="True">
+                                    <Setter Property="Content" Value="Analyzing..." />
+                                    <Setter Property="IsEnabled" Value="False" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </Grid>
+
+            <Expander Header="Analysis options" Margin="0,0,0,12"
+                      Foreground="{StaticResource TextSecondaryBrush}">
+                <Border Background="{StaticResource SurfaceBrush}"
+                        BorderBrush="{StaticResource BorderBrush}"
+                        BorderThickness="1" CornerRadius="7" Padding="12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="2*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                            <TextBlock Style="{StaticResource SecondaryText}" Margin="0,0,0,4" Text="Analysis depth" />
+                            <ComboBox ItemsSource="{Binding AnalysisModes}"
+                                      AutomationProperties.Name="Analysis depth"
+                                      DisplayMemberPath="Label" SelectedValuePath="Key"
+                                      SelectedValue="{Binding SelectedAnalysisMode}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="0,0,12,0">
+                            <TextBlock Style="{StaticResource SecondaryText}" Margin="0,0,0,4" Text="Browser cookies" />
+                            <ComboBox ItemsSource="{Binding BrowserChoices}" IsEditable="True"
+                                      AutomationProperties.Name="Analysis browser cookies"
+                                      Text="{Binding AnalysisCookiesFromBrowser}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Style="{StaticResource SecondaryText}" Margin="0,0,0,4"
+                                       Text="Cookies file (takes priority over browser)" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding AnalysisCookiesFile}"
+                                         AutomationProperties.Name="Analysis cookies file" />
+                                <Button Grid.Column="1" Style="{StaticResource MiniButton}" Margin="6,0,0,0"
+                                        Content="Browse..." Command="{Binding BrowseAnalysisCookiesCommand}" />
+                            </Grid>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Expander>
+
+            <!-- Fetch progress / cancel -->
+            <StackPanel Orientation="Horizontal" Margin="0,-4,0,10"
+                        Visibility="{Binding IsFetching, Converter={StaticResource BoolToVis}}">
+                <ProgressBar Width="220" IsIndeterminate="True" />
+                <Button Style="{StaticResource MiniButton}" Margin="10,0,0,0" Content="Cancel"
+                        Command="{Binding CancelFetchCommand}" />
+                <TextBlock Style="{StaticResource SecondaryText}" Margin="12,0,0,0" VerticalAlignment="Center"
+                           Text="Fetching metadata from the site..." />
+            </StackPanel>
+
+            <!-- Fetch error -->
+            <Border Style="{StaticResource Card}" BorderBrush="{StaticResource ErrorBrush}"
+                    Margin="0,0,0,12" Padding="12,9"
+                    Visibility="{Binding HasFetchError, Converter={StaticResource BoolToVis}}">
+                <TextBlock Foreground="{StaticResource ErrorBrush}" TextWrapping="Wrap"
+                           Text="{Binding FetchError}" />
+            </Border>
+
+            <!-- ===== Preview card ===== -->
+            <Border Style="{StaticResource Card}" Margin="0,0,0,16"
+                    Visibility="{Binding HasPreview, Converter={StaticResource BoolToVis}}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Thumbnail -->
+                    <Border Grid.Column="0" Width="176" Height="99" CornerRadius="7"
+                            Background="{StaticResource SurfaceBrush}" VerticalAlignment="Top">
+                        <Border.Clip>
+                            <RectangleGeometry Rect="0,0,176,99" RadiusX="7" RadiusY="7" />
+                        </Border.Clip>
+                        <Grid>
+                            <TextBlock Text="&#xE768;" FontFamily="Segoe MDL2 Assets" FontSize="24"
+                                       Foreground="{StaticResource TextMutedBrush}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <Image Source="{Binding PreviewThumbnail}" Stretch="UniformToFill" />
+                        </Grid>
+                    </Border>
+
+                    <!-- Info + options -->
+                    <StackPanel Grid.Column="1" Margin="16,0,0,0">
+                        <TextBlock Text="{Binding Preview.DisplayTitle}"
+                                   FontSize="15" FontWeight="SemiBold" TextWrapping="Wrap" MaxHeight="44" />
+                        <TextBlock Style="{StaticResource SecondaryText}" Margin="0,4,0,0"
+                                   Text="{Binding PreviewMetaText}" />
+                        <TextBlock Style="{StaticResource SecondaryText}" FontSize="11" Margin="0,3,0,0"
+                                   Foreground="{StaticResource TextMutedBrush}"
+                                   Text="{Binding SubtitleSummaryText}"
+                                   Visibility="{Binding HasSubtitleInfo, Converter={StaticResource BoolToVis}}" />
+
+                        <StackPanel Margin="0,10,0,0" MaxWidth="250" HorizontalAlignment="Left">
+                            <TextBlock Style="{StaticResource SecondaryText}" Margin="0,0,0,4" Text="Type" />
+                            <ComboBox ItemsSource="{Binding DownloadModes}"
+                                      AutomationProperties.Name="Download type"
+                                      MinWidth="150"
+                                      ToolTip="Choose video with audio, video only, or audio only"
+                                      DisplayMemberPath="Label" SelectedValuePath="Key"
+                                      SelectedValue="{Binding AddDownloadMode}" />
+                        </StackPanel>
+
+                        <!-- Playlist items -->
+                        <StackPanel Orientation="Horizontal" Margin="0,10,0,0"
+                                    Visibility="{Binding IsPlaylistPreview, Converter={StaticResource BoolToVis}}">
+                            <CheckBox Margin="0,0,14,0" VerticalAlignment="Center"
+                                      Content="Download playlist" IsChecked="{Binding AddDownloadPlaylist}" />
+                            <TextBlock Style="{StaticResource SecondaryText}" VerticalAlignment="Center"
+                                       Text="Playlist items (e.g. 1-3,7):" />
+                            <TextBox Width="130" Margin="8,0,0,0"
+                                     AutomationProperties.Name="Playlist items"
+                                     Text="{Binding AddPlaylistItems}" />
+                        </StackPanel>
+
+                        <!-- Option grid -->
+                        <Grid Margin="0,12,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,12,8"
+                                        Visibility="{Binding ShowVideoOptions, Converter={StaticResource BoolToVis}}">
+                                <TextBlock Style="{StaticResource SecondaryText}" Margin="0,0,0,4" Text="Quality" />
+                                <ComboBox ItemsSource="{Binding QualityChoices}"
+                                          AutomationProperties.Name="Video quality"
+                                          MinWidth="120"
+                                          ToolTip="Choose a quality preset or a custom yt-dlp format selector"
+                                          DisplayMemberPath="Label"
+                                          SelectedValuePath="Key"
+                                          SelectedValue="{Binding SelectedQualityKey}" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,12,8"
+                                        Visibility="{Binding ShowAudioOptions, Converter={StaticResource BoolToVis}}">
+                                <TextBlock Style="{StaticResource SecondaryText}" Margin="0,0,0,4" Text="Audio" />
+                                <StackPanel Orientation="Horizontal">
+                                    <ComboBox MinWidth="90" Margin="0,0,6,0"
+                                              AutomationProperties.Name="Audio format"
+                                              ItemsSource="{Binding AudioFormats}"
+                                              SelectedItem="{Binding AddAudioFormat}" />
+                                    <ComboBox MinWidth="110"
+                                              AutomationProperties.Name="Audio quality"
+                                              ItemsSource="{Binding AudioQualities}"
+                                              SelectedItem="{Binding AddAudioQuality}" />
+                                </StackPanel>
+                            </StackPanel>
+
+                            <StackPanel Grid.Row="0" Grid.Column="2" Margin="0,0,0,8"
+                                        Visibility="{Binding ShowCustomFormat, Converter={StaticResource BoolToVis}}">
+                                <TextBlock Style="{StaticResource SecondaryText}" Margin="0,0,0,4" Text="Format code" />
+                                <TextBox Text="{Binding CustomFormat}" AutomationProperties.Name="Custom format code"
+                                         ToolTip="Example: bestvideo[height&lt;=1080]+bestaudio" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,12,0">
+                                <TextBlock Style="{StaticResource SecondaryText}" Margin="0,0,0,4" Text="Output folder" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Text="{Binding AddOutputDir}" AutomationProperties.Name="Output folder" />
+                                    <Button Grid.Column="1" Style="{StaticResource MiniButton}" Margin="6,0,0,0"
+                                            Content="Browse..." Command="{Binding BrowseOutputDirCommand}" />
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,0,12,0">
+                                <TextBlock Style="{StaticResource SecondaryText}" Margin="0,0,0,4" Text="Subtitles" />
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox VerticalAlignment="Center" Content="Download subs"
+                                              IsChecked="{Binding AddWriteSubs}" />
+                                    <TextBox Width="80" Margin="8,0,0,0" Text="{Binding AddSubLangs}"
+                                             AutomationProperties.Name="Subtitle languages"
+                                             ToolTip="Languages, comma separated (e.g. en,de)" />
+                                </StackPanel>
+                            </StackPanel>
+
+                            <StackPanel Grid.Row="1" Grid.Column="2">
+                                <TextBlock Style="{StaticResource SecondaryText}" Margin="0,0,0,4" Text="Extra options" />
+                                <TextBox Text="{Binding AddExtraArgs}" AutomationProperties.Name="Extra engine arguments"
+                                         ToolTip="Appended verbatim to the yt-dlp command line" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Expander Header="Advanced download options" Margin="0,12,0,0"
+                                  Foreground="{StaticResource TextSecondaryBrush}">
+                            <Border Background="{StaticResource SurfaceBrush}"
+                                    BorderBrush="{StaticResource BorderBrush}"
+                                    BorderThickness="1" CornerRadius="7" Padding="12">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,12,12"
+                                                Visibility="{Binding ShowVideoOptions, Converter={StaticResource BoolToVis}}">
+                                        <TextBlock Style="{StaticResource SecondaryText}" Margin="0,0,0,4" Text="Video codec" />
+                                        <ComboBox ItemsSource="{Binding VideoCodecs}"
+                                                  AutomationProperties.Name="Video codec"
+                                                  DisplayMemberPath="Label" SelectedValuePath="Key"
+                                                  SelectedValue="{Binding AddVideoCodec}" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,12,12"
+                                                Visibility="{Binding ShowVideoOptions, Converter={StaticResource BoolToVis}}">
+                                        <TextBlock Style="{StaticResource SecondaryText}" Margin="0,0,0,4" Text="Maximum frame rate" />
+                                        <ComboBox ItemsSource="{Binding FrameRateChoices}"
+                                                  AutomationProperties.Name="Maximum frame rate"
+                                                  DisplayMemberPath="Label" SelectedValuePath="Key"
+                                                  SelectedValue="{Binding AddMaxFps}" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="0" Grid.Column="2" Margin="0,0,0,12"
+                                                Visibility="{Binding ShowVideoOptions, Converter={StaticResource BoolToVis}}">
+                                        <TextBlock Style="{StaticResource SecondaryText}" Margin="0,0,0,4" Text="Output container" />
+                                        <ComboBox ItemsSource="{Binding Containers}" SelectedItem="{Binding AddContainer}"
+                                                  AutomationProperties.Name="Output container" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,12,12">
+                                        <TextBlock Style="{StaticResource SecondaryText}" Margin="0,0,0,4"
+                                                   Text="Output filename template" />
+                                        <TextBox Text="{Binding AddOutputTemplate}"
+                                                 AutomationProperties.Name="Output filename template"
+                                                 ToolTip="yt-dlp output template, for example %(title)s [%(id)s].%(ext)s" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="1" Grid.Column="2" Margin="0,0,0,12">
+                                        <TextBlock Style="{StaticResource SecondaryText}" Margin="0,0,0,5" Text="Metadata and artwork" />
+                                        <WrapPanel>
+                                            <CheckBox Margin="0,0,12,5" Content="Save thumbnail" IsChecked="{Binding AddWriteThumbnail}" />
+                                            <CheckBox Margin="0,0,12,5" Content="Embed thumbnail" IsChecked="{Binding AddEmbedThumbnail}" />
+                                            <CheckBox Margin="0,0,12,5" Content="Metadata" IsChecked="{Binding AddMetadata}" />
+                                            <CheckBox Margin="0,0,0,5" Content="Chapters" IsChecked="{Binding AddEmbedChapters}" />
+                                        </WrapPanel>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,0,12,12">
+                                        <TextBlock Style="{StaticResource SecondaryText}" Margin="0,0,0,5" Text="Subtitle options" />
+                                        <WrapPanel>
+                                            <CheckBox Margin="0,0,12,5" Content="Automatic captions" IsChecked="{Binding AddWriteAutoSubs}" />
+                                            <CheckBox Margin="0,0,0,5" Content="Embed subtitles" IsChecked="{Binding AddEmbedSubs}" />
+                                        </WrapPanel>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="2" Grid.Column="1" Margin="0,0,12,12">
+                                        <TextBlock Style="{StaticResource SecondaryText}" Margin="0,0,0,4" Text="Playlist start / end" />
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBox Width="82" Text="{Binding AddPlaylistStart}"
+                                                     AutomationProperties.Name="Playlist start" ToolTip="First playlist position; 0 uses the default" />
+                                            <TextBlock Margin="7,0" VerticalAlignment="Center" Style="{StaticResource SecondaryText}" Text="to" />
+                                            <TextBox Width="82" Text="{Binding AddPlaylistEnd}"
+                                                     AutomationProperties.Name="Playlist end" ToolTip="Last playlist position; 0 uses the default" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="2" Grid.Column="2" Margin="0,0,0,12">
+                                        <TextBlock Style="{StaticResource SecondaryText}" Margin="0,0,0,4" Text="Speed limit / retries / fragments" />
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBox Width="82" Text="{Binding AddRateLimit}" AutomationProperties.Name="Speed limit"
+                                                     ToolTip="Examples: 500K or 4.2M; blank means unlimited" />
+                                            <TextBox Width="62" Margin="6,0,0,0" Text="{Binding AddRetries}"
+                                                     AutomationProperties.Name="Retries" ToolTip="Retries, 0-1000" />
+                                            <TextBox Width="62" Margin="6,0,0,0" Text="{Binding AddConcurrentFragments}"
+                                                     AutomationProperties.Name="Concurrent fragments" ToolTip="Concurrent fragments, 1-32" />
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="2*" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                                            <TextBlock Style="{StaticResource SecondaryText}" Margin="0,0,0,4" Text="Browser cookies" />
+                                            <ComboBox ItemsSource="{Binding BrowserChoices}" IsEditable="True"
+                                                      AutomationProperties.Name="Download browser cookies"
+                                                      Text="{Binding AddCookiesFromBrowser}" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock Style="{StaticResource SecondaryText}" Margin="0,0,0,4"
+                                                       Text="Cookies file (takes priority over browser)" />
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBox Text="{Binding AddCookiesFile}"
+                                                         AutomationProperties.Name="Download cookies file" />
+                                                <Button Grid.Column="1" Style="{StaticResource MiniButton}" Margin="6,0,0,0"
+                                                        Content="Browse..." Command="{Binding BrowseDownloadCookiesCommand}" />
+                                            </Grid>
+                                        </StackPanel>
+                                    </Grid>
+                                </Grid>
+                            </Border>
+                        </Expander>
+
+                        <!-- Action row -->
+                        <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
+                            <Button Style="{StaticResource AccentButton}" Content="Add to queue"
+                                    Command="{Binding AddToQueueCommand}" />
+                            <Button Margin="10,0,0,0"
+                                    ToolTip="Choose a specific format offered by the site"
+                                    Command="{Binding InspectFormatsCommand}">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource MiniButton}">
+                                        <Setter Property="Content" Value="Choose format" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsInspectingFormats}" Value="True">
+                                                <Setter Property="Content" Value="Loading formats..." />
+                                                <Setter Property="IsEnabled" Value="False" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                            <Button Style="{StaticResource MiniButton}" Margin="8,0,0,0"
+                                    Content="Cancel format lookup"
+                                    Visibility="{Binding IsInspectingFormats, Converter={StaticResource BoolToVis}}"
+                                    Command="{Binding CancelFormatInspectionCommand}" />
+                            <Button Style="{StaticResource MiniButton}" Margin="10,0,0,0" Content="Discard"
+                                    Command="{Binding DiscardPreviewCommand}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- ===== Queue toolbar ===== -->
+            <Grid Margin="0,4,0,10">
+                <TextBlock Text="Queue" Style="{StaticResource SectionText}" VerticalAlignment="Center" />
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Style="{StaticResource MiniButton}" Content="Start all"
+                            Command="{Binding StartAllCommand}" />
+                    <Button Style="{StaticResource MiniButton}" Margin="8,0,0,0" Content="Pause all"
+                            Command="{Binding PauseAllCommand}" />
+                    <Button Style="{StaticResource MiniButton}" Margin="8,0,0,0" Content="Clear completed"
+                            Command="{Binding ClearCompletedCommand}" />
+                </StackPanel>
+            </Grid>
+
+            <!-- Empty state -->
+            <Border Style="{StaticResource Card}" Padding="40,34"
+                    Visibility="{Binding HasItems, Converter={StaticResource InverseBoolToVis}}">
+                <StackPanel>
+                    <TextBlock Text="&#xE896;" FontFamily="Segoe MDL2 Assets" FontSize="30"
+                               Foreground="{StaticResource TextMutedBrush}" HorizontalAlignment="Center" />
+                    <TextBlock Style="{StaticResource SecondaryText}" Margin="0,10,0,0" TextAlignment="Center"
+                               Text="Queue is empty. Analyze a link above, paste several links at once, or import a batch file." />
+                </StackPanel>
+            </Border>
+
+            <!-- ===== Queue items ===== -->
+            <ListBox ItemsSource="{Binding Items}"
+                     MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                     ScrollViewer.CanContentScroll="True"
+                     VirtualizingPanel.IsVirtualizing="True"
+                     VirtualizingPanel.VirtualizationMode="Recycling">
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:DownloadItemViewModel}">
+                        <Border Style="{StaticResource Card}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <Border Grid.Column="0" Width="132" Height="74" CornerRadius="6"
+                                        Background="{StaticResource SurfaceBrush}" VerticalAlignment="Top">
+                                    <Border.Clip>
+                                        <RectangleGeometry Rect="0,0,132,74" RadiusX="6" RadiusY="6" />
+                                    </Border.Clip>
+                                    <Grid>
+                                        <TextBlock Text="&#xE768;" FontFamily="Segoe MDL2 Assets" FontSize="18"
+                                                   Foreground="{StaticResource TextMutedBrush}"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        <Image Source="{Binding Thumbnail}" Stretch="UniformToFill" />
+                                    </Grid>
+                                </Border>
+
+                                <StackPanel Grid.Column="1" Margin="14,0,0,0">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding Title}" FontWeight="SemiBold"
+                                                   TextTrimming="CharacterEllipsis" />
+                                        <Border Grid.Column="1" Style="{StaticResource StatusChip}"
+                                                Background="{Binding Status, Converter={StaticResource StatusToBrush}}">
+                                            <TextBlock Text="{Binding StatusText}" FontSize="10.5"
+                                                       FontWeight="SemiBold" Foreground="{StaticResource StatusTextBrush}" />
+                                        </Border>
+                                    </Grid>
+
+                                    <TextBlock Style="{StaticResource SecondaryText}" FontSize="11"
+                                               Foreground="{StaticResource TextMutedBrush}"
+                                               TextTrimming="CharacterEllipsis"
+                                               Text="{Binding Url}" Margin="0,3,0,8" />
+
+                                    <ProgressBar Value="{Binding Progress}"
+                                                 IsIndeterminate="{Binding IsIndeterminate}" />
+
+                                    <StackPanel Orientation="Horizontal" Margin="0,7,0,0">
+                                        <TextBlock Style="{StaticResource SecondaryText}" FontWeight="SemiBold"
+                                                   Text="{Binding Progress, Converter={StaticResource ProgressText}}" />
+                                        <TextBlock Style="{StaticResource SecondaryText}" Margin="10,0,0,0"
+                                                   Text="{Binding SizeText}" />
+                                        <TextBlock Style="{StaticResource SecondaryText}" Margin="10,0,0,0"
+                                                   Foreground="{StaticResource InfoBrush}"
+                                                   Text="{Binding SpeedText}" />
+                                        <TextBlock Style="{StaticResource SecondaryText}" Margin="10,0,0,0"
+                                                   Text="{Binding EtaText}" />
+                                    </StackPanel>
+
+                                    <TextBlock Foreground="{StaticResource ErrorBrush}" FontSize="11.5"
+                                               TextWrapping="Wrap" Margin="0,6,0,0"
+                                               Text="{Binding ErrorText}"
+                                               Visibility="{Binding HasError, Converter={StaticResource BoolToVis}}" />
+
+                                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                        <Button Style="{StaticResource MiniButton}" Content="Pause"
+                                                Visibility="{Binding ShowPause, Converter={StaticResource BoolToVis}}"
+                                                Command="{Binding PauseCommand}" />
+                                        <Button Style="{StaticResource MiniButton}" Content="Resume"
+                                                Visibility="{Binding ShowResume, Converter={StaticResource BoolToVis}}"
+                                                Command="{Binding ResumeCommand}" />
+                                        <Button Style="{StaticResource MiniButton}" Margin="8,0,0,0" Content="Cancel"
+                                                Visibility="{Binding ShowCancel, Converter={StaticResource BoolToVis}}"
+                                                Command="{Binding CancelCommand}" />
+                                        <Button Style="{StaticResource MiniButton}" Margin="8,0,0,0" Content="Remove"
+                                                Visibility="{Binding ShowRemove, Converter={StaticResource BoolToVis}}"
+                                                Command="{Binding RemoveCommand}" />
+                                        <Button Style="{StaticResource MiniButton}" Margin="8,0,0,0" Content="Play"
+                                                Visibility="{Binding ShowOpenFile, Converter={StaticResource BoolToVis}}"
+                                                Command="{Binding OpenFileCommand}" />
+                                        <Button Style="{StaticResource MiniButton}" Margin="8,0,0,0" Content="Folder"
+                                                Command="{Binding OpenFolderCommand}" />
+                                        <Button Style="{StaticResource MiniButton}" Margin="8,0,0,0" Content="Copy link"
+                                                Command="{Binding CopyUrlCommand}" />
+                                    </StackPanel>
+
+                                    <Expander Margin="0,10,0,0">
+                                        <Expander.Header>
+                                            <TextBlock Style="{StaticResource SecondaryText}" FontSize="11"
+                                                       Text="Engine log" />
+                                        </Expander.Header>
+                                        <Border Background="{StaticResource SurfaceBrush}" CornerRadius="6" Padding="8">
+                                            <ScrollViewer MaxHeight="150" VerticalScrollBarVisibility="Auto">
+                                                <ItemsControl ItemsSource="{Binding Log}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <TextBlock Text="{Binding}" FontFamily="{StaticResource MonoFontFamily}" FontSize="10.5"
+                                                                       Foreground="{StaticResource TextSecondaryBrush}" />
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </ScrollViewer>
+                                        </Border>
+                                    </Expander>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
