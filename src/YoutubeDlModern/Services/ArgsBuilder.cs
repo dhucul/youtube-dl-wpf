@@ -299,7 +299,14 @@ public static class ArgsBuilder
         if (net.SleepInterval > 0) { a.Add("--sleep-interval"); a.Add(net.SleepInterval.ToString()); }
         if (net.MaxSleepInterval > 0) { a.Add("--max-sleep-interval"); a.Add(net.MaxSleepInterval.ToString()); }
         if (net.NoCheckCertificate) a.Add("--no-check-certificate");
-        if (!string.IsNullOrWhiteSpace(net.UserAgent)) { a.Add("--user-agent"); a.Add(net.UserAgent); }
+
+        // Default browser-like User-Agent prevents YouTube from returning 403 Forbidden
+        // when no custom agent is configured. The user can still override it in settings.
+        var userAgent = !string.IsNullOrWhiteSpace(net.UserAgent)
+            ? net.UserAgent
+            : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+        a.Add("--user-agent"); a.Add(userAgent);
+
         if (!string.IsNullOrWhiteSpace(net.Referer)) { a.Add("--referer"); a.Add(net.Referer); }
         foreach (var line in net.CustomHeaders.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
         {
@@ -309,6 +316,17 @@ public static class ArgsBuilder
                 a.Add(line);
             }
         }
+
+        // YouTube frequently returns 403 Forbidden when the default "web" client is
+        // blocked. The iOS client uses a different, less-restricted API endpoint and
+        // is tried first. Android, web_embedded, and tv provide additional fallbacks.
+        // player_skip configs avoid webpage requests that can also trigger 403s.
+        // These extractor args are safe to pass for non-YouTube sites — yt-dlp
+        // ignores unknown extractor arguments.
+        a.Add("--extractor-args");
+        a.Add("youtube:player_client=ios,android,web_embedded,tv;player_skip=webpage,configs");
+        a.Add("--extractor-retries");
+        a.Add("5");
     }
 
     private static void AddAuthArgs(
