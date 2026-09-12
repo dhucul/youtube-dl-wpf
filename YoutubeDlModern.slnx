@@ -2,4 +2,5 @@
   <Folder Name="/src/">
     <Project Path="src/YoutubeDlModern/YoutubeDlModern.csproj" />
   </Folder>
+  <Project Path="tests/YoutubeDlModern.Tests/YoutubeDlModern.Tests.csproj" />
 </Solution>

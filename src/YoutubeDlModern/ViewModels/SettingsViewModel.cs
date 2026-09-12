@@ -34,7 +34,7 @@ public partial class SettingsViewModel : ObservableObject
             _draft = _settings.CreateDraft();
             OnPropertyChanged(nameof(S));
             _queue.ApplyConcurrency();
-            NotifyRequested?.Invoke("Settings saved.");
+            NotifyRequested?.Invoke(_settings.BackupWarning ?? "Settings saved.");
         }
         catch (Exception ex)
         {
@@ -54,7 +54,7 @@ public partial class SettingsViewModel : ObservableObject
 
         _draft = SettingsService.CreateDefault();
         OnPropertyChanged(nameof(S));
-        Save();
+        NotifyRequested?.Invoke("Defaults restored. Select Save to apply them.");
     }
 
     [RelayCommand]

@@ -13,7 +13,7 @@ namespace YoutubeDlModern.Services;
 /// pause (stop-and-resume via yt-dlp's own resume support), cancel, retry,
 /// completion history and notifications. All public members are called on the UI thread.
 /// </summary>
-public sealed class DownloadQueueService : IDisposable, IAsyncDisposable
+public sealed class DownloadQueueService : IAsyncDisposable
 {
     private const int WorkerCount = 8;
     private const int MaximumQueueItems = 10_000;
@@ -34,8 +34,8 @@ public sealed class DownloadQueueService : IDisposable, IAsyncDisposable
 
     private const int MaxPendingLogLines = 500;
 
-    private readonly YtDlpEngine _engine;
-    private readonly FfmpegManager _ffmpeg;
+    private readonly IYtDlpEngine _engine;
+    private readonly IFfmpegLocator _ffmpeg;
     private readonly SettingsService _settings;
     private readonly HistoryService _history;
     private readonly SynchronizationContext _ui;
@@ -65,7 +65,7 @@ public sealed class DownloadQueueService : IDisposable, IAsyncDisposable
     /// <summary>Raised (on UI thread) for an unexpected scheduler failure.</summary>
     public event Action<string>? QueueError;
 
-    public DownloadQueueService(YtDlpEngine engine, FfmpegManager ffmpeg, SettingsService settings, HistoryService history)
+    public DownloadQueueService(IYtDlpEngine engine, IFfmpegLocator ffmpeg, SettingsService settings, HistoryService history)
     {
         _engine = engine;
         _ffmpeg = ffmpeg;
@@ -135,6 +135,7 @@ public sealed class DownloadQueueService : IDisposable, IAsyncDisposable
                 ? "The download queue is shutting down."
                 : "The download scheduler is full. Wait for queued work to start, then retry.";
             item.MarkFailed(message);
+            runCts.Dispose();
             QueueError?.Invoke(message);
         }
     }
@@ -210,8 +211,9 @@ public sealed class DownloadQueueService : IDisposable, IAsyncDisposable
 
     private async Task RunItemAsync(DownloadItemViewModel item, CancellationTokenSource runCts)
     {
-        var ct = runCts.Token;
+        var ct = runCts.Token; // Only this worker disposes the source.
         var acquired = false;
+        var fileCommits = new List<Task>();
         var pendingLogs = new ConcurrentQueue<string>();
         var pendingLogCount = 0;
         var logDrainScheduled = 0;
@@ -263,78 +265,92 @@ public sealed class DownloadQueueService : IDisposable, IAsyncDisposable
             await AcquireConcurrencySlotAsync(ct).ConfigureAwait(false);
             acquired = true;
 
-            ct.ThrowIfCancellationRequested();
-            PostIfCurrent(item.MarkDownloading);
+            await OnUiAsync(() =>
+            {
+                ct.ThrowIfCancellationRequested();
+                if (!ReferenceEquals(item.Cts, runCts)) throw new OperationCanceledException(ct);
+                item.MarkDownloading();
+            }).ConfigureAwait(false);
 
             var ffmpegDir = await _ffmpeg.LocateAsync(item.SettingsSnapshot, ct).ConfigureAwait(false);
-
             var result = await _engine.DownloadAsync(
-                item.Url,
-                item.Options,
-                item.SettingsSnapshot,
-                ffmpegDir,
+                item.Url, item.Options, item.SettingsSnapshot, ffmpegDir,
                 new CallbackProgress<ProgressUpdate>(u => PostIfCurrent(() => item.ApplyProgress(u))),
-                QueueLog,
-                ct).ConfigureAwait(false);
-
-            ct.ThrowIfCancellationRequested();
-            if (result.ExitCode == 0)
-            {
-                PostIfCurrent(() =>
+                QueueLog, ct,
+                path => fileCommits.Add(OnUiAsync(() =>
                 {
-                    if (runCts.IsCancellationRequested)
-                    {
-                        if (item.UserCanceled) item.MarkCanceled();
-                        else item.MarkPaused();
-                        return;
-                    }
+                    // A finalized file remains a success even if a later playlist entry
+                    // fails, or cancellation arrives before the UI handles this callback.
+                    if (item.RecordCompletedFile(path))
+                        _history.Add(new HistoryEntry
+                        {
+                            Title = Path.GetFileNameWithoutExtension(path),
+                            Url = item.Url,
+                            FilePath = path,
+                            FileSize = TryGetFileSize(path),
+                            CompletedAt = DateTime.Now,
+                            Site = TryGetHost(item.Url)
+                        });
+                }))).ConfigureAwait(false);
 
-                    item.MarkCompleted(result.FinalFilePaths);
-                    var paths = result.FinalFilePaths;
-                    var entries = paths.Select((path, index) => new HistoryEntry
-                    {
-                        Title = paths.Count > 1 ? $"{item.Title} ({index + 1}/{paths.Count})" : item.Title,
-                        Url = item.Url,
-                        FilePath = path,
-                        FileSize = TryGetFileSize(path),
-                        CompletedAt = DateTime.Now,
-                        Site = TryGetHost(item.Url)
-                    });
-                    if (paths.Count > 0)
-                        _history.AddRange(entries);
-                    ItemCompleted?.Invoke(this, item);
-                });
-            }
-            else
+            // Process exit is authoritative. A late cancellation must not erase success.
+            await OnUiAsync(() =>
             {
-                PostIfCurrent(() =>
+                if (!ReferenceEquals(item.Cts, runCts)) return;
+                if (result.ExitCode == 0)
+                {
+                    item.MarkCompleted(result.FinalFilePaths);
+                    ItemCompleted?.Invoke(this, item);
+                }
+                else
                 {
                     item.MarkFailed(result.ErrorSummary);
                     ItemFailed?.Invoke(this, item);
-                });
-            }
+                }
+            }).ConfigureAwait(false);
         }
         catch (OperationCanceledException)
         {
-            PostIfCurrent(() =>
+            await OnUiAsync(() =>
             {
+                if (!ReferenceEquals(item.Cts, runCts)) return;
                 if (item.UserCanceled) item.MarkCanceled();
                 else item.MarkPaused();
-            });
+            }).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            PostIfCurrent(() =>
+            await OnUiAsync(() =>
             {
+                if (!ReferenceEquals(item.Cts, runCts)) return;
                 item.MarkFailed(ex.Message);
                 ItemFailed?.Invoke(this, item);
-            });
+            }).ConfigureAwait(false);
         }
         finally
         {
-            if (acquired)
-                ReleaseConcurrencySlot();
+            try
+            {
+                // ProcessRunner drains both pipes before returning or throwing, so no
+                // producer can append another file commit after this point.
+                await Task.WhenAll(fileCommits).ConfigureAwait(false);
+            }
+            finally
+            {
+                if (acquired) ReleaseConcurrencySlot();
+            }
         }
+    }
+
+    private Task OnUiAsync(Action action)
+    {
+        var completion = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        _ui.Post(_ =>
+        {
+            try { action(); completion.SetResult(); }
+            catch (Exception ex) { completion.SetException(ex); }
+        }, null);
+        return completion.Task;
     }
 
     private async Task AcquireConcurrencySlotAsync(CancellationToken ct)
@@ -437,10 +453,30 @@ public sealed class DownloadQueueService : IDisposable, IAsyncDisposable
     {
         await foreach (var scheduled in _workQueue.Reader.ReadAllAsync().ConfigureAwait(false))
         {
-            var item = scheduled.Item;
-            if (item.Status != DownloadStatus.Queued || !ReferenceEquals(item.Cts, scheduled.Cts))
-                continue;
-            await RunItemAsync(item, scheduled.Cts).ConfigureAwait(false);
+            try
+            {
+                // Canceled queued runs are still drained, and their sources disposed
+                // here. The UI may already have scheduled a different run for the item.
+                if (!scheduled.Cts.IsCancellationRequested)
+                    await RunItemAsync(scheduled.Item, scheduled.Cts).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                await OnUiAsync(() => QueueError?.Invoke("Download queue error: " + ex.Message))
+                    .ConfigureAwait(false);
+            }
+            finally
+            {
+                await OnUiAsync(() =>
+                {
+                    if (ReferenceEquals(scheduled.Item.Cts, scheduled.Cts))
+                    {
+                        if (scheduled.Item.UserCanceled) scheduled.Item.MarkCanceled();
+                        else scheduled.Item.MarkPaused();
+                    }
+                }).ConfigureAwait(false);
+                scheduled.Cts.Dispose();
+            }
         }
     }
 
@@ -479,8 +515,6 @@ public sealed class DownloadQueueService : IDisposable, IAsyncDisposable
         try { await Task.WhenAll(workers).ConfigureAwait(false); }
         catch { /* worker faults are reported by ObserveRunAsync */ }
     }
-
-    public void Dispose() => ShutdownAsync().GetAwaiter().GetResult();
 
     public async ValueTask DisposeAsync() => await ShutdownAsync().ConfigureAwait(false);
 

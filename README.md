@@ -17,7 +17,7 @@ YoutubeDL Modern is a Windows desktop front end for [yt-dlp](https://github.com/
 - Pause, resume, cancel, remove, and run downloads in parallel
 - Keep a persistent download history with shortcuts to the file and folder
 - Configure advanced youtube-dl/yt-dlp options for files, formats, networking, selection, authentication, and post-processing
-- Install and update the bundled yt-dlp engine from the app; locate or install ffmpeg when post-processing needs it
+- Install and reinstall the verified, application-pinned yt-dlp engine from the app; locate or install ffmpeg when post-processing needs it
 
 ## Getting started
 
@@ -85,7 +85,7 @@ Downloads begin automatically as concurrency slots become available. The configu
 - **Cancel** stops the item. **Remove** deletes only the queue card.
 - **Start all**, **Pause all**, and **Clear completed** apply bulk actions without deleting downloaded media.
 - Expand **Engine log** on a card for the underlying yt-dlp output.
-- Successful downloads appear in **History**, where **Play** and **Folder** open the result. Removing or clearing history never deletes media.
+- Each finalized file appears in **History**, including files completed before a later playlist failure or cancellation. Use **Play** and **Folder** there to open the result. Removing or clearing history never deletes media.
 
 ### Saved settings
 
@@ -110,13 +110,13 @@ The in-app **Help > Examples** tab contains step-by-step context, authentication
 
 ## Private or age-restricted media
 
-Use cookies only for accounts and content you are authorized to access. Expand **Analysis options** or **Advanced download options** and select a browser, or browse to a Netscape-format cookies file. A cookies file takes priority over browser cookies.
+Use cookies only for accounts and content you are authorized to access. Analysis uses saved authentication by default; clear **Use saved authentication** to supply an override. Expand **Analysis options** or **Advanced download options** and select a browser, or browse to a Netscape-format cookies file. A cookies file takes priority over browser cookies.
 
 Authentication defaults can also be saved under **Settings > Authentication**. Stored secrets are protected with the current Windows user account; one-time two-factor codes are never persisted.
 
 ## Troubleshooting
 
-- **A site suddenly stops working:** Open **About** and update the yt-dlp engine. Supported sites change frequently.
+- **A site suddenly stops working:** Install a newer application release for newer yt-dlp support. **About > Reinstall engine** repairs the version pinned by this application. Supported sites change frequently.
 - **Merging or audio extraction fails:** Install ffmpeg from **About**, or set its folder under **Settings > Post-processing**.
 - **Private media cannot be analyzed:** Supply browser cookies or a cookies file for both analysis and download.
 - **A playlist is larger than expected:** Clear **Download playlist**, enter playlist items such as `1-3,7`, or enable the global single-video option in Settings.
@@ -147,7 +147,17 @@ dotnet build .\YoutubeDlModern.slnx --configuration Release
 dotnet run --project .\src\YoutubeDlModern\YoutubeDlModern.csproj
 ```
 
-The app downloads yt-dlp only when you choose to install it. ffmpeg is also downloaded on demand.
+Global extra arguments apply to downloads. Metadata analysis accepts only connection and extraction overrides, ignores external configuration files, and always runs in simulation mode.
+
+The app downloads its pinned yt-dlp release only when you choose to install or reinstall it. New engine versions arrive with application releases. ffmpeg is also downloaded on demand.
+
+### Run regression checks
+
+The checks exercise queue cancellation and shutdown, partial-result persistence, preview initialization, settings recovery, and argument selection using a fake engine. They do not download media or modify your application profile.
+
+```powershell
+dotnet run --project .\tests\YoutubeDlModern.Tests\YoutubeDlModern.Tests.csproj --configuration Release
+```
 
 ### Build the installer
 

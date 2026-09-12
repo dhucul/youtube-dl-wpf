@@ -72,7 +72,7 @@
 
                         <TextBlock Style="{StaticResource GroupHeader}" Text="Power user" Margin="0,10,0,10" />
                         <StackPanel Style="{StaticResource FieldRow}">
-                            <TextBlock Style="{StaticResource FieldLabel}" Text="Extra engine arguments" ToolTip="Appended verbatim to every yt-dlp invocation — any classic option works here" />
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Extra engine arguments" ToolTip="Applied to downloads. Analysis uses only supported connection and extraction options." />
                             <TextBox Width="420" Style="{StaticResource ModernTextBox}" Text="{Binding S.General.ExtraArgs}" />
                         </StackPanel>
                         <CheckBox Style="{StaticResource SpacedCheck}"

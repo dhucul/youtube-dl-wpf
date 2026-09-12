@@ -5,6 +5,11 @@ $ErrorActionPreference = 'Stop'
 
 $repositoryRoot = Split-Path -Parent $PSScriptRoot
 $projectPath = Join-Path $repositoryRoot 'src\YoutubeDlModern\YoutubeDlModern.csproj'
+$projectXml = [xml](Get-Content -LiteralPath $projectPath -Raw)
+$appVersion = [string]$projectXml.Project.PropertyGroup.Version
+if ($appVersion -notmatch '^\d+\.\d+\.\d+$') {
+    throw "The application project must declare a three-part version."
+}
 $stagingRoot = Join-Path $repositoryRoot '.installer-staging'
 $publishPath = Join-Path $stagingRoot ([Guid]::NewGuid().ToString('N'))
 $installerScript = Join-Path $repositoryRoot 'installer\YoutubeDlModern.iss'
@@ -31,12 +36,12 @@ try {
     }
 
     $publishDefine = '/DPublishDir=' + $publishPath
-    & $innoCompiler $publishDefine $installerScript
+    & $innoCompiler $publishDefine ('/DMyAppVersion=' + $appVersion) $installerScript
     if ($LASTEXITCODE -ne 0) {
         throw "Inno Setup compilation failed with exit code $LASTEXITCODE."
     }
 
-    $installerPath = Join-Path $repositoryRoot 'installer\output\YoutubeDL-Modern-Setup-1.0.0-x64.exe'
+    $installerPath = Join-Path $repositoryRoot ("installer\output\YoutubeDL-Modern-Setup-$appVersion-x64.exe")
     if (-not (Test-Path -LiteralPath $installerPath -PathType Leaf)) {
         throw "Installer output was not created at '$installerPath'."
     }

@@ -29,7 +29,8 @@ public partial class QueueViewModel : ObservableObject, IDisposable
 
     private readonly DownloadQueueService _queue;
     private readonly SettingsService _settings;
-    private readonly YtDlpEngine _engine;
+    private readonly IYtDlpEngine _engine;
+    private readonly Func<string?, CancellationToken, Task<ImageSource?>> _loadThumbnail;
     private readonly CancellationTokenSource _lifetimeCts = new();
 
     private CancellationTokenSource? _fetchCts;
@@ -37,6 +38,7 @@ public partial class QueueViewModel : ObservableObject, IDisposable
     private string _fetchedUrl = "";
 
     public event Action<string>? NotifyRequested;
+    public event Action? EngineStateChanged;
 
     public ObservableCollection<DownloadItemViewModel> Items => _queue.Items;
     public ObservableCollection<QualityChoice> QualityChoices { get; } = new();
@@ -65,7 +67,7 @@ public partial class QueueViewModel : ObservableObject, IDisposable
     public string[] BrowserChoices { get; } =
         { "none", "brave", "chrome", "chromium", "edge", "firefox", "opera", "safari", "vivaldi", "whale" };
     public string[] AudioFormats { get; } = { "mp3", "m4a", "opus", "flac", "wav", "vorbis", "aac", "best" };
-    public string[] AudioQualities { get; } = { "0 (best VBR)", "2", "5 (medium VBR)", "128K", "192K", "256K", "320K" };
+    public string[] AudioQualities { get; } = { "0", "2", "5", "128K", "192K", "256K", "320K" };
 
     [ObservableProperty] private string _urlInput = "";
     [ObservableProperty] private bool _isFetching;
@@ -75,6 +77,7 @@ public partial class QueueViewModel : ObservableObject, IDisposable
     [ObservableProperty] private ImageSource? _previewThumbnail;
 
     [ObservableProperty] private string _selectedAnalysisMode = "quick";
+    [ObservableProperty] private bool _useSavedAnalysisAuthentication = true;
     [ObservableProperty] private string _analysisCookiesFile = "";
     [ObservableProperty] private string _analysisCookiesFromBrowser = "none";
 
@@ -114,11 +117,14 @@ public partial class QueueViewModel : ObservableObject, IDisposable
 
     [ObservableProperty] private bool _hasItems;
 
-    public QueueViewModel(DownloadQueueService queue, SettingsService settings, YtDlpEngine engine)
+    public QueueViewModel(DownloadQueueService queue, SettingsService settings, IYtDlpEngine engine,
+        Func<string?, CancellationToken, Task<ImageSource?>>? loadThumbnail = null)
     {
         _queue = queue;
         _settings = settings;
         _engine = engine;
+        _loadThumbnail = loadThumbnail ?? ThumbnailService.LoadAsync;
+        _settings.Changed += OnSettingsChanged;
 
         _isEngineInstalled = engine.IsInstalled;
         Items.CollectionChanged += (_, _) => HasItems = Items.Count > 0;
@@ -136,7 +142,6 @@ public partial class QueueViewModel : ObservableObject, IDisposable
     public bool ShowVideoOptions => AddDownloadMode != "audio-only";
     public bool ShowCustomFormat => SelectedQualityKey == "custom";
     public bool HasSubtitleInfo => (Preview?.SubtitleLanguages.Count ?? 0) > 0 || (Preview?.AutoCaptionLanguages.Count ?? 0) > 0;
-    public bool HasFormats => (Preview?.Formats?.Count ?? 0) > 0;
 
     public string PreviewMetaText
     {
@@ -172,7 +177,6 @@ public partial class QueueViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(PreviewMetaText));
         OnPropertyChanged(nameof(SubtitleSummaryText));
         OnPropertyChanged(nameof(HasSubtitleInfo));
-        OnPropertyChanged(nameof(HasFormats));
     }
 
     partial void OnFetchErrorChanged(string value) => OnPropertyChanged(nameof(HasFetchError));
@@ -225,7 +229,7 @@ public partial class QueueViewModel : ObservableObject, IDisposable
             return;
         }
 
-        if (!ValidateCookiesFile(AnalysisCookiesFile, out var cookieError))
+        if (!ValidateCookiesFile(BuildAnalysisOptions().CookiesFile, out var cookieError))
         {
             FetchError = cookieError;
             return;
@@ -253,8 +257,7 @@ public partial class QueueViewModel : ObservableObject, IDisposable
                 return;
             }
 
-            foreach (var u in urls)
-                _queue.Enqueue(u, options, null, settingsSnapshot: settingsSnapshot);
+            EnqueueBatch(urls, options, settingsSnapshot, _lifetimeCts.Token);
             NotifyRequested?.Invoke($"Added {urls.Count} URLs to the queue.");
             UrlInput = "";
             return;
@@ -269,15 +272,22 @@ public partial class QueueViewModel : ObservableObject, IDisposable
         PreviewThumbnail = null;
         try
         {
-            _fetchedUrl = urls[0];
-            Preview = await _engine.GetVideoInfoAsync(
-                _fetchedUrl,
-                fetchCts.Token,
-                BuildAnalysisOptions());
-            PreviewThumbnail = await ThumbnailService.LoadAsync(
-                Preview.BestThumbnailUrl, fetchCts.Token);
-            RebuildQualityChoices();
-            ApplyDownloadDefaults(useAnalysisAuthentication: true);
+            var url = urls[0];
+            var authentication = BuildAnalysisOptions();
+            var defaults = _settings.CreateSnapshot();
+            var info = await _engine.GetVideoInfoAsync(url, fetchCts.Token, authentication);
+            fetchCts.Token.ThrowIfCancellationRequested();
+            if (!ReferenceEquals(_fetchCts, fetchCts)) return;
+
+            // Publish the preview only after all of its editable options are ready.
+            _fetchedUrl = url;
+            RebuildQualityChoices(info);
+            ApplyDownloadDefaults(useAnalysisAuthentication: true, defaults, authentication);
+            Preview = info;
+            var thumbnail = await _loadThumbnail(info.BestThumbnailUrl, fetchCts.Token);
+            if (!fetchCts.IsCancellationRequested && ReferenceEquals(_fetchCts, fetchCts) &&
+                ReferenceEquals(Preview, info))
+                PreviewThumbnail = thumbnail;
         }
         catch (OperationCanceledException) { /* user canceled the fetch */ }
         catch (Exception ex)
@@ -322,6 +332,7 @@ public partial class QueueViewModel : ObservableObject, IDisposable
             return;
         }
 
+        _fetchCts?.Cancel(); // The optional thumbnail must not mutate an accepted preview.
         _queue.Enqueue(_fetchedUrl, options!, Preview, PreviewThumbnail);
         NotifyRequested?.Invoke($"Added to queue: {Preview.DisplayTitle}");
 
@@ -334,6 +345,7 @@ public partial class QueueViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private void DiscardPreview()
     {
+        _fetchCts?.Cancel();
         CancelFormatInspection();
         Preview = null;
         PreviewThumbnail = null;
@@ -351,6 +363,7 @@ public partial class QueueViewModel : ObservableObject, IDisposable
             commandToken, _lifetimeCts.Token);
         _formatsCts = formatsCts;
         IsInspectingFormats = true;
+        var inspectedPreview = Preview;
         try
         {
             IReadOnlyList<FormatInfo> formats = (Preview.Formats ?? [])
@@ -376,13 +389,17 @@ public partial class QueueViewModel : ObservableObject, IDisposable
                     lookupIsPlaylist);
             }
 
-            var title = Preview.IsPlaylist
+            formatsCts.Token.ThrowIfCancellationRequested();
+            if (!ReferenceEquals(Preview, inspectedPreview)) return;
+            var title = inspectedPreview.IsPlaylist
                 ? "Available formats (first playlist item)"
                 : "Available formats";
             var formatSnapshot = formats.ToList();
             var choices = await BackgroundWork.RunAsync(
                 token => FormatChoice.CreateChoices(formatSnapshot, token),
                 formatsCts.Token);
+            formatsCts.Token.ThrowIfCancellationRequested();
+            if (!ReferenceEquals(Preview, inspectedPreview)) return;
             var dialog = new FormatPickerDialog(title, choices);
             var owner = Application.Current?.MainWindow;
             if (owner?.IsVisible == true)
@@ -428,8 +445,19 @@ public partial class QueueViewModel : ObservableObject, IDisposable
         catch { /* clipboard busy */ }
     }
 
+    private void ClearCustomSelection()
+    {
+        if (SelectedQualityKey != "custom") return;
+        SelectedQualityKey = "best";
+        CustomFormat = "";
+    }
+
+    partial void OnAddVideoCodecChanged(string value) => ClearCustomSelection();
+    partial void OnAddMaxFpsChanged(string value) => ClearCustomSelection();
+
     partial void OnAddDownloadModeChanged(string value)
     {
+        ClearCustomSelection();
         OnPropertyChanged(nameof(ShowAudioOptions));
         OnPropertyChanged(nameof(ShowVideoOptions));
         OnPropertyChanged(nameof(ShowCustomFormat));
@@ -465,7 +493,7 @@ public partial class QueueViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private async Task ImportBatchFileAsync(CancellationToken ct)
     {
-        if (!ValidateCookiesFile(AnalysisCookiesFile, out var cookieError))
+        if (!ValidateCookiesFile(BuildAnalysisOptions().CookiesFile, out var cookieError))
         {
             FetchError = cookieError;
             return;
@@ -521,23 +549,18 @@ public partial class QueueViewModel : ObservableObject, IDisposable
                 }
             }
 
-            for (var index = 0; index < urls.Count; index++)
-            {
-                if (index == 0 && !_queue.CanEnqueue(urls.Count))
-                    throw new InvalidOperationException(
-                        "The queue does not have enough capacity for this batch. Remove finished items first.");
-                var u = urls[index];
-                _queue.Enqueue(u, options, null, settingsSnapshot: settingsSnapshot);
-                if ((index + 1) % 50 == 0)
-                    await Task.Yield();
-            }
+            operationToken.ThrowIfCancellationRequested();
+            // Commit the bounded batch in one UI turn: no other command can consume
+            // capacity between this check and insertion. Cancellation is checked first.
+            EnqueueBatch(urls, options, settingsSnapshot, operationToken);
 
             var skipped = invalidCount > 0 ? $" Skipped {invalidCount} invalid line(s)." : "";
             NotifyRequested?.Invoke($"Imported {urls.Count} URLs from batch file.{skipped}");
         }
+        catch (OperationCanceledException) { }
         catch (Exception ex)
         {
-            FetchError = $"Could not read batch file: {ex.Message}";
+            FetchError = $"Could not import batch file: {ex.Message}";
         }
     }
 
@@ -564,7 +587,8 @@ public partial class QueueViewModel : ObservableObject, IDisposable
                     EngineInstallText = p.Message;
                 }),
                 _lifetimeCts.Token);
-            IsEngineInstalled = true;
+            RefreshEngineState();
+            EngineStateChanged?.Invoke();
             NotifyRequested?.Invoke("yt-dlp engine installed successfully.");
         }
         catch (Exception ex)
@@ -593,13 +617,23 @@ public partial class QueueViewModel : ObservableObject, IDisposable
         return false;
     }
 
-    private void RebuildQualityChoices()
+    internal void EnqueueBatch(IReadOnlyList<string> urls, DownloadOptions options,
+        AppSettings settingsSnapshot, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        if (!_queue.CanEnqueue(urls.Count))
+            throw new InvalidOperationException("The queue does not have enough capacity for this batch. Remove finished items first.");
+        foreach (var url in urls)
+            _queue.Enqueue(url, options, null, settingsSnapshot: settingsSnapshot);
+    }
+
+    private void RebuildQualityChoices(VideoInfo? info = null)
     {
         var previous = SelectedQualityKey;
         QualityChoices.Clear();
         QualityChoices.Add(new QualityChoice("best", "Best"));
         var fixedHeights = new[] { 2160, 1440, 1080, 720, 480, 360 };
-        var availableHeights = Preview?.AvailableHeights ?? (IReadOnlyList<int>)Array.Empty<int>();
+        var availableHeights = (info ?? Preview)?.AvailableHeights ?? (IReadOnlyList<int>)Array.Empty<int>();
         foreach (var h in fixedHeights.Concat(availableHeights).Distinct().OrderByDescending(height => height))
             QualityChoices.Add(new QualityChoice(h.ToString(), $"{h}p"));
         QualityChoices.Add(new QualityChoice("worst", "Smallest"));
@@ -610,9 +644,11 @@ public partial class QueueViewModel : ObservableObject, IDisposable
 
     private DownloadOptions BuildDefaultOptions(
         bool useAnalysisAuthentication = false,
-        AppSettings? settingsSnapshot = null)
+        AppSettings? settingsSnapshot = null,
+        AnalysisOptions? authentication = null)
     {
         var settings = settingsSnapshot ?? _settings.Data;
+        authentication ??= BuildAnalysisOptions();
         var defaultQuality = settings.Formats.DefaultQuality;
         return new DownloadOptions
         {
@@ -638,9 +674,9 @@ public partial class QueueViewModel : ObservableObject, IDisposable
             PlaylistItems = settings.Selection.PlaylistItems,
             PlaylistStart = settings.Selection.PlaylistStart,
             PlaylistEnd = settings.Selection.PlaylistEnd,
-            CookiesFile = useAnalysisAuthentication ? AnalysisCookiesFile.Trim() : settings.Auth.CookiesFile,
+            CookiesFile = useAnalysisAuthentication ? authentication.CookiesFile : settings.Auth.CookiesFile,
             CookiesFromBrowser = useAnalysisAuthentication
-                ? NormalizeBrowser(AnalysisCookiesFromBrowser)
+                ? NormalizeBrowser(authentication.CookiesFromBrowser)
                 : NormalizeBrowser(settings.Auth.CookiesFromBrowser),
             RateLimit = settings.Network.RateLimit,
             Retries = Math.Max(0, settings.Network.Retries),
@@ -648,9 +684,10 @@ public partial class QueueViewModel : ObservableObject, IDisposable
         };
     }
 
-    private void ApplyDownloadDefaults(bool useAnalysisAuthentication = false)
+    private void ApplyDownloadDefaults(bool useAnalysisAuthentication = false,
+        AppSettings? settingsSnapshot = null, AnalysisOptions? authentication = null)
     {
-        var defaults = BuildDefaultOptions(useAnalysisAuthentication);
+        var defaults = BuildDefaultOptions(useAnalysisAuthentication, settingsSnapshot, authentication);
         AddDownloadMode = defaults.DownloadMode;
         SelectedQualityKey = QualityChoices.Any(choice => choice.Key == defaults.QualityPreset)
             ? defaults.QualityPreset
@@ -683,11 +720,24 @@ public partial class QueueViewModel : ObservableObject, IDisposable
         AddExtraArgs = defaults.ExtraArgs;
     }
 
-    private AnalysisOptions BuildAnalysisOptions() => new()
+    partial void OnUseSavedAnalysisAuthenticationChanged(bool value)
+    {
+        if (value) OnSettingsChanged();
+    }
+
+    private void OnSettingsChanged()
+    {
+        if (!UseSavedAnalysisAuthentication) return;
+        AnalysisCookiesFile = _settings.Data.Auth.CookiesFile;
+        AnalysisCookiesFromBrowser = NormalizeBrowser(_settings.Data.Auth.CookiesFromBrowser);
+    }
+
+    internal AnalysisOptions BuildAnalysisOptions() => new()
     {
         Mode = SelectedAnalysisMode,
-        CookiesFile = AnalysisCookiesFile.Trim(),
-        CookiesFromBrowser = NormalizeBrowser(AnalysisCookiesFromBrowser)
+        CookiesFile = (UseSavedAnalysisAuthentication ? _settings.Data.Auth.CookiesFile : AnalysisCookiesFile).Trim(),
+        CookiesFromBrowser = NormalizeBrowser(UseSavedAnalysisAuthentication
+            ? _settings.Data.Auth.CookiesFromBrowser : AnalysisCookiesFromBrowser)
     };
 
     private bool TryBuildCurrentOptions(out DownloadOptions? options, out string error)
@@ -831,8 +881,18 @@ public partial class QueueViewModel : ObservableObject, IDisposable
             .SelectMany(entry => new[] { entry.WebpageUrl, entry.Url })
             .FirstOrDefault(value => !string.IsNullOrWhiteSpace(value) && IsSupportedUrl(value));
 
+    internal Task WaitForPendingWorkAsync() => Task.WhenAll(new[]
+    {
+        FetchCommand.ExecutionTask, InspectFormatsCommand.ExecutionTask,
+        ImportBatchFileCommand.ExecutionTask, InstallEngineCommand.ExecutionTask
+    }.OfType<Task>());
+
+    private bool _isDisposed;
     public void Dispose()
     {
+        if (_isDisposed) return;
+        _isDisposed = true;
+        _settings.Changed -= OnSettingsChanged;
         _lifetimeCts.Cancel();
         _fetchCts?.Cancel();
         _formatsCts?.Cancel();

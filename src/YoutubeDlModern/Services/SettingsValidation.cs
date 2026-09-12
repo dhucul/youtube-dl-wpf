@@ -53,6 +53,34 @@ internal static class SettingsValidation
         }
     }
 
+    /// <summary>Only extraction/connection settings belong in metadata requests.</summary>
+    internal static IReadOnlyList<string> AnalysisExtraArguments(string raw)
+    {
+        var allowed = new HashSet<string>(StringComparer.Ordinal)
+        {
+            "--extractor-args", "--extractor-retries", "--user-agent", "--referer",
+            "--add-headers", "--proxy", "--socket-timeout", "--source-address",
+            "--geo-verification-proxy", "--geo-bypass-country", "--geo-bypass-ip-block",
+            "--js-runtimes", "--remote-components", "--impersonate"
+        };
+        var result = new List<string>();
+        var args = ProcessRunner.SplitArguments(raw);
+        for (var index = 0; index < args.Count; index++)
+        {
+            var argument = args[index];
+            var equals = argument.IndexOf('=');
+            var flag = equals < 0 ? argument : argument[..equals];
+            if (!allowed.Contains(flag)) continue;
+            if (equals >= 0) result.Add(argument);
+            else if (index + 1 < args.Count && !args[index + 1].StartsWith('-'))
+            {
+                result.Add(argument);
+                result.Add(args[++index]);
+            }
+        }
+        return result;
+    }
+
     public static bool IsValidRateLimit(string value)
     {
         var text = value.Trim();

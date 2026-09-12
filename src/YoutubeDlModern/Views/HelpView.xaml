@@ -44,7 +44,7 @@
                                 <TextBlock Text="First-time setup" Style="{StaticResource SectionText}" />
                                 <TextBlock Style="{StaticResource HelpLabel}" Text="1. Install yt-dlp" />
                                 <TextBlock Style="{StaticResource HelpBody}"
-                                           Text="The status at the bottom of the navigation rail shows whether the download engine is ready. If it is missing, select Install engine on Downloads. You can update it later from About." />
+                                           Text="The status at the bottom of the navigation rail shows whether the download engine is ready. If it is missing, select Install engine on Downloads. About can reinstall the verified engine version pinned by this application." />
                                 <TextBlock Style="{StaticResource HelpLabel}" Text="2. Install ffmpeg when needed" />
                                 <TextBlock Style="{StaticResource HelpBody}"
                                            Text="Open About and select Download ffmpeg if you plan to merge separate video and audio streams, extract audio, convert media, or embed subtitles and artwork. Simple single-stream downloads may not need it." />
@@ -429,7 +429,7 @@
                                 <TextBlock Text="Engine and site errors" Style="{StaticResource SectionText}" />
                                 <TextBlock Style="{StaticResource HelpLabel}" Text="Unsupported URL, extractor error, or a site suddenly stopped working" />
                                 <TextBlock Style="{StaticResource HelpBody}"
-                                           Text="Open About and update yt-dlp, then try again. Confirm the URL opens in a browser and is a complete http or https address. Sites change frequently, so an engine update is the most common fix." />
+                                           Text="Install a newer application release for newer site support. About can reinstall the pinned engine if its files are damaged. Confirm the URL opens in a browser and is a complete http or https address." />
                                 <TextBlock Style="{StaticResource HelpLabel}" Text="Sign-in, age, or bot-confirmation error" />
                                 <TextBlock Style="{StaticResource HelpBody}"
                                            Text="Provide browser cookies or a cookies file for both analysis and downloading. Make sure the selected browser profile is signed in, close the browser if its cookie database is locked, and avoid repeatedly retrying if the site is rate-limiting the account." />

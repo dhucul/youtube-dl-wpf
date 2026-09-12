@@ -13,6 +13,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private readonly CancellationTokenSource _lifetimeCts = new();
     private int _engineRefreshVersion;
     private bool _isDisposed;
+    private Task _engineStatusRefresh = Task.CompletedTask;
 
     public QueueViewModel Queue { get; }
     public SettingsViewModel Settings { get; }
@@ -44,9 +45,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
         _currentPage = Queue;
 
         Queue.NotifyRequested += Notify;
+        Queue.EngineStateChanged += () => StartEngineStatusRefresh(forceVersionCheck: true);
         Settings.NotifyRequested += Notify;
         About.NotifyRequested += Notify;
-        About.EngineStateChanged += () => _ = RefreshEngineStatusAsync(forceVersionCheck: true);
+        About.EngineStateChanged += () => StartEngineStatusRefresh(forceVersionCheck: true);
 
         queueService.ItemCompleted += (_, item) => Notify($"Completed: {item.Title}");
         queueService.ItemFailed += (_, item) => Notify($"Failed: {item.Title}");
@@ -61,7 +63,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
             _notifyTimer.Stop();
         };
 
-        _ = RefreshEngineStatusAsync();
+        StartEngineStatusRefresh();
+    }
+
+    private void StartEngineStatusRefresh(bool forceVersionCheck = false)
+    {
+        var refresh = RefreshEngineStatusAsync(forceVersionCheck);
+        _engineStatusRefresh = _engineStatusRefresh.IsCompleted ? refresh : Task.WhenAll(_engineStatusRefresh, refresh);
     }
 
     public async Task RefreshEngineStatusAsync(bool forceVersionCheck = false)
@@ -120,6 +128,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
         IsNotificationVisible = true;
         _notifyTimer.Stop();
         _notifyTimer.Start();
+    }
+
+    public async Task StopAsync()
+    {
+        Dispose();
+        await Task.WhenAll(Queue.WaitForPendingWorkAsync(), About.WaitForPendingWorkAsync(), _engineStatusRefresh);
     }
 
     public void Dispose()

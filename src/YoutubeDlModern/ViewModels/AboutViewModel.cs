@@ -15,6 +15,7 @@ public partial class AboutViewModel : ObservableObject, IDisposable
     private readonly CancellationTokenSource _lifetimeCts = new();
     private CancellationTokenSource? _refreshCts;
     private int _refreshVersion;
+    private Task _refreshTask = Task.CompletedTask;
 
     public event Action<string>? NotifyRequested;
     public event Action? EngineStateChanged;
@@ -34,7 +35,6 @@ public partial class AboutViewModel : ObservableObject, IDisposable
     [ObservableProperty] private bool _isEngineInstalled;
     [ObservableProperty] private bool _isEngineBusy;
     [ObservableProperty] private string _engineLog = "";
-    [ObservableProperty] private double _engineProgress;
 
     [ObservableProperty] private string _ffmpegStatusText = "checking…";
     [ObservableProperty] private bool _isFfmpegBusy;
@@ -77,7 +77,8 @@ public partial class AboutViewModel : ObservableObject, IDisposable
         var previous = Interlocked.Exchange(ref _refreshCts, refreshCts);
         previous?.Cancel();
         previous?.Dispose();
-        _ = RefreshSafelyAsync(refreshCts);
+        var refresh = RefreshSafelyAsync(refreshCts);
+        _refreshTask = _refreshTask.IsCompleted ? refresh : Task.WhenAll(_refreshTask, refresh);
     }
 
     private async Task RefreshSafelyAsync(CancellationTokenSource refreshCts)
@@ -99,23 +100,23 @@ public partial class AboutViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
-    private async Task UpdateEngineAsync()
+    private async Task ReinstallEngineAsync()
     {
         if (IsEngineBusy) return;
         IsEngineBusy = true;
         EngineLog = "";
         try
         {
-            await _engine.UpdateAsync(AppendEngineLog, _lifetimeCts.Token);
+            await _engine.ReinstallAsync(AppendEngineLog, _lifetimeCts.Token);
             AppendEngineLog("Done.");
             await RefreshAsync(_lifetimeCts.Token);
             EngineStateChanged?.Invoke();
-            NotifyRequested?.Invoke($"Engine is up to date ({EngineVersionText}).");
+            NotifyRequested?.Invoke($"Pinned engine reinstalled ({EngineVersionText}).");
         }
         catch (Exception ex)
         {
             AppendEngineLog("Error: " + ex.Message);
-            NotifyRequested?.Invoke("Engine update failed: " + ex.Message);
+            NotifyRequested?.Invoke("Engine reinstall failed: " + ex.Message);
         }
         finally
         {
@@ -184,8 +185,16 @@ public partial class AboutViewModel : ObservableObject, IDisposable
             EngineLog = EngineLog[^MaxLogChars..];
     }
 
+    internal Task WaitForPendingWorkAsync() => Task.WhenAll(new[]
+    {
+        _refreshTask, ReinstallEngineCommand.ExecutionTask, InstallFfmpegCommand.ExecutionTask
+    }.OfType<Task>());
+
+    private bool _isDisposed;
     public void Dispose()
     {
+        if (_isDisposed) return;
+        _isDisposed = true;
         _lifetimeCts.Cancel();
         var refreshCts = Interlocked.Exchange(ref _refreshCts, null);
         refreshCts?.Cancel();

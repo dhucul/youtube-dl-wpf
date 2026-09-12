@@ -1,3 +1,4 @@
+using System.Globalization;
 using YoutubeDlModern.Models;
 
 namespace YoutubeDlModern.Services;
@@ -16,7 +17,7 @@ public static class ArgsBuilder
     public const string FinalFilePrefix = "YTFILE|";
 
     private const string DownloadProgressTemplate =
-        "download:YTPROG|%(progress.downloaded_bytes)s|%(progress.total_bytes,total_bytes_estimate)s|%(progress.speed)s|%(progress.eta)s|%(progress.status)s";
+        "download:YTPROG|%(progress.downloaded_bytes)s|%(progress.total_bytes,progress.total_bytes_estimate)s|%(progress.speed)s|%(progress.eta)s|%(progress.status)s";
 
     private const string PostProcessTemplate =
         "postprocess:YTPOST|%(progress.status)s";
@@ -32,7 +33,7 @@ public static class ArgsBuilder
         var a = new List<string>();
         AddConnectionArgs(a, s);
         AddAuthArgs(a, s, options.CookiesFile, options.CookiesFromBrowser, overrideCookies: true);
-        a.AddRange(ProcessRunner.SplitArguments(s.General.ExtraArgs));
+        a.AddRange(SettingsValidation.AnalysisExtraArguments(s.General.ExtraArgs));
         // Never recursively expand every entry during the preview request. Full mode
         // still performs format checks for a video; quick mode skips those checks.
         // Safety flags are deliberately appended after custom arguments so they cannot
@@ -44,6 +45,9 @@ public static class ArgsBuilder
             a.Add("--no-check-formats");
         if (string.Equals(options.Mode, "playlist", StringComparison.OrdinalIgnoreCase))
             a.Add("--yes-playlist");
+        a.Add("--ignore-config");
+        a.Add("--simulate");
+        a.Add("--no-exec");
         a.Add("-J");
         a.Add("--no-warnings");
         a.Add(url);
@@ -65,7 +69,7 @@ public static class ArgsBuilder
         var a = new List<string>();
         AddConnectionArgs(a, s);
         AddAuthArgs(a, s, options.CookiesFile, options.CookiesFromBrowser, overrideCookies: true);
-        a.AddRange(ProcessRunner.SplitArguments(s.General.ExtraArgs));
+        a.AddRange(SettingsValidation.AnalysisExtraArguments(s.General.ExtraArgs));
         if (isPlaylist)
         {
             // A format listing is meaningful per entry. Bound playlist work so the
@@ -78,6 +82,9 @@ public static class ArgsBuilder
         {
             a.Add("--no-playlist");
         }
+        a.Add("--ignore-config");
+        a.Add("--simulate");
+        a.Add("--no-exec");
         a.Add("-J");
         a.Add("--no-warnings");
         a.Add(url);
@@ -87,7 +94,7 @@ public static class ArgsBuilder
     /// <summary>Full argument set for an actual download.</summary>
     public static List<string> BuildDownloadArgs(AppSettings s, DownloadOptions o, string url, string? ffmpegLocation)
     {
-        var a = new List<string>();
+        var a = new List<string> { "--ignore-config" };
 
         // --- Machine-readable progress / final-path reporting ---
         a.Add("--newline");
@@ -115,7 +122,7 @@ public static class ArgsBuilder
         // --- Download behavior ---
         if (!string.IsNullOrWhiteSpace(o.RateLimit)) { a.Add("-r"); a.Add(o.RateLimit); }
         if (o.Retries >= 0) { a.Add("-R"); a.Add(o.Retries.ToString()); }
-        if (net.FragmentRetries > 0) { a.Add("--fragment-retries"); a.Add(net.FragmentRetries.ToString()); }
+        if (net.FragmentRetries >= 0) { a.Add("--fragment-retries"); a.Add(net.FragmentRetries.ToString()); }
         if (!net.SkipUnavailableFragments) a.Add("--abort-on-unavailable-fragment");
         if (!string.IsNullOrWhiteSpace(net.BufferSize)) { a.Add("--buffer-size"); a.Add(net.BufferSize); }
         if (net.NoResizeBuffer) a.Add("--no-resize-buffer");
@@ -257,8 +264,8 @@ public static class ArgsBuilder
         if (downloadMode == "audio-only" || preset == "audio") return "ba/b";
 
         var filters = new List<string>();
-        if (preset is "2160" or "1440" or "1080" or "720" or "480" or "360")
-            filters.Add($"height<={preset}");
+        if (int.TryParse(preset, NumberStyles.None, CultureInfo.InvariantCulture, out var height) && height > 0)
+            filters.Add($"height<={height.ToString(CultureInfo.InvariantCulture)}");
         if (maxFps > 0)
             filters.Add($"fps<={maxFps}");
 
@@ -266,7 +273,7 @@ public static class ArgsBuilder
         {
             "h264" => "vcodec^=avc",
             "h265" => "vcodec~='^(hev|hvc)'",
-            "vp9" => "vcodec^=vp0",
+            "vp9" => "vcodec~='^(vp9|vp09)([.]|$)'",
             "av1" => "vcodec^=av01",
             _ => ""
         };

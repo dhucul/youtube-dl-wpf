@@ -16,10 +16,10 @@ public sealed class DownloadRunResult
 }
 
 /// <summary>
-/// Owns the yt-dlp engine binary: installation, self-update, version info,
+/// Owns the yt-dlp engine binary: installation, verified reinstallation, version info,
 /// metadata queries (-J) and download execution with machine-readable progress.
 /// </summary>
-public sealed class YtDlpEngine
+public sealed class YtDlpEngine : IYtDlpEngine
 {
     public const string PinnedEngineVersion = "2026.07.04";
     private const string EngineDownloadUrl =
@@ -164,7 +164,8 @@ public sealed class YtDlpEngine
         string? ffmpegLocation,
         IProgress<ProgressUpdate> progress,
         Action<string> log,
-        CancellationToken ct)
+        CancellationToken ct,
+        Action<string>? onFileCompleted = null)
     {
         using var operation = await EnterOperationAsync(ct).ConfigureAwait(false);
         EnsureInstalledOrThrow();
@@ -194,7 +195,10 @@ public sealed class YtDlpEngine
                 var finalFile = line[ArgsBuilder.FinalFilePrefix.Length..].Trim();
                 if (!string.IsNullOrWhiteSpace(finalFile) &&
                     !finalFiles.Contains(finalFile, StringComparer.OrdinalIgnoreCase))
+                {
                     finalFiles.Add(finalFile);
+                    onFileCompleted?.Invoke(finalFile);
+                }
                 progress.Report(new ProgressUpdate { FinalFilePath = finalFile });
             }
             else
@@ -275,7 +279,7 @@ public sealed class YtDlpEngine
     }
 
     /// <summary>Replaces the engine with the application-pinned, verified release.</summary>
-    public async Task UpdateAsync(Action<string> log, CancellationToken ct)
+    public async Task ReinstallAsync(Action<string> log, CancellationToken ct)
     {
         await _maintenanceGate.WaitAsync(ct).ConfigureAwait(false);
         try

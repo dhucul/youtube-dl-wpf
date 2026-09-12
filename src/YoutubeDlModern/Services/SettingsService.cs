@@ -17,7 +17,11 @@ public sealed class SettingsService
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "YoutubeDlModern");
 
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
-    private string FilePath => Path.Combine(AppDataDir, "settings.json");
+    private readonly string _storageDirectory;
+    private string FilePath => Path.Combine(_storageDirectory, "settings.json");
+    public SettingsService(string? storageDirectory = null) => _storageDirectory = storageDirectory ?? AppDataDir;
+    public event Action? Changed;
+    public string? BackupWarning { get; private set; }
 
     public AppSettings Data { get; private set; } = new();
 
@@ -59,11 +63,16 @@ public sealed class SettingsService
         AtomicFile.WriteAllText(FilePath, serialized, createBackup: false);
         // Store only protected data in the recovery file. Copying a legacy primary
         // before migration would preserve its plaintext credentials indefinitely.
-        AtomicFile.WriteAllText(AtomicFile.BackupPath(FilePath), serialized, createBackup: false);
+        // The successful primary-file replacement is the commit point.
         Data = normalized;
+        BackupWarning = null;
+        try { AtomicFile.WriteAllText(AtomicFile.BackupPath(FilePath), serialized, createBackup: false); }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            BackupWarning = "Settings saved, but the recovery copy could not be updated: " + ex.Message;
+        }
+        Changed?.Invoke();
     }
-
-    public void Reset() => Data = Normalize(new AppSettings());
 
     public AppSettings CreateSnapshot() => Normalize(Clone(Data));
 

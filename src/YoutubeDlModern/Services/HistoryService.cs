@@ -19,7 +19,9 @@ public sealed class HistoryService : IDisposable
     private CancellationTokenSource? _debounceCts;
     private Task _pendingSave = Task.CompletedTask;
     private bool _isDisposed;
-    private string FilePath => Path.Combine(SettingsService.AppDataDir, "history.json");
+    private readonly string _storageDirectory;
+    private string FilePath => Path.Combine(_storageDirectory, "history.json");
+    public HistoryService(string? storageDirectory = null) => _storageDirectory = storageDirectory ?? SettingsService.AppDataDir;
 
     public ObservableCollection<HistoryEntry> Entries { get; } = new();
     public event Action<string>? PersistenceFailed;

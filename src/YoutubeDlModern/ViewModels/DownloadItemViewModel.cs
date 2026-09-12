@@ -54,9 +54,18 @@ public partial class DownloadItemViewModel : ObservableObject
 
     internal CancellationTokenSource? Cts { get; set; }
     internal bool UserCanceled { get; set; }
+    private readonly HashSet<string> _recordedFiles = new(StringComparer.OrdinalIgnoreCase);
+
+    internal bool RecordCompletedFile(string path)
+    {
+        if (!_recordedFiles.Add(path)) return false;
+        OutputPaths = _recordedFiles.ToList();
+        OutputPath = path;
+        return true;
+    }
 
     // ---- State-driven button visibility ----
-    public bool ShowPause => Status == DownloadStatus.Downloading;
+    public bool ShowPause => Status is DownloadStatus.Queued or DownloadStatus.Downloading or DownloadStatus.Processing;
     public bool ShowResume => Status is DownloadStatus.Paused or DownloadStatus.Failed or DownloadStatus.Canceled;
     public bool ShowCancel => Status is DownloadStatus.Queued or DownloadStatus.Downloading or DownloadStatus.Processing;
     public bool ShowRemove => Status is DownloadStatus.Paused or DownloadStatus.Completed or DownloadStatus.Failed or DownloadStatus.Canceled;
@@ -96,7 +105,7 @@ public partial class DownloadItemViewModel : ObservableObject
     // ---- State transitions (called by the queue service, always on UI thread) ----
     internal void Reset()
     {
-        Cts?.Dispose();
+        // Scheduled runs own disposal, including runs canceled before being dequeued.
         Cts = new CancellationTokenSource();
         UserCanceled = false;
         ErrorText = "";
@@ -104,8 +113,7 @@ public partial class DownloadItemViewModel : ObservableObject
         SizeText = "";
         SpeedText = "";
         EtaText = "";
-        OutputPath = "";
-        OutputPaths = [];
+        OutputPath = OutputPaths.LastOrDefault() ?? "";
         Status = DownloadStatus.Queued;
     }
 
@@ -113,8 +121,13 @@ public partial class DownloadItemViewModel : ObservableObject
 
     internal void ApplyProgress(ProgressUpdate u)
     {
+        if (Status is DownloadStatus.Completed or DownloadStatus.Failed or DownloadStatus.Canceled or DownloadStatus.Paused)
+            return;
         if (!string.IsNullOrWhiteSpace(u.FinalFilePath))
+        {
             OutputPath = u.FinalFilePath!;
+            return;
+        }
 
         if (u.IsPostProcessing)
         {
@@ -122,7 +135,7 @@ public partial class DownloadItemViewModel : ObservableObject
             return;
         }
 
-        if (Status == DownloadStatus.Queued)
+        if (u.Status is "downloading" or "finished" || u.DownloadedBytes.HasValue)
             Status = DownloadStatus.Downloading;
 
         if (u.DownloadedBytes is > 0 || u.TotalBytes is > 0)
@@ -152,7 +165,7 @@ public partial class DownloadItemViewModel : ObservableObject
         Status = DownloadStatus.Paused;
         SpeedText = "";
         EtaText = "";
-        DisposeCancellationSource();
+        DetachCancellationSource();
     }
 
     internal void MarkCanceled()
@@ -160,12 +173,12 @@ public partial class DownloadItemViewModel : ObservableObject
         Status = DownloadStatus.Canceled;
         SpeedText = "";
         EtaText = "";
-        DisposeCancellationSource();
+        DetachCancellationSource();
     }
 
     internal void MarkCompleted(IReadOnlyList<string> finalPaths)
     {
-        OutputPaths = finalPaths.ToList();
+        foreach (var path in finalPaths) RecordCompletedFile(path);
         var finalPath = OutputPaths.LastOrDefault();
         if (!string.IsNullOrWhiteSpace(finalPath))
             OutputPath = finalPath!;
@@ -173,7 +186,7 @@ public partial class DownloadItemViewModel : ObservableObject
         Progress = 100;
         SpeedText = "";
         EtaText = "";
-        DisposeCancellationSource();
+        DetachCancellationSource();
     }
 
     internal void MarkFailed(string message)
@@ -182,14 +195,10 @@ public partial class DownloadItemViewModel : ObservableObject
         Status = DownloadStatus.Failed;
         SpeedText = "";
         EtaText = "";
-        DisposeCancellationSource();
+        DetachCancellationSource();
     }
 
-    private void DisposeCancellationSource()
-    {
-        Cts?.Dispose();
-        Cts = null;
-    }
+    private void DetachCancellationSource() => Cts = null;
 
     // ---- Commands ----
     [RelayCommand] private void Pause() => _queue.Pause(this);
@@ -213,7 +222,7 @@ public partial class DownloadItemViewModel : ObservableObject
                     : null;
                 var fallback = !string.IsNullOrWhiteSpace(Options.OutputDirectory)
                     ? Options.OutputDirectory
-                    : App.Settings.Data.General.DownloadDirectory;
+                    : SettingsSnapshot.General.DownloadDirectory;
                 using var process = Process.Start("explorer.exe", $"\"{dir ?? fallback}\"");
             }
         }

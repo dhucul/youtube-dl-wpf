@@ -9,7 +9,7 @@ namespace YoutubeDlModern.Services;
 /// Locates or installs ffmpeg (required for format merging, audio extraction,
 /// and most post-processing).
 /// </summary>
-public sealed class FfmpegManager
+public sealed class FfmpegManager : IFfmpegLocator
 {
     public const string PinnedFfmpegVersion = "9.0.1";
     private const string FfmpegZipUrl =
@@ -28,9 +28,13 @@ public sealed class FfmpegManager
     private (long FfmpegLength, long FfmpegTicks, long FfprobeLength, long FfprobeTicks)? _verifiedFiles;
     private bool _verifiedIntegrity;
 
-    public FfmpegManager(SettingsService settings) => _settings = settings;
+    public FfmpegManager(SettingsService settings, string? managedDirectory = null)
+    {
+        _settings = settings;
+        FfmpegDir = managedDirectory ?? Path.Combine(SettingsService.LocalDataDir, "ffmpeg");
+    }
 
-    public string FfmpegDir => Path.Combine(SettingsService.LocalDataDir, "ffmpeg");
+    public string FfmpegDir { get; }
 
     /// <summary>Directory containing ffmpeg.exe, or null. Checks configured path, app-managed dir, then PATH.</summary>
     public Task<string?> LocateAsync(CancellationToken ct = default) =>
@@ -178,7 +182,7 @@ public sealed class FfmpegManager
         }
     }
 
-    private void CommitManagedInstall(string stagingDir, string backupDir)
+    internal void CommitManagedInstall(string stagingDir, string backupDir)
     {
         var previousInstallMoved = false;
         if (Directory.Exists(FfmpegDir))
@@ -208,14 +212,11 @@ public sealed class FfmpegManager
             throw;
         }
 
-        if (previousInstallMoved)
-        {
-            try { Directory.Delete(backupDir, recursive: true); }
-            catch { /* the new complete install is already active */ }
-        }
+        // Keep the recovery directory until post-install verification succeeds.
+        // EnsureInstalledCoreAsync performs cleanup only after that verification.
     }
 
-    private void RestoreManagedInstallAfterVerificationFailure(string backupDir)
+    internal void RestoreManagedInstallAfterVerificationFailure(string backupDir)
     {
         if (Directory.Exists(FfmpegDir))
             Directory.Delete(FfmpegDir, recursive: true);
