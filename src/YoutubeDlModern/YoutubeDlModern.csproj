@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -9,7 +9,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AssemblyName>YoutubeDlModern</AssemblyName>
     <RootNamespace>YoutubeDlModern</RootNamespace>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <AssemblyTitle>YoutubeDL Modern</AssemblyTitle>
     <Description>A modern WPF interface for the classic youtube-dl feature set, powered by the yt-dlp engine.</Description>
     <Product>YoutubeDL Modern</Product>

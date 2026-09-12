@@ -1,6 +1,6 @@
 #define MyAppName "YoutubeDL Modern"
 #ifndef MyAppVersion
-#define MyAppVersion "1.0.1"
+#define MyAppVersion "1.0.2"
 #endif
 #define MyAppPublisher "YoutubeDL Modern"
 #define MyAppExeName "YoutubeDlModern.exe"
