@@ -8,6 +8,7 @@ namespace YoutubeDlModern.Models;
 /// </summary>
 public sealed class VideoInfo
 {
+    [JsonIgnore] internal YoutubeDl.Engine.NativePlaylistSnapshot? NativePlaylistSnapshot { get; init; }
     [JsonPropertyName("id")] public string? Id { get; set; }
     [JsonPropertyName("title")] public string? Title { get; set; }
     [JsonPropertyName("uploader")] public string? Uploader { get; set; }
@@ -178,7 +179,7 @@ public static class Formatting
         if (seconds is null or < 0 || !double.IsFinite(seconds.Value) || seconds > TimeSpan.MaxValue.TotalSeconds)
             return "";
         var ts = TimeSpan.FromSeconds(seconds.Value);
-        return ts.TotalHours >= 1 ? ts.ToString(@"h\:mm\:ss") : ts.ToString(@"m\:ss");
+        return FormatTime(ts);
     }
 
     public static string FormatDuration(double? seconds, string fallback = "")
@@ -186,8 +187,12 @@ public static class Formatting
         if (seconds is null or <= 0 || !double.IsFinite(seconds.Value) || seconds > TimeSpan.MaxValue.TotalSeconds)
             return fallback;
         var ts = TimeSpan.FromSeconds(seconds.Value);
-        return ts.TotalHours >= 1 ? ts.ToString(@"h\:mm\:ss") : ts.ToString(@"m\:ss");
+        return FormatTime(ts);
     }
+
+    private static string FormatTime(TimeSpan value) => value.TotalHours >= 1
+        ? FormattableString.Invariant($"{value.Ticks / TimeSpan.TicksPerHour}:{value.Minutes:00}:{value.Seconds:00}")
+        : value.ToString(@"m\:ss");
 
     public static string FormatCount(long? count)
     {

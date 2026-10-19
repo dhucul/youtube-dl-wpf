@@ -9,7 +9,7 @@ public partial class AboutViewModel : ObservableObject, IDisposable
 {
     private const int MaxLogChars = 6000;
 
-    private readonly YtDlpEngine _engine;
+    private readonly IYtDlpEngine _engine;
     private readonly FfmpegManager _ffmpeg;
     private readonly SemaphoreSlim _refreshGate = new(1, 1);
     private readonly CancellationTokenSource _lifetimeCts = new();
@@ -20,7 +20,7 @@ public partial class AboutViewModel : ObservableObject, IDisposable
     public event Action<string>? NotifyRequested;
     public event Action? EngineStateChanged;
 
-    public AboutViewModel(YtDlpEngine engine, FfmpegManager ffmpeg)
+    public AboutViewModel(IYtDlpEngine engine, FfmpegManager ffmpeg)
     {
         _engine = engine;
         _ffmpeg = ffmpeg;
@@ -30,6 +30,8 @@ public partial class AboutViewModel : ObservableObject, IDisposable
         System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "1.0.0";
 
     public string EnginePath => _engine.EnginePath;
+    public bool CanReinstallEngine => !_engine.IsBuiltIn;
+    public string EngineSummary => _engine.IsBuiltIn ? "Included with the app; no separate download required." : "External download engine";
 
     [ObservableProperty] private string _engineVersionText = "checking…";
     [ObservableProperty] private bool _isEngineInstalled;
@@ -61,6 +63,8 @@ public partial class AboutViewModel : ObservableObject, IDisposable
         var ffmpeg = await _ffmpeg.LocateAsync(ct);
         if (refreshVersion != Volatile.Read(ref _refreshVersion)) return;
         IsEngineInstalled = isEngineInstalled;
+        OnPropertyChanged(nameof(CanReinstallEngine));
+        ReinstallEngineCommand.NotifyCanExecuteChanged();
         EngineVersionText = engineVersionText;
         IsFfmpegAvailable = ffmpeg is not null;
         FfmpegStatusText = ffmpeg ?? "not found — required for merging formats and audio extraction";
@@ -99,7 +103,7 @@ public partial class AboutViewModel : ObservableObject, IDisposable
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanReinstallEngine))]
     private async Task ReinstallEngineAsync()
     {
         if (IsEngineBusy) return;

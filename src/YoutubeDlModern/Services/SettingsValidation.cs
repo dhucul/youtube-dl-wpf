@@ -1,4 +1,4 @@
-using System.Globalization;
+using YoutubeDl.Engine.Download;
 using YoutubeDlModern.Models;
 
 namespace YoutubeDlModern.Services;
@@ -10,6 +10,7 @@ internal static class SettingsValidation
         var g = settings.General;
         var n = settings.Network;
         var s = settings.Selection;
+        _=NativeLivePolicy.Create(settings.Formats);
 
         if (g.MaxConcurrentDownloads is < 1 or > 8)
             throw new ArgumentException("Maximum concurrent downloads must be between 1 and 8.");
@@ -81,19 +82,13 @@ internal static class SettingsValidation
         return result;
     }
 
-    public static bool IsValidRateLimit(string value)
+    public static bool IsValidRateLimit(string? value)
     {
-        var text = value.Trim();
-        if (text.Length == 0) return true;
-        if (char.IsLetter(text[^1]))
+        try
         {
-            if ("KMGTP".IndexOf(char.ToUpperInvariant(text[^1])) < 0) return false;
-            text = text[..^1];
+            _ = ByteRateLimiter.Parse(value);
+            return true;
         }
-        return double.TryParse(
-            text,
-            NumberStyles.AllowDecimalPoint,
-            CultureInfo.InvariantCulture,
-            out var amount) && double.IsFinite(amount) && amount > 0;
+        catch (FormatException) { return false; }
     }
 }

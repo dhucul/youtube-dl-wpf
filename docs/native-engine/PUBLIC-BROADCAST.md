@@ -1,0 +1,41 @@
+# Native ARD, ZDF, NRK and subtitle-download timing
+
+Checkpoint 0.216.0, 2026-10-18. These are independent C# implementation subsets. The original 1,731 extractor keys, 126 classic settings and 276 captured long names remain in scope; full replacement and packaged production cutover remain incomplete.
+
+## ARD Mediathek
+
+Recorded /video/ pages bind the encoded CRID to the selected first-party page-gateway item, publication URN, duration and main audio/video edition. Complete issuer-offered H.264 MP4/HLS and normal WebVTT are supported for the observed delivery profiles. Selected publication identity/duration and format IDs remain pinned during renewal. Login/FSK/region/DRM/expiry restrictions are preserved. Source credentials/custom headers are isolated from public API/media and renewed manifest reads.
+
+Flat /sendung/ and /serie/ programme inventories consume every declared widget page, verify parent CRID, exact page/size/total bounds, unique child identities and source ordering, and retain unavailable entries. Inventories carry page/archive identities rather than playback URLs. Missing totals, changed membership/counts, partial pages and configured limits refuse complete-inventory claims. Fresh selected playback uses its own current item API and standard inspected-membership revalidation. Seasonal/version filters, live, additional roles/codecs/CDNs and other collection types remain pending.
+
+Primary contracts: https://www.ardmediathek.de/sendung/tagesschau/Y3JpZDovL2Rhc2Vyc3RlLmRlL3RhZ2Vzc2NoYXU ; the page's declared api.ardmediathek.de/page-gateway/pages/ard/item and widgets/ard/asset queries; and the complete current flat inventory for https://www.ardmediathek.de/sendung/das-verschwinden/Y3JpZDovL2Rhc2Vyc3RlLmRlL2Rhc1ZlcnNjaHdpbmRlbg . The latter currently declares one published item; it is not described as the original four-part series archive. Frozen ARDMediathek and ARDMediathekCollection gain subset evidence.
+
+## ZDFheute
+
+A canonical selected video page must expose one literal JSON-LD VideoObject, the expected ZDFheute author, complete duration and a matching publisher /api/video/{page-slug}.m3u8 service. No public website token or account credentials are needed for the observed declared grant. The controlled first-party redirect supplies the CDN asset; path/duration remain pinned for renewal. Publisher expiry/subscription/DRM and HTTP denials are preserved. The issued master/variant graph includes explicit packaging-host segment URLs, which are checked during independent source verification.
+
+Primary source: https://www.zdfheute.de/video/heute-nachrichten/261018-heute-sendung-17-uhr-100.html . It declares the complete public HLS API URL itself. This establishes a frozen zdf subset; zdf:channel, other ZDF domains/routes, collections, account/region cases and additional captions/formats remain open. No computed page JavaScript or upstream extractor runs.
+
+## NRK on-demand programmes
+
+Captured nrk:PROGRAM and tv.nrk.no programme/page aliases bind to the same declared programme identity. Only NRK owns that added opaque scheme in the registry. Metadata and playback manifest ID, full duration, on-demand mode, rights windows/region and clear HLS asset facts must match. Selected delivery path remains pinned for renewal; foreign captions/assets, encryption, changed edition or unsupported asset ambiguity fail. Available WebVTT and timed chapter indexes are exposed, including valid zero chapter starts. Series, radio, live, additional URL/assets/CDNs and account/region workflows remain pending.
+
+Primary contracts: https://tv.nrk.no/program/NNFA51093025 , https://psapi.nrk.no/playback/metadata/program/NNFA51093025 and its exact declared manifest endpoint. The source is a complete 2,837.88-second public programme with clear world playback rights. Frozen NRK and NRKTV gain subset evidence. Other NRK keys are not counted.
+
+The observed NRK TS source restarts PID continuity counters at complete PES starts. Initial strict decoding refused those header errors, and the received source/failure evidence is retained. The opted-in profile validates the entire packet stream before any changes: 188-byte alignment, sync/error/adaptation structure and every counter jump. Only zero resets at actual PES starts or explicit discontinuities are accepted; other gaps and damage fail before writes. It then changes continuity nibbles only. Encoded payloads, clocks, all other header bits, packet boundaries and complete media remain unchanged. Full strict decoding is still mandatory. Published/retained NRK transport media has corrected continuity headers; it is not claimed byte-identical to the received transport. Independent proof compares every other byte against the exact retained failing source. Existing Loom normalization defaults remain unchanged.
+
+## --sleep-subtitles
+
+The captured option is a finite nonnegative number of seconds before each selected subtitle download. Last argument wins; invalid values fail before discovery in a native download. WPF preserves job override precedence without changing saved settings, and strips this download-only value from read-only analysis. Defaults do not wait and keep previous request serialization/publication/recovery identities. Timing is excluded from the publication recipe, so changing a delay does not invalidate media recovery.
+
+Direct caption bodies, static HLS caption playlists, segmented/ranged DASH caption streams and live HLS/DASH logical tracks wait before their first retrieval. Live polling, fragments and initialization do not cause a new delay per piece. Unselected/absent tracks and already resolved inline text do not wait or fetch again. Waiting is cancellable, including very large finite values. Configured static/live adaptive paths reuse full caption, retention, conversion/embedding and recovery fixtures.
+
+Three classic global fields remain refused: Auth.ApMso, Auth.ApUsername, Auth.ApPassword. Registered application/programmer context, MVPD login and resource/session entitlement are still required. Real-account verification remains explicitly user-deferred. The sampled Rai item declares login/region protection and its relinker returned 403, so it is retained as unavailable research and not counted as successful coverage.
+
+## Final verification
+
+3,425 complete current core checks; 28 new media cases; 178 additional distinct affected media; 3631 current native checks; 188 WPF checks. Focused total is 122 including foundations/core/media. All 171 affected renewal, 282 caption and 19 existing Loom checks pass. Configured delay tests cover direct, static HLS/DASH and live HLS/DASH caption retrieval; defaults, cancellation, invalid values, resolved/unselected tracks and preflight are checked. The final solution builds with zero warnings/errors. Full optional suite was not rerun; prior complete 4,199-check gate on 0.200.0 remains recorded.
+
+Eighteen retained generated workflows and three actual public playback workflows fully decode 45 valid media/source files with 53 independent comparisons. Exact comparisons cover 113,939 coded picture units, 211,848 coded AAC packets and 428,769,664 PCM24 samples. ARD progressive bytes, the complete ordered ZDF HLS fragment body and both public caption bodies match fresh publisher responses. The current complete ARD inventory has one independently matched member; larger paging and limits are verified with owned 25-member fixtures.
+
+The original NRK input fails strict demuxing because of independent PES-start counter resets. It is retained separately and is not claimed strictly decodable as received. Every one of its 1,355,662 packets is independently compared with the normalized published source: only 1,256,515 continuity nibbles change; every payload/clock byte and packet boundary is exact. The resulting full 2,837.88-second stream passes strict complete decoding and exact coded/sample comparisons. Damaged sync/error/adaptation structure, non-PES zero resets, other gaps and canceled validation refuse changes/publication. Initial failure, original transport, header diagnosis and normalized reference are retained. Default request/selection/publication and static/live HLS recovery identities match verified 0.214.0. Engine SHA256: 6DD0AFDBE5EDA2ADE01DCFEEC181130DE159F743F85FD00BBB48D7ADF4F01BD0.

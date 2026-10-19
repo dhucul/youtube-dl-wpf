@@ -3,6 +3,9 @@ namespace YoutubeDlModern.Models;
 /// <summary>Per-download options chosen in the "add download" card.</summary>
 public sealed class DownloadOptions
 {
+    [System.Text.Json.Serialization.JsonIgnore]
+    internal YoutubeDl.Engine.NativePlaylistSnapshot? NativePlaylistSnapshot { get; set; }
+    internal DownloadOptions CopyForQueue() => (DownloadOptions)MemberwiseClone();
     /// <summary>video-audio | video-only | audio-only</summary>
     public string DownloadMode { get; set; } = "video-audio";
     /// <summary>best | 2160 | 1440 | 1080 | 720 | 480 | 360 | worst | custom</summary>

@@ -33,6 +33,7 @@ public sealed class YtDlpEngine : IYtDlpEngine
     private static readonly HttpClient Http = new() { Timeout = Timeout.InfiniteTimeSpan };
 
     private readonly SettingsService _settings;
+    private readonly Lazy<IYtDlpEngine> _nativeLiveEngine;
     private readonly SemaphoreSlim _maintenanceGate = new(1, 1);
     private readonly object _operationSync = new();
     private readonly object _integritySync = new();
@@ -49,16 +50,23 @@ public sealed class YtDlpEngine : IYtDlpEngine
         public void Dispose() => Interlocked.Exchange(ref _owner, null)?.ExitOperation();
     }
 
-    public YtDlpEngine(SettingsService settings) => _settings = settings;
+    public YtDlpEngine(SettingsService settings,IYtDlpEngine? nativeLiveEngine=null)
+    {
+        _settings=settings;_nativeLiveEngine=new(()=>nativeLiveEngine??new NativeEngineAdapter(settings:settings));
+    }
+    public bool NativeLivePolicyEnabled=>_settings.Data.Formats.NativeLiveDash;
+    public bool IsBuiltIn => NativeLivePolicyEnabled;
+    public string DisplayName => NativeLivePolicyEnabled ? "native live DASH" : "yt-dlp";
 
     public string EngineDir => Path.Combine(SettingsService.LocalDataDir, "engine");
     public string EnginePath => Path.Combine(EngineDir, "yt-dlp.exe");
     public bool EngineFileExists => File.Exists(EnginePath);
-    public bool IsInstalled => IsPinnedEngineValid();
+    public bool IsInstalled => NativeLivePolicyEnabled||IsPinnedEngineValid();
 
     public async Task<string?> GetVersionAsync(CancellationToken ct = default)
     {
         using var operation = await EnterOperationAsync(ct).ConfigureAwait(false);
+        if(NativeLivePolicyEnabled){ct.ThrowIfCancellationRequested();return "native live DASH "+YoutubeDl.Engine.NativeEngine.Version;}
         if (!IsInstalled) return null;
         try
         {
@@ -77,6 +85,7 @@ public sealed class YtDlpEngine : IYtDlpEngine
         AnalysisOptions? options = null)
     {
         using var operation = await EnterOperationAsync(ct).ConfigureAwait(false);
+        if(NativeLivePolicyEnabled)return await _nativeLiveEngine.Value.GetVideoInfoAsync(url,ct,options).ConfigureAwait(false);
         EnsureInstalledOrThrow();
         var args = ArgsBuilder.BuildInfoArgs(_settings.Data, url, options);
         var result = await ProcessRunner.RunAsync(
@@ -112,6 +121,7 @@ public sealed class YtDlpEngine : IYtDlpEngine
         bool isPlaylist = false)
     {
         using var operation = await EnterOperationAsync(ct).ConfigureAwait(false);
+        if(NativeLivePolicyEnabled)return await _nativeLiveEngine.Value.ListFormatsAsync(url,ct,options,isPlaylist).ConfigureAwait(false);
         EnsureInstalledOrThrow();
         var args = ArgsBuilder.BuildListFormatsArgs(_settings.Data, url, options, isPlaylist);
         var result = await ProcessRunner.RunAsync(
@@ -168,6 +178,7 @@ public sealed class YtDlpEngine : IYtDlpEngine
         Action<string>? onFileCompleted = null)
     {
         using var operation = await EnterOperationAsync(ct).ConfigureAwait(false);
+        if(settingsSnapshot.Formats.NativeLiveDash)return await _nativeLiveEngine.Value.DownloadAsync(url,options,settingsSnapshot,ffmpegLocation,progress,log,ct,onFileCompleted).ConfigureAwait(false);
         EnsureInstalledOrThrow();
 
         var args = ArgsBuilder.BuildDownloadArgs(settingsSnapshot, options, url, ffmpegLocation);
@@ -232,6 +243,7 @@ public sealed class YtDlpEngine : IYtDlpEngine
     /// <summary>Downloads the application-pinned yt-dlp.exe and verifies its published digest.</summary>
     public async Task EnsureInstalledAsync(IProgress<(double Percent, string Message)>? progress, CancellationToken ct)
     {
+        if(NativeLivePolicyEnabled){ct.ThrowIfCancellationRequested();await _nativeLiveEngine.Value.EnsureInstalledAsync(progress,ct).ConfigureAwait(false);return;}
         await _maintenanceGate.WaitAsync(ct).ConfigureAwait(false);
         try
         {
@@ -355,7 +367,7 @@ public sealed class YtDlpEngine : IYtDlpEngine
 
     private void EnsureInstalledOrThrow()
     {
-        if (!IsInstalled)
+        if (!IsPinnedEngineValid())
             throw new InvalidOperationException(
                 "The yt-dlp engine is not installed yet. Use the Install button on the Downloads or About page first.");
     }

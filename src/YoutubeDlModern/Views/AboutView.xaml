@@ -34,12 +34,10 @@
                             </Border>
                         </StackPanel>
                         <TextBlock Style="{StaticResource SecondaryText}" Margin="0,4,0,0" TextWrapping="Wrap"
-                                   Text="A modern Windows remake of the classic youtube-dl — every original option, a real GUI, and a living engine (yt-dlp) underneath. Built with WPF on .NET 10." />
+                                   Text="Save videos or audio, choose quality, and manage your downloads in one Windows app." />
                         <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                             <Button Style="{StaticResource MiniButton}" Content="youtube-dl (original project)"
                                     Command="{Binding OpenLinkCommand}" CommandParameter="https://github.com/ytdl-org/youtube-dl" />
-                            <Button Style="{StaticResource MiniButton}" Margin="8,0,0,0" Content="yt-dlp engine"
-                                    Command="{Binding OpenLinkCommand}" CommandParameter="https://github.com/yt-dlp/yt-dlp" />
                             <Button Style="{StaticResource MiniButton}" Margin="8,0,0,0" Content="ffmpeg"
                                     Command="{Binding OpenLinkCommand}" CommandParameter="https://ffmpeg.org" />
                         </StackPanel>
@@ -50,17 +48,18 @@
             <!-- Engine card -->
             <Border Style="{StaticResource Card}" Margin="0,0,0,14">
                 <StackPanel>
-                    <TextBlock Style="{StaticResource SectionText}" Text="Download engine (yt-dlp)" />
+                    <TextBlock Style="{StaticResource SectionText}" Text="Download engine" />
                     <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
                         <TextBlock Style="{StaticResource SecondaryText}" Text="Status:" />
                         <TextBlock Margin="8,0,0,0" FontWeight="SemiBold" Text="{Binding EngineVersionText}" />
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                    <TextBlock Style="{StaticResource SecondaryText}" Margin="0,6,0,0" Text="{Binding EngineSummary}" />
+                    <StackPanel Orientation="Horizontal" Margin="0,3,0,0" Visibility="{Binding CanReinstallEngine, Converter={StaticResource BoolToVis}}">
                         <TextBlock Style="{StaticResource SecondaryText}" Text="Location:" />
                         <TextBlock Style="{StaticResource SecondaryText}" Margin="8,0,0,0" FontSize="11"
                                    Text="{Binding EnginePath}" />
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                    <StackPanel Orientation="Horizontal" Margin="0,12,0,0" Visibility="{Binding CanReinstallEngine, Converter={StaticResource BoolToVis}}">
                         <Button Command="{Binding ReinstallEngineCommand}"
                                 IsEnabled="{Binding IsEngineBusy, Converter={StaticResource InverseBool}}">
                             <Button.Style>
@@ -113,7 +112,7 @@
 
             <TextBlock Style="{StaticResource SecondaryText}" FontSize="11" TextWrapping="Wrap" Margin="0,4,0,30"
                        Foreground="{StaticResource TextMutedBrush}"
-                       Text="Please respect the terms of service of the sites you download from and only download content you have the right to save. This project is a GUI front-end and is not affiliated with youtube-dl, yt-dlp or ffmpeg." />
+                       Text="Please respect the terms of service of the sites you download from and only download content you have the right to save. This application is not affiliated with the websites it supports or with ffmpeg." />
         </StackPanel>
     </ScrollViewer>
 </UserControl>

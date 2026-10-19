@@ -9,15 +9,18 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AssemblyName>YoutubeDlModern</AssemblyName>
     <RootNamespace>YoutubeDlModern</RootNamespace>
-    <Version>1.0.2</Version>
+    <Version>1.1.5</Version>
     <AssemblyTitle>YoutubeDL Modern</AssemblyTitle>
-    <Description>A modern WPF interface for the classic youtube-dl feature set, powered by the yt-dlp engine.</Description>
+    <Description>A Windows video and audio downloader with a built-in C# engine.</Description>
     <Product>YoutubeDL Modern</Product>
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <ProjectReference Include="..\YoutubeDl.Engine\YoutubeDl.Engine.csproj" />
+    <ProjectReference Include="..\YoutubeDl.Engine.PlayerRuntime\YoutubeDl.Engine.PlayerRuntime.csproj" />
+    <ProjectReference Include="..\YoutubeDl.Engine.BrowserRuntime\YoutubeDl.Engine.BrowserRuntime.csproj" />
   </ItemGroup>
 
   <ItemGroup>

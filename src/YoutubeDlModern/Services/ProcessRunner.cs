@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using YoutubeDl.Engine.Media;
 
 namespace YoutubeDlModern.Services;
 
@@ -21,6 +22,7 @@ public static class ProcessRunner
 {
     private const int DefaultMaximumCapturedCharacters = 32 * 1024 * 1024;
     private const int DefaultMaximumLineCharacters = 1024 * 1024;
+    private static readonly TimeSpan CleanupTimeout = TimeSpan.FromSeconds(5);
 
     public static async Task<ProcessResult> RunAsync(
         string fileName,
@@ -67,25 +69,40 @@ public static class ProcessRunner
         if (!process.Start())
             throw new InvalidOperationException($"Could not start the process '{Path.GetFileName(fileName)}'.");
 
+        using var lifetime = ProcessLifetime.Attach(process);
+        void StopProcess()
+        {
+            KillTree(process);
+            // The job also owns descendants whose parent has already exited.
+            lifetime.Dispose();
+        }
+
         var outTask = ReadLinesAsync(
             process.StandardOutput, stdout, onStdoutLine,
-            maximumCapturedCharacters, maximumLineCharacters, () => KillTree(process));
+            maximumCapturedCharacters, maximumLineCharacters, StopProcess, effectiveToken);
         var errTask = ReadLinesAsync(
             process.StandardError, stderr, onStderrLine,
-            maximumCapturedCharacters, maximumLineCharacters, () => KillTree(process));
+            maximumCapturedCharacters, maximumLineCharacters, StopProcess, effectiveToken);
 
-        await using (effectiveToken.Register(() => KillTree(process)))
+        async Task StopAndDrainAsync()
+        {
+            StopProcess();
+            try { await process.WaitForExitAsync().WaitAsync(CleanupTimeout).ConfigureAwait(false); } catch { /* best effort after termination */ }
+            try { await Task.WhenAll(outTask, errTask).WaitAsync(CleanupTimeout).ConfigureAwait(false); } catch { /* preserve the original failure */ }
+        }
+
+        await using (effectiveToken.Register(StopProcess))
         {
             try
             {
                 await process.WaitForExitAsync(effectiveToken).ConfigureAwait(false);
+                // Descendants may hold redirected handles after the parent exits.
+                // The deadline and cancellation registration cover the entire drain.
+                await Task.WhenAll(outTask, errTask).WaitAsync(effectiveToken).ConfigureAwait(false);
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException) when (effectiveToken.IsCancellationRequested)
             {
-                // The kill was requested; wait for the process to actually exit so it is reaped.
-                KillTree(process);
-                try { await process.WaitForExitAsync().ConfigureAwait(false); } catch { /* ignore */ }
-                try { await Task.WhenAll(outTask, errTask).ConfigureAwait(false); } catch { /* ignore */ }
+                await StopAndDrainAsync().ConfigureAwait(false);
 
                 if (!ct.IsCancellationRequested && timeoutCts?.IsCancellationRequested == true)
                     throw new TimeoutException($"The process '{Path.GetFileName(fileName)}' exceeded its {durationText(timeout)} timeout.");
@@ -93,14 +110,10 @@ public static class ProcessRunner
             }
             catch
             {
-                KillTree(process);
-                try { await process.WaitForExitAsync().ConfigureAwait(false); } catch { /* ignore */ }
-                try { await Task.WhenAll(outTask, errTask).ConfigureAwait(false); } catch { /* ignore */ }
+                await StopAndDrainAsync().ConfigureAwait(false);
                 throw;
             }
         }
-
-        await Task.WhenAll(outTask, errTask).ConfigureAwait(false);
 
         return new ProcessResult
         {
@@ -133,7 +146,8 @@ public static class ProcessRunner
         Action<string>? onLine,
         int maximumCapturedCharacters,
         int maximumLineCharacters,
-        Action abortProcess)
+        Action abortProcess,
+        CancellationToken ct)
     {
         var buffer = GC.AllocateUninitializedArray<char>(4096);
         var currentLine = new StringBuilder();
@@ -141,7 +155,7 @@ public static class ProcessRunner
 
         while (true)
         {
-            var read = await reader.ReadAsync(buffer).ConfigureAwait(false);
+            var read = await reader.ReadAsync(buffer.AsMemory(), ct).ConfigureAwait(false);
             if (read == 0)
                 break;
             for (var index = 0; index < read; index++)

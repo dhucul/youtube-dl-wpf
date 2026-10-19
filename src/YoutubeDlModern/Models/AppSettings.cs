@@ -66,6 +66,25 @@ public partial class FormatSettings : ObservableObject
     [ObservableProperty] private string _recodeVideo = "";         // classic --recode-video
     [ObservableProperty] private bool _keepVideo;                  // classic -k
     [ObservableProperty] private bool _noPostOverwrites;
+    [ObservableProperty] private bool _nativeLiveDash;
+    [ObservableProperty] private string _liveAudioLanguages="";
+    [ObservableProperty] private string _liveAudioRoles="";
+    [ObservableProperty] private string _liveCaptionRoles="";
+    [ObservableProperty] private bool _liveFollowQuality=true;
+    [ObservableProperty] private bool _liveConvertCaptions=true;
+    [ObservableProperty] private bool _liveNormalizeTransitions;
+    [ObservableProperty] private bool _liveAdaptiveLadder;
+    [ObservableProperty] private int _liveTransitionHeight=720;
+    [ObservableProperty] private string _liveTransitionVideoCodec="auto";
+    [ObservableProperty] private string _liveTransitionAudioCodec="auto";
+    [ObservableProperty] private string _liveTransitionAudioLayout="preserve";
+    [ObservableProperty] private int _liveTransitionAudioSampleRate=48000;
+    [ObservableProperty] private bool _liveNormalizeGeometry;
+    [ObservableProperty] private string _liveTransitionColorPolicy="preserve";
+    [ObservableProperty] private int _liveHdrPeakNits=1000;
+    [ObservableProperty] private string _liveTransitionCrop="";
+    [ObservableProperty] private string _liveHdrSelectorPolicy="strict";
+    partial void OnLiveNormalizeTransitionsChanged(bool value){if(!value)LiveAdaptiveLadder=false;}
 }
 
 public partial class SubtitleSettings : ObservableObject

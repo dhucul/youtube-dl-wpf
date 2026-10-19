@@ -76,7 +76,7 @@
                             <TextBox Width="420" Style="{StaticResource ModernTextBox}" Text="{Binding S.General.ExtraArgs}" />
                         </StackPanel>
                         <CheckBox Style="{StaticResource SpacedCheck}"
-                                  Content="Verify the yt-dlp engine version when the application starts"
+                                  Content="Verify the external engine version when the application starts" Visibility="Collapsed"
                                   IsChecked="{Binding S.General.CheckEngineUpdatesOnStart}" />
                     </StackPanel>
                 </ScrollViewer>
@@ -172,6 +172,31 @@
                             </ComboBox>
                         </StackPanel>
                         <CheckBox Style="{StaticResource SpacedCheck}" Content="Do not overwrite post-processed files (--no-post-overwrites)" IsChecked="{Binding S.Formats.NoPostOverwrites}" />
+                        <TextBlock Style="{StaticResource GroupHeader}" Text="Native live DASH" Margin="0,16,0,10" />
+                        <CheckBox x:Name="NativeLiveDashToggle" Style="{StaticResource SpacedCheck}" Content="Use native live DASH policies" IsChecked="{Binding S.Formats.NativeLiveDash}" />
+                        <TextBlock Text="Optional controls for live DASH audio, captions and quality changes." TextWrapping="Wrap" Margin="0,0,0,8" />
+                        <StackPanel IsEnabled="{Binding S.Formats.NativeLiveDash}">
+                            <StackPanel Style="{StaticResource FieldRow}"><TextBlock Style="{StaticResource FieldLabel}" Text="Audio languages, in order" /><TextBox x:Name="LiveAudioLanguagesField" Style="{StaticResource FieldBox}" Text="{Binding S.Formats.LiveAudioLanguages, UpdateSourceTrigger=PropertyChanged}" ToolTip="Comma separated, for example fr,en. Blank keeps the offered default." /></StackPanel>
+                            <StackPanel Style="{StaticResource FieldRow}"><TextBlock Style="{StaticResource FieldLabel}" Text="Audio roles, in order" /><TextBox Style="{StaticResource FieldBox}" Text="{Binding S.Formats.LiveAudioRoles, UpdateSourceTrigger=PropertyChanged}" ToolTip="For example main,commentary" /></StackPanel>
+                            <StackPanel Style="{StaticResource FieldRow}"><TextBlock Style="{StaticResource FieldLabel}" Text="Caption roles, in order" /><TextBox Style="{StaticResource FieldBox}" Text="{Binding S.Formats.LiveCaptionRoles, UpdateSourceTrigger=PropertyChanged}" ToolTip="For example subtitle,caption" /></StackPanel>
+                            <CheckBox Style="{StaticResource SpacedCheck}" Content="Follow the selected quality at new periods" IsChecked="{Binding S.Formats.LiveFollowQuality}" />
+                            <CheckBox Style="{StaticResource SpacedCheck}" Content="Convert WebVTT and TTML caption transitions" IsChecked="{Binding S.Formats.LiveConvertCaptions}" />
+                            <CheckBox x:Name="LiveNormalizeTransitionsToggle" Style="{StaticResource SpacedCheck}" Content="Convert decoder and resolution transitions" IsChecked="{Binding S.Formats.LiveNormalizeTransitions}" />
+                            <StackPanel IsEnabled="{Binding S.Formats.LiveNormalizeTransitions}">
+                                <CheckBox Style="{StaticResource SpacedCheck}" Content="Choose across the adaptive resolution ladder" IsChecked="{Binding S.Formats.LiveAdaptiveLadder}" />
+                                <StackPanel Style="{StaticResource FieldRow}"><TextBlock Style="{StaticResource FieldLabel}" Text="Converted video height" /><ComboBox x:Name="LiveTransitionHeightChoice" Style="{StaticResource FieldCombo}" SelectedValuePath="Tag" SelectedValue="{Binding S.Formats.LiveTransitionHeight}"><ComboBoxItem Content="360p" Tag="360" /><ComboBoxItem Content="480p" Tag="480" /><ComboBoxItem Content="720p" Tag="720" /><ComboBoxItem Content="1080p" Tag="1080" /><ComboBoxItem Content="2160p" Tag="2160" /></ComboBox></StackPanel>
+                                <StackPanel Style="{StaticResource FieldRow}"><TextBlock Style="{StaticResource FieldLabel}" Text="Converted video codec" /><ComboBox x:Name="LiveVideoCodecChoice" Style="{StaticResource FieldCombo}" SelectedValue="{Binding S.Formats.LiveTransitionVideoCodec}"><ComboBoxItem Content="H.264 (default)" Tag="auto" /><ComboBoxItem Content="H.264" Tag="h264" /><ComboBoxItem Content="HEVC" Tag="hevc" /><ComboBoxItem Content="VP9" Tag="vp9" /><ComboBoxItem Content="AV1" Tag="av1" /></ComboBox></StackPanel>
+                                <StackPanel Style="{StaticResource FieldRow}"><TextBlock Style="{StaticResource FieldLabel}" Text="Converted audio codec" /><ComboBox x:Name="LiveAudioCodecChoice" Style="{StaticResource FieldCombo}" SelectedValue="{Binding S.Formats.LiveTransitionAudioCodec}"><ComboBoxItem Content="ALAC (default)" Tag="auto" /><ComboBoxItem Content="ALAC" Tag="alac" /><ComboBoxItem Content="AAC" Tag="aac" /><ComboBoxItem Content="FLAC" Tag="flac" /><ComboBoxItem Content="Opus (fixed 48 kHz layout)" Tag="opus" /></ComboBox></StackPanel>
+                                <StackPanel Style="{StaticResource FieldRow}"><TextBlock Style="{StaticResource FieldLabel}" Text="Fixed audio layout" /><ComboBox x:Name="LiveAudioLayoutChoice" Style="{StaticResource FieldCombo}" SelectedValue="{Binding S.Formats.LiveTransitionAudioLayout}"><ComboBoxItem Content="Preserve stable layout" Tag="preserve" /><ComboBoxItem Content="Mono" Tag="mono" /><ComboBoxItem Content="Stereo" Tag="stereo" /><ComboBoxItem Content="5.1" Tag="5.1" /></ComboBox></StackPanel>
+                                <StackPanel Style="{StaticResource FieldRow}"><TextBlock Style="{StaticResource FieldLabel}" Text="Fixed audio sample rate" /><ComboBox Style="{StaticResource FieldCombo}" SelectedValue="{Binding S.Formats.LiveTransitionAudioSampleRate}"><ComboBoxItem Content="32 kHz" Tag="32000" /><ComboBoxItem Content="44.1 kHz" Tag="44100" /><ComboBoxItem Content="48 kHz" Tag="48000" /><ComboBoxItem Content="88.2 kHz" Tag="88200" /><ComboBoxItem Content="96 kHz" Tag="96000" /></ComboBox></StackPanel>
+                                <CheckBox x:Name="LiveGeometryToggle" Style="{StaticResource SpacedCheck}" Content="Normalize pixel aspect ratio and quarter-turn rotation" IsChecked="{Binding S.Formats.LiveNormalizeGeometry}" />
+                                <StackPanel Style="{StaticResource FieldRow}"><TextBlock Style="{StaticResource FieldLabel}" Text="Color conversion" /><ComboBox x:Name="LiveColorPolicyChoice" Style="{StaticResource FieldCombo}" SelectedValue="{Binding S.Formats.LiveTransitionColorPolicy}"><ComboBoxItem Content="Preserve stable SDR color" Tag="preserve" /><ComboBoxItem Content="Convert tagged SDR to BT.709" Tag="bt709" /><ComboBoxItem Content="PQ / HLG HDR to BT.709 SDR" Tag="hdr-to-bt709" /><ComboBoxItem Content="Preserve PQ / HLG HDR (10-bit HEVC)" Tag="hdr-preserve" /><ComboBoxItem Content="Preserve changing / dynamic HDR (HEVC)" Tag="hdr-metadata" /><ComboBoxItem Content="Remap dynamic HDR geometry (HEVC)" Tag="hdr-spatial" /><ComboBoxItem Content="Transform HDR geometry and padding (HEVC)" Tag="hdr-transform" /><ComboBoxItem Content="Reconstruct FEL / HDR (measured)" Tag="hdr-reconstruct" /><ComboBoxItem Content="Wide gamut / RGB to BT.709" Tag="wide-to-bt709" /><ComboBoxItem Content="Wide gamut / RGB to BT.2020 (10-bit HEVC)" Tag="bt2020" /></ComboBox></StackPanel>
+                                <StackPanel Style="{StaticResource FieldRow}"><TextBlock Style="{StaticResource FieldLabel}" Text="HDR10+ selector authoring" /><ComboBox x:Name="LiveHdrSelectorChoice" Style="{StaticResource FieldCombo}" SelectedValue="{Binding S.Formats.LiveHdrSelectorPolicy}"><ComboBoxItem Content="Preserve processing rectangles" Tag="strict" /><ComboBoxItem Content="Preserve ellipses; measure rectangle envelopes" Tag="ellipse-envelope" /></ComboBox></StackPanel>
+                                <StackPanel Style="{StaticResource FieldRow}"><TextBlock Style="{StaticResource FieldLabel}" Text="HDR crop margins (L,T,R,B)" /><TextBox x:Name="LiveHdrCropField" Style="{StaticResource FieldBox}" Text="{Binding S.Formats.LiveTransitionCrop, UpdateSourceTrigger=PropertyChanged}" /></StackPanel>
+                                <StackPanel Style="{StaticResource FieldRow}"><TextBlock Style="{StaticResource FieldLabel}" Text="Nominal HDR peak (nits)" /><TextBox x:Name="LiveHdrPeakField" Style="{StaticResource FieldBox}" Text="{Binding S.Formats.LiveHdrPeakNits}" /></StackPanel>
+                                <TextBlock Text="Converted video uses a 16:9 canvas at 30 fps with aspect-preserving padding. Fixed audio layouts allow remapping and resampling between periods. HDR tone mapping produces SDR and uses the selected nominal peak. HDR preservation keeps PQ/HLG; changing/dynamic HDR uses the explicit metadata policy. The spatial policy remaps supported HDR windows and active areas; choose HEVC for 10-bit HDR or BT.2020 output. Reconstruction uses crop margins and source display transforms, measures final HDR10+ pixels and composes FEL at twelve-bit precision before the ten-bit HEVC target. Non-PQ sources use their declared mastering peak. Ellipse envelope authoring preserves supported unclipped ellipses and measures their new processing rectangles. Keep original retains complete source periods. Conversion uses more processing time." TextWrapping="Wrap" Margin="0,0,0,8" />
+                            </StackPanel>
+                        </StackPanel>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
@@ -469,7 +494,7 @@
                             </ComboBox>
                         </StackPanel>
                         <StackPanel Style="{StaticResource FieldRow}">
-                            <TextBlock Style="{StaticResource FieldLabel}" Text="SponsorBlock ✦ modern" ToolTip="Mark or cut sponsor segments using the SponsorBlock database" />
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="SponsorBlock ✦ modern" ToolTip="Mark or cut sponsor segments. Uses SponsorBlock data from https://sponsor.ajay.app (CC BY-NC-SA 4.0)." />
                             <ComboBox Style="{StaticResource FieldCombo}" SelectedValue="{Binding S.PostProcess.SponsorBlock}">
                                 <ComboBoxItem Content="Off" Tag="none" />
                                 <ComboBoxItem Content="Mark chapters" Tag="mark" />
@@ -503,3 +528,7 @@
         </StackPanel>
     </Grid>
 </UserControl>
+
+
+
+

@@ -17,7 +17,7 @@
             <TextBlock Text="Downloads" Style="{StaticResource HeadingText}" />
             <TextBlock Style="{StaticResource SecondaryText}"
                        Margin="0,3,0,16"
-                       Text="Paste a video or playlist link, or several links at once. Powered by the yt-dlp engine and compatible with classic youtube-dl options."
+                       Text="Paste a video link, choose video or audio, and add it to your downloads."
                        TextWrapping="Wrap" />
 
             <!-- ===== Engine missing banner ===== -->

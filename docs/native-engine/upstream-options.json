@@ -1,0 +1,1114 @@
+{
+  "schemaVersion": 1,
+  "capturedOn": "2026-10-07",
+  "upstreamRevision": "51bab8a0116f4d8004c315706d809782607d5847",
+  "source": "https://raw.githubusercontent.com/yt-dlp/yt-dlp/51bab8a0116f4d8004c315706d809782607d5847/README.md",
+  "optionCount": 276,
+  "notes": "Long option names advertised in upstream usage documentation. Aliases, defaults, interactions, selector/template grammars, and extractor-specific behavior need additional specifications. Naming an option here does not claim an implementation.",
+  "options": [
+    {
+      "name": "--abort-on-error",
+      "status": "pending"
+    },
+    {
+      "name": "--abort-on-unavailable-fragments",
+      "status": "pending"
+    },
+    {
+      "name": "--add-chapters",
+      "status": "pending"
+    },
+    {
+      "name": "--add-headers",
+      "status": "pending"
+    },
+    {
+      "name": "--add-metadata",
+      "status": "pending"
+    },
+    {
+      "name": "--age-limit",
+      "status": "pending"
+    },
+    {
+      "name": "--alias",
+      "status": "pending"
+    },
+    {
+      "name": "--allow-dynamic-mpd",
+      "status": "pending"
+    },
+    {
+      "name": "--ap-list-mso",
+      "status": "pending"
+    },
+    {
+      "name": "--ap-mso",
+      "status": "pending"
+    },
+    {
+      "name": "--ap-password",
+      "status": "pending"
+    },
+    {
+      "name": "--ap-username",
+      "status": "pending"
+    },
+    {
+      "name": "--audio-format",
+      "status": "pending"
+    },
+    {
+      "name": "--audio-multistreams",
+      "status": "pending"
+    },
+    {
+      "name": "--audio-quality",
+      "status": "pending"
+    },
+    {
+      "name": "--batch-file",
+      "status": "pending"
+    },
+    {
+      "name": "--bidi-workaround",
+      "status": "pending"
+    },
+    {
+      "name": "--break-match-filters",
+      "status": "pending"
+    },
+    {
+      "name": "--break-on-existing",
+      "status": "pending"
+    },
+    {
+      "name": "--break-per-input",
+      "status": "pending"
+    },
+    {
+      "name": "--buffer-size",
+      "status": "pending"
+    },
+    {
+      "name": "--cache-dir",
+      "status": "pending"
+    },
+    {
+      "name": "--check-all-formats",
+      "status": "pending"
+    },
+    {
+      "name": "--check-formats",
+      "status": "pending"
+    },
+    {
+      "name": "--clean-info-json",
+      "status": "pending"
+    },
+    {
+      "name": "--client-certificate",
+      "status": "pending"
+    },
+    {
+      "name": "--client-certificate-key",
+      "status": "pending"
+    },
+    {
+      "name": "--client-certificate-password",
+      "status": "pending"
+    },
+    {
+      "name": "--color",
+      "status": "pending"
+    },
+    {
+      "name": "--compat-options",
+      "status": "pending"
+    },
+    {
+      "name": "--concat-playlist",
+      "status": "pending"
+    },
+    {
+      "name": "--concurrent-fragments",
+      "status": "pending"
+    },
+    {
+      "name": "--config-locations",
+      "status": "pending"
+    },
+    {
+      "name": "--console-title",
+      "status": "pending"
+    },
+    {
+      "name": "--continue",
+      "status": "pending"
+    },
+    {
+      "name": "--convert-",
+      "status": "pending"
+    },
+    {
+      "name": "--convert-subs",
+      "status": "pending"
+    },
+    {
+      "name": "--convert-thumbnails",
+      "status": "pending"
+    },
+    {
+      "name": "--cookies",
+      "status": "pending"
+    },
+    {
+      "name": "--cookies-from-browser",
+      "status": "pending"
+    },
+    {
+      "name": "--date",
+      "status": "pending"
+    },
+    {
+      "name": "--dateafter",
+      "status": "pending"
+    },
+    {
+      "name": "--datebefore",
+      "status": "pending"
+    },
+    {
+      "name": "--default-search",
+      "status": "pending"
+    },
+    {
+      "name": "--download-archive",
+      "status": "pending"
+    },
+    {
+      "name": "--download-sections",
+      "status": "pending"
+    },
+    {
+      "name": "--downloader",
+      "status": "pending"
+    },
+    {
+      "name": "--downloader-args",
+      "status": "pending"
+    },
+    {
+      "name": "--dump-json",
+      "status": "pending"
+    },
+    {
+      "name": "--dump-pages",
+      "status": "pending"
+    },
+    {
+      "name": "--dump-single-json",
+      "status": "pending"
+    },
+    {
+      "name": "--embed-chapters",
+      "status": "pending"
+    },
+    {
+      "name": "--embed-info-json",
+      "status": "pending"
+    },
+    {
+      "name": "--embed-metadata",
+      "status": "pending"
+    },
+    {
+      "name": "--embed-subs",
+      "status": "pending"
+    },
+    {
+      "name": "--embed-thumbnail",
+      "status": "pending"
+    },
+    {
+      "name": "--enable-file-urls",
+      "status": "pending"
+    },
+    {
+      "name": "--encoding",
+      "status": "pending"
+    },
+    {
+      "name": "--exec",
+      "status": "pending"
+    },
+    {
+      "name": "--external-downloader",
+      "status": "pending"
+    },
+    {
+      "name": "--external-downloader-args",
+      "status": "pending"
+    },
+    {
+      "name": "--extract-audio",
+      "status": "pending"
+    },
+    {
+      "name": "--extractor-args",
+      "status": "pending"
+    },
+    {
+      "name": "--extractor-descriptions",
+      "status": "pending"
+    },
+    {
+      "name": "--extractor-retries",
+      "status": "pending"
+    },
+    {
+      "name": "--ffmpeg-location",
+      "status": "pending"
+    },
+    {
+      "name": "--file-access-retries",
+      "status": "pending"
+    },
+    {
+      "name": "--fixup",
+      "status": "pending"
+    },
+    {
+      "name": "--flat-playlist",
+      "status": "pending"
+    },
+    {
+      "name": "--force-download-archive",
+      "status": "pending"
+    },
+    {
+      "name": "--force-ipv4",
+      "status": "pending"
+    },
+    {
+      "name": "--force-ipv6",
+      "status": "pending"
+    },
+    {
+      "name": "--force-keyframes-at-cuts",
+      "status": "pending"
+    },
+    {
+      "name": "--force-overwrites",
+      "status": "pending"
+    },
+    {
+      "name": "--force-write-archive",
+      "status": "pending"
+    },
+    {
+      "name": "--format",
+      "status": "pending"
+    },
+    {
+      "name": "--format-sort",
+      "status": "pending"
+    },
+    {
+      "name": "--format-sort-force",
+      "status": "pending"
+    },
+    {
+      "name": "--format-sort-reset",
+      "status": "pending"
+    },
+    {
+      "name": "--fragment-retries",
+      "status": "pending"
+    },
+    {
+      "name": "--geo-verification-proxy",
+      "status": "pending"
+    },
+    {
+      "name": "--get-audio",
+      "status": "pending"
+    },
+    {
+      "name": "--get-comments",
+      "status": "pending"
+    },
+    {
+      "name": "--help",
+      "status": "pending"
+    },
+    {
+      "name": "--hls-split-discontinuity",
+      "status": "pending"
+    },
+    {
+      "name": "--hls-use-mpegts",
+      "status": "pending"
+    },
+    {
+      "name": "--http-chunk-size",
+      "status": "pending"
+    },
+    {
+      "name": "--ies",
+      "status": "pending"
+    },
+    {
+      "name": "--ignore-config",
+      "status": "pending"
+    },
+    {
+      "name": "--ignore-dynamic-mpd",
+      "status": "pending"
+    },
+    {
+      "name": "--ignore-errors",
+      "status": "pending"
+    },
+    {
+      "name": "--ignore-no-formats-error",
+      "status": "pending"
+    },
+    {
+      "name": "--impersonate",
+      "status": "pending"
+    },
+    {
+      "name": "--js-runtimes",
+      "status": "pending"
+    },
+    {
+      "name": "--keep-fragments",
+      "status": "pending"
+    },
+    {
+      "name": "--keep-video",
+      "status": "pending"
+    },
+    {
+      "name": "--lazy-playlist",
+      "status": "pending"
+    },
+    {
+      "name": "--legacy-server-connect",
+      "status": "pending"
+    },
+    {
+      "name": "--limit-rate",
+      "status": "pending"
+    },
+    {
+      "name": "--list-extractors",
+      "status": "pending"
+    },
+    {
+      "name": "--list-formats",
+      "status": "pending"
+    },
+    {
+      "name": "--list-impersonate-targets",
+      "status": "pending"
+    },
+    {
+      "name": "--list-subs",
+      "status": "pending"
+    },
+    {
+      "name": "--list-thumbnails",
+      "status": "pending"
+    },
+    {
+      "name": "--live-from-start",
+      "status": "pending"
+    },
+    {
+      "name": "--load-info-json",
+      "status": "pending"
+    },
+    {
+      "name": "--mark-watched",
+      "status": "pending"
+    },
+    {
+      "name": "--match-filters",
+      "status": "pending"
+    },
+    {
+      "name": "--max-downloads",
+      "status": "pending"
+    },
+    {
+      "name": "--max-filesize",
+      "status": "pending"
+    },
+    {
+      "name": "--max-sleep-interval",
+      "status": "pending"
+    },
+    {
+      "name": "--merge-output-format",
+      "status": "pending"
+    },
+    {
+      "name": "--min-filesize",
+      "status": "pending"
+    },
+    {
+      "name": "--min-sleep-interval",
+      "status": "pending"
+    },
+    {
+      "name": "--mtime",
+      "status": "pending"
+    },
+    {
+      "name": "--netrc",
+      "status": "pending"
+    },
+    {
+      "name": "--netrc-cmd",
+      "status": "pending"
+    },
+    {
+      "name": "--netrc-location",
+      "status": "pending"
+    },
+    {
+      "name": "--newline",
+      "status": "pending"
+    },
+    {
+      "name": "--no-abort-on-error",
+      "status": "pending"
+    },
+    {
+      "name": "--no-abort-on-unavailable-fragments",
+      "status": "pending"
+    },
+    {
+      "name": "--no-add-chapters",
+      "status": "pending"
+    },
+    {
+      "name": "--no-add-metadata",
+      "status": "pending"
+    },
+    {
+      "name": "--no-allow-dynamic-mpd",
+      "status": "pending"
+    },
+    {
+      "name": "--no-audio-multistreams",
+      "status": "pending"
+    },
+    {
+      "name": "--no-batch-file",
+      "status": "pending"
+    },
+    {
+      "name": "--no-break-match-filters",
+      "status": "pending"
+    },
+    {
+      "name": "--no-break-on-existing",
+      "status": "pending"
+    },
+    {
+      "name": "--no-break-per-input",
+      "status": "pending"
+    },
+    {
+      "name": "--no-cache-dir",
+      "status": "pending"
+    },
+    {
+      "name": "--no-check-certificates",
+      "status": "pending"
+    },
+    {
+      "name": "--no-check-formats",
+      "status": "pending"
+    },
+    {
+      "name": "--no-clean-info-json",
+      "status": "pending"
+    },
+    {
+      "name": "--no-config",
+      "status": "pending"
+    },
+    {
+      "name": "--no-config-locations",
+      "status": "pending"
+    },
+    {
+      "name": "--no-continue",
+      "status": "pending"
+    },
+    {
+      "name": "--no-cookies",
+      "status": "pending"
+    },
+    {
+      "name": "--no-cookies-from-browser",
+      "status": "pending"
+    },
+    {
+      "name": "--no-download",
+      "status": "pending"
+    },
+    {
+      "name": "--no-download-archive",
+      "status": "pending"
+    },
+    {
+      "name": "--no-embed-chapters",
+      "status": "pending"
+    },
+    {
+      "name": "--no-embed-info-json",
+      "status": "pending"
+    },
+    {
+      "name": "--no-embed-metadata",
+      "status": "pending"
+    },
+    {
+      "name": "--no-embed-subs",
+      "status": "pending"
+    },
+    {
+      "name": "--no-embed-thumbnail",
+      "status": "pending"
+    },
+    {
+      "name": "--no-exec",
+      "status": "pending"
+    },
+    {
+      "name": "--no-flat-playlist",
+      "status": "pending"
+    },
+    {
+      "name": "--no-force-keyframes-at-cuts",
+      "status": "pending"
+    },
+    {
+      "name": "--no-force-overwrites",
+      "status": "pending"
+    },
+    {
+      "name": "--no-format-sort-force",
+      "status": "pending"
+    },
+    {
+      "name": "--no-get-comments",
+      "status": "pending"
+    },
+    {
+      "name": "--no-hls-split-discontinuity",
+      "status": "pending"
+    },
+    {
+      "name": "--no-hls-use-mpegts",
+      "status": "pending"
+    },
+    {
+      "name": "--no-ignore-dynamic-mpd",
+      "status": "pending"
+    },
+    {
+      "name": "--no-ignore-errors",
+      "status": "pending"
+    },
+    {
+      "name": "--no-ignore-no-formats-error",
+      "status": "pending"
+    },
+    {
+      "name": "--no-js-",
+      "status": "pending"
+    },
+    {
+      "name": "--no-js-runtimes",
+      "status": "pending"
+    },
+    {
+      "name": "--no-keep-fragments",
+      "status": "pending"
+    },
+    {
+      "name": "--no-keep-video",
+      "status": "pending"
+    },
+    {
+      "name": "--no-lazy-playlist",
+      "status": "pending"
+    },
+    {
+      "name": "--no-live-from-start",
+      "status": "pending"
+    },
+    {
+      "name": "--no-mark-watched",
+      "status": "pending"
+    },
+    {
+      "name": "--no-match-filters",
+      "status": "pending"
+    },
+    {
+      "name": "--no-mtime",
+      "status": "pending"
+    },
+    {
+      "name": "--no-overwrites",
+      "status": "pending"
+    },
+    {
+      "name": "--no-part",
+      "status": "pending"
+    },
+    {
+      "name": "--no-playlist",
+      "status": "pending"
+    },
+    {
+      "name": "--no-plugin-dirs",
+      "status": "pending"
+    },
+    {
+      "name": "--no-post-overwrites",
+      "status": "pending"
+    },
+    {
+      "name": "--no-prefer-free-formats",
+      "status": "pending"
+    },
+    {
+      "name": "--no-progress",
+      "status": "pending"
+    },
+    {
+      "name": "--no-quiet",
+      "status": "pending"
+    },
+    {
+      "name": "--no-remote-components",
+      "status": "pending"
+    },
+    {
+      "name": "--no-remove-chapters",
+      "status": "pending"
+    },
+    {
+      "name": "--no-resize-buffer",
+      "status": "pending"
+    },
+    {
+      "name": "--no-restrict-filenames",
+      "status": "pending"
+    },
+    {
+      "name": "--no-simulate",
+      "status": "pending"
+    },
+    {
+      "name": "--no-skip-unavailable-fragments",
+      "status": "pending"
+    },
+    {
+      "name": "--no-split-chapters",
+      "status": "pending"
+    },
+    {
+      "name": "--no-sponsorblock",
+      "status": "pending"
+    },
+    {
+      "name": "--no-update",
+      "status": "pending"
+    },
+    {
+      "name": "--no-video-multistreams",
+      "status": "pending"
+    },
+    {
+      "name": "--no-wait-for-video",
+      "status": "pending"
+    },
+    {
+      "name": "--no-warnings",
+      "status": "pending"
+    },
+    {
+      "name": "--no-windows-filenames",
+      "status": "pending"
+    },
+    {
+      "name": "--no-write-auto-subs",
+      "status": "pending"
+    },
+    {
+      "name": "--no-write-automatic-subs",
+      "status": "pending"
+    },
+    {
+      "name": "--no-write-comments",
+      "status": "pending"
+    },
+    {
+      "name": "--no-write-description",
+      "status": "pending"
+    },
+    {
+      "name": "--no-write-info-json",
+      "status": "pending"
+    },
+    {
+      "name": "--no-write-playlist-metafiles",
+      "status": "pending"
+    },
+    {
+      "name": "--no-write-subs",
+      "status": "pending"
+    },
+    {
+      "name": "--no-write-thumbnail",
+      "status": "pending"
+    },
+    {
+      "name": "--output",
+      "status": "pending"
+    },
+    {
+      "name": "--output-na-placeholder",
+      "status": "pending"
+    },
+    {
+      "name": "--parse-metadata",
+      "status": "pending"
+    },
+    {
+      "name": "--part",
+      "status": "pending"
+    },
+    {
+      "name": "--password",
+      "status": "pending"
+    },
+    {
+      "name": "--paths",
+      "status": "pending"
+    },
+    {
+      "name": "--playlist-items",
+      "status": "pending"
+    },
+    {
+      "name": "--playlist-random",
+      "status": "pending"
+    },
+    {
+      "name": "--playlist-reverse",
+      "status": "pending"
+    },
+    {
+      "name": "--plugin-dirs",
+      "status": "pending"
+    },
+    {
+      "name": "--post-overwrites",
+      "status": "pending"
+    },
+    {
+      "name": "--postprocessor-args",
+      "status": "pending"
+    },
+    {
+      "name": "--ppa",
+      "status": "pending"
+    },
+    {
+      "name": "--prefer-free-formats",
+      "status": "pending"
+    },
+    {
+      "name": "--prefer-insecure",
+      "status": "pending"
+    },
+    {
+      "name": "--preset-alias",
+      "status": "pending"
+    },
+    {
+      "name": "--print",
+      "status": "pending"
+    },
+    {
+      "name": "--print-to-file",
+      "status": "pending"
+    },
+    {
+      "name": "--print-traffic",
+      "status": "pending"
+    },
+    {
+      "name": "--progress",
+      "status": "pending"
+    },
+    {
+      "name": "--progress-delta",
+      "status": "pending"
+    },
+    {
+      "name": "--progress-template",
+      "status": "pending"
+    },
+    {
+      "name": "--proxy",
+      "status": "pending"
+    },
+    {
+      "name": "--quiet",
+      "status": "pending"
+    },
+    {
+      "name": "--recode-video",
+      "status": "pending"
+    },
+    {
+      "name": "--remote-components",
+      "status": "pending"
+    },
+    {
+      "name": "--remove-chapters",
+      "status": "pending"
+    },
+    {
+      "name": "--remux-video",
+      "status": "pending"
+    },
+    {
+      "name": "--replace-in-metadata",
+      "status": "pending"
+    },
+    {
+      "name": "--resize-buffer",
+      "status": "pending"
+    },
+    {
+      "name": "--restrict-filenames",
+      "status": "pending"
+    },
+    {
+      "name": "--retries",
+      "status": "pending"
+    },
+    {
+      "name": "--retry-sleep",
+      "status": "pending"
+    },
+    {
+      "name": "--rm-cache-dir",
+      "status": "pending"
+    },
+    {
+      "name": "--simulate",
+      "status": "pending"
+    },
+    {
+      "name": "--skip-download",
+      "status": "pending"
+    },
+    {
+      "name": "--skip-playlist-after-errors",
+      "status": "pending"
+    },
+    {
+      "name": "--skip-unavailable-fragments",
+      "status": "pending"
+    },
+    {
+      "name": "--sleep-interval",
+      "status": "pending"
+    },
+    {
+      "name": "--sleep-requests",
+      "status": "pending"
+    },
+    {
+      "name": "--sleep-subtitles",
+      "status": "pending"
+    },
+    {
+      "name": "--socket-timeout",
+      "status": "pending"
+    },
+    {
+      "name": "--source-address",
+      "status": "pending"
+    },
+    {
+      "name": "--split-chapters",
+      "status": "pending"
+    },
+    {
+      "name": "--sponsorblock-api",
+      "status": "pending"
+    },
+    {
+      "name": "--sponsorblock-chapter-title",
+      "status": "pending"
+    },
+    {
+      "name": "--sponsorblock-mark",
+      "status": "pending"
+    },
+    {
+      "name": "--sponsorblock-remove",
+      "status": "pending"
+    },
+    {
+      "name": "--sub-",
+      "status": "pending"
+    },
+    {
+      "name": "--sub-format",
+      "status": "pending"
+    },
+    {
+      "name": "--sub-langs",
+      "status": "pending"
+    },
+    {
+      "name": "--throttled-rate",
+      "status": "pending"
+    },
+    {
+      "name": "--trim-filenames",
+      "status": "pending"
+    },
+    {
+      "name": "--twofactor",
+      "status": "pending"
+    },
+    {
+      "name": "--update",
+      "status": "pending"
+    },
+    {
+      "name": "--update-to",
+      "status": "pending"
+    },
+    {
+      "name": "--use-extractors",
+      "status": "pending"
+    },
+    {
+      "name": "--use-postprocessor",
+      "status": "pending"
+    },
+    {
+      "name": "--username",
+      "status": "pending"
+    },
+    {
+      "name": "--verbose",
+      "status": "pending"
+    },
+    {
+      "name": "--version",
+      "status": "pending"
+    },
+    {
+      "name": "--video-multistreams",
+      "status": "pending"
+    },
+    {
+      "name": "--video-password",
+      "status": "pending"
+    },
+    {
+      "name": "--wait-for-video",
+      "status": "pending"
+    },
+    {
+      "name": "--windows-filenames",
+      "status": "pending"
+    },
+    {
+      "name": "--write-all-thumbnails",
+      "status": "pending"
+    },
+    {
+      "name": "--write-auto-subs",
+      "status": "pending"
+    },
+    {
+      "name": "--write-automatic-subs",
+      "status": "pending"
+    },
+    {
+      "name": "--write-comments",
+      "status": "pending"
+    },
+    {
+      "name": "--write-description",
+      "status": "pending"
+    },
+    {
+      "name": "--write-desktop-link",
+      "status": "pending"
+    },
+    {
+      "name": "--write-info-json",
+      "status": "pending"
+    },
+    {
+      "name": "--write-link",
+      "status": "pending"
+    },
+    {
+      "name": "--write-pages",
+      "status": "pending"
+    },
+    {
+      "name": "--write-playlist-metafiles",
+      "status": "pending"
+    },
+    {
+      "name": "--write-subs",
+      "status": "pending"
+    },
+    {
+      "name": "--write-thumbnail",
+      "status": "pending"
+    },
+    {
+      "name": "--write-url-link",
+      "status": "pending"
+    },
+    {
+      "name": "--write-webloc-link",
+      "status": "pending"
+    },
+    {
+      "name": "--xattrs",
+      "status": "pending"
+    },
+    {
+      "name": "--xff",
+      "status": "pending"
+    },
+    {
+      "name": "--yes-playlist",
+      "status": "pending"
+    }
+  ]
+}

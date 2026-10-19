@@ -1,0 +1,170 @@
+[
+  {
+    "Version": 1,
+    "Seed": 0,
+    "Encoded": "010000000037469d4470bc02879173d53964c3133917760cf67678c590948e2f8278d1688f0cb765b14052282c28d9bd955ba0f880bb9ded4b5893b3a578fd0f295f7b1702e913450126e015d516",
+    "Expected": "https://video-fixture.xhcdn.com/selected/clip.mp4?token=owned%2Bvalue&x=1"
+  },
+  {
+    "Version": 1,
+    "Seed": 2147483647,
+    "Encoded": "01ffffff7f3afd20d3d5f7e7a84c3818ce613816665a6dd1c1137360ff6985a295bdcaad3081cc98a625990dc3f51270a2de1b7d5ff60630bc7d18d68ac57602be1ae0527de4a8f896832b70fa4b",
+    "Expected": "https://video-fixture.xhcdn.com/selected/clip.mp4?token=owned%2Bvalue&x=1"
+  },
+  {
+    "Version": 1,
+    "Seed": 2147483648,
+    "Encoded": "010000008037469d4470bc02879173d53964c3133917760cf67678c590948e2f8278d1688f0cb765b14052282c28d9bd955ba0f880bb9ded4b5893b3a578fd0f295f7b1702e913450126e015d516",
+    "Expected": "https://video-fixture.xhcdn.com/selected/clip.mp4?token=owned%2Bvalue&x=1"
+  },
+  {
+    "Version": 1,
+    "Seed": 4294967295,
+    "Encoded": "01ffffffff3afd20d3d5f7e7a84c3818ce613816665a6dd1c1137360ff6985a295bdcaad3081cc98a625990dc3f51270a2de1b7d5ff60630bc7d18d68ac57602be1ae0527de4a8f896832b70fa4b",
+    "Expected": "https://video-fixture.xhcdn.com/selected/clip.mp4?token=owned%2Bvalue&x=1"
+  },
+  {
+    "Version": 2,
+    "Seed": 0,
+    "Encoded": "020000000068747470733a2f2f766964656f2d666978747572652e786863646e2e636f6d2f73656c65637465642f636c69702e6d70343f746f6b656e3d6f776e656425324276616c756526783d31",
+    "Expected": "https://video-fixture.xhcdn.com/selected/clip.mp4?token=owned%2Bvalue&x=1"
+  },
+  {
+    "Version": 2,
+    "Seed": 2147483647,
+    "Encoded": "02ffffff7f770f7f3ea348bf16c379cd62e4782f0f4315a414ea1f3a0dbcaa227a221b3669ab987046ffdbca087608f5f24f6ea7516f4ad8cebd8c44fbc361e46d1110e48dc60beea4927308c4ef",
+    "Expected": "https://video-fixture.xhcdn.com/selected/clip.mp4?token=owned%2Bvalue&x=1"
+  },
+  {
+    "Version": 2,
+    "Seed": 2147483648,
+    "Encoded": "020000008068f03ce432a40fed3176229ed0d0cd8a204f5834f2095bf4ac37616eb71d473fe426b287f647e600fd2274691612935eff09a1a0fa33c0192de00deb54a87a0718c81f5cc789685e66",
+    "Expected": "https://video-fixture.xhcdn.com/selected/clip.mp4?token=owned%2Bvalue&x=1"
+  },
+  {
+    "Version": 2,
+    "Seed": 4294967295,
+    "Encoded": "02ffffffff778b37aae2d69fd484668b995b8584ec1b2e89527d38199173f92d3af6691c793cdbaea46ae8496ca449edf22952597fa47c0d012cdaeadf81f687e3219dacc8a8a29d8d30dc18a7b8",
+    "Expected": "https://video-fixture.xhcdn.com/selected/clip.mp4?token=owned%2Bvalue&x=1"
+  },
+  {
+    "Version": 3,
+    "Seed": 0,
+    "Encoded": "0300000000c884d390f6c0248b4363fcceb13a3f196116a80f7be801f1abd95a168cb53a2e865a0f34241ba79b6c0982af392eacd0f3b31415ec0e65556c889f39619d884be13c0b0bf9a168b71d",
+    "Expected": "https://video-fixture.xhcdn.com/selected/clip.mp4?token=owned%2Bvalue&x=1"
+  },
+  {
+    "Version": 3,
+    "Seed": 2147483647,
+    "Encoded": "03ffffff7ff05a574d5b36248439f8719efece44bf99fc1904aa7ec53204919cc268eaa049725e183e21c13f6460156d80b632e28a1f5229ac074f6109af2dd77f545f3e1bb6aae4336f5e6abe81",
+    "Expected": "https://video-fixture.xhcdn.com/selected/clip.mp4?token=owned%2Bvalue&x=1"
+  },
+  {
+    "Version": 3,
+    "Seed": 2147483648,
+    "Encoded": "03000000802cf7b0cab8dd8176c7bf8720d37a5ef93b384606f3cd3bb8760f113ecdd80efadf674ff8b6dd78caf582716587b40828b310f6da56a87c907907d5acab27accdf9f04fb89598a0e851",
+    "Expected": "https://video-fixture.xhcdn.com/selected/clip.mp4?token=owned%2Bvalue&x=1"
+  },
+  {
+    "Version": 3,
+    "Seed": 4294967295,
+    "Encoded": "03ffffffff7048f5794026ce8b9ec05aaf61366a092b0ff136271e625522a01dd9be8c238345b4a1bae6f1ab776fa412c922add155df95105af740eb032060913f42c0dfca070cd34ddcc7e1b5d3",
+    "Expected": "https://video-fixture.xhcdn.com/selected/clip.mp4?token=owned%2Bvalue&x=1"
+  },
+  {
+    "Version": 4,
+    "Seed": 0,
+    "Encoded": "0400000000e59b0923e935569b9fe37af3777d25a7079d41eb12fb8bfdd441a0070f5b91c541665495163a5c33ce701d463dc6bd2ffae9505b971bbcb0078a21ff57b4065b1de34b6d95f4e2abb5",
+    "Expected": "https://video-fixture.xhcdn.com/selected/clip.mp4?token=owned%2Bvalue&x=1"
+  },
+  {
+    "Version": 4,
+    "Seed": 2147483647,
+    "Encoded": "04ffffff7f255bc963297516db8a23bab337bde5e7475d012bd2bb4bbd9381604ccf1bd18501a61455567a1cf30e305dabfd06fdefbaa9101bd75bfc70c74a61481774461b5d230bad55b422ebf5",
+    "Expected": "https://video-fixture.xhcdn.com/selected/clip.mp4?token=owned%2Bvalue&x=1"
+  },
+  {
+    "Version": 4,
+    "Seed": 2147483648,
+    "Encoded": "0400000080a5db49e3a9f5965bdfa33ae6b73d6567c7dd81ab523bcb3d9401e0cc4f9b5105812694d5d6fa9c738eb0dd2b7d867d6f3a29909b57db7cf047cae1c897f4c69bdda38b2dd534a26b75",
+    "Expected": "https://video-fixture.xhcdn.com/selected/clip.mp4?token=owned%2Bvalue&x=1"
+  },
+  {
+    "Version": 4,
+    "Seed": 4294967295,
+    "Encoded": "04ffffffff651b89a369b5d61b1f63fa73f7fda527871dc16b927b0b7d54c1200c8fdb1145c1e6d41596badcb31bf09debbd463daf7a69d0db179b3c30d40aa188d73486db9d63cbed1574622b00",
+    "Expected": "https://video-fixture.xhcdn.com/selected/clip.mp4?token=owned%2Bvalue&x=1"
+  },
+  {
+    "Version": 5,
+    "Seed": 0,
+    "Encoded": "0500000000cd37a0535a7ce8876bea25b6c66b2d7626826a3686d5348e22e6955747729876e204fd40db274d0a7f1894ce962acdfa0e7862c7ecc27b677bf5c077870ed890802febba2b4118a4da",
+    "Expected": "https://video-fixture.xhcdn.com/selected/clip.mp4?token=owned%2Bvalue&x=1"
+  },
+  {
+    "Version": 5,
+    "Seed": 2147483647,
+    "Encoded": "05ffffff7f4c50d229561ba37bc26cba7fdb47d310dd1664e88c1cec21b48d17bf7485dd67a25b9be980062bcbfa6852c33a9210e5f6dc8ebb59fe0bbb8005abb235579c8379a18e1ec5fa6af20b",
+    "Expected": "https://video-fixture.xhcdn.com/selected/clip.mp4?token=owned%2Bvalue&x=1"
+  },
+  {
+    "Version": 5,
+    "Seed": 2147483648,
+    "Encoded": "0500000080cd37f0aa21526c9f9adfcab8eb5f74cbb1e7390fe12007157e7e00de485f971bcf09ae34e549fd1a93bc99b18d3679bd3898966a813737ba831ca58e10d3bdfb136058508b045fbb2b",
+    "Expected": "https://video-fixture.xhcdn.com/selected/clip.mp4?token=owned%2Bvalue&x=1"
+  },
+  {
+    "Version": 5,
+    "Seed": 4294967295,
+    "Encoded": "05ffffffff4c50a2ed42c8c07f647b46814406993374c3feb8662b12d00ae52b4634836f2bd8fd1fd2b450c1fba481110b9412c6f1fd4450f541ad4d3454cefa7dc91804d0da9df662416a1ab053",
+    "Expected": "https://video-fixture.xhcdn.com/selected/clip.mp4?token=owned%2Bvalue&x=1"
+  },
+  {
+    "Version": 6,
+    "Seed": 0,
+    "Encoded": "06000000000acd65c64648b1b0a3a279780d1aa4681c407646b320072885aac92e1102a953799ea90eac841f3a8b791b3171cf6a69f44b0861a9e66f61688eada16779d3002b387b6e6457443ef4",
+    "Expected": "https://video-fixture.xhcdn.com/selected/clip.mp4?token=owned%2Bvalue&x=1"
+  },
+  {
+    "Version": 6,
+    "Seed": 2147483647,
+    "Encoded": "06ffffff7f69124190213909bf6f6750f3c2e80266fa0ac815002d6369620e5a3564c6b3499a006ba0705f13e6c4a14f0edfdd6cd77a3e5e6c6c1159596c86e67bd1f6a13a38ba6eb62448760536",
+    "Expected": "https://video-fixture.xhcdn.com/selected/clip.mp4?token=owned%2Bvalue&x=1"
+  },
+  {
+    "Version": 6,
+    "Seed": 2147483648,
+    "Encoded": "060000008068b369a170314735430267981712019901bfd68801c29cdc4f7f21da6443c2ec0eec870f0e75667f2185c12d43e36cb427bb452a16b0764a464f0564d010318af739593ac0ee79c8d2",
+    "Expected": "https://video-fixture.xhcdn.com/selected/clip.mp4?token=owned%2Bvalue&x=1"
+  },
+  {
+    "Version": 6,
+    "Seed": 4294967295,
+    "Encoded": "06ffffffffef0c81b5c835cc34c16cb40f39ac4c727f0903850a0ad942a235188348c98c1a22f1c4f9bafa7ca25a287d1e04511c7ed7bb65c1a1b7ee4553b209ea7f5d3787421fb2cb6b21a33328",
+    "Expected": "https://video-fixture.xhcdn.com/selected/clip.mp4?token=owned%2Bvalue&x=1"
+  },
+  {
+    "Version": 7,
+    "Seed": 0,
+    "Encoded": "07000000007bc53a9d79a6c84ac6f6ada601e34f3c0014b1bb33bc9d7963b817b2103dfe1a551e2ca5896755f6dfcf794d417bd4dd2bb4512cc09719fe39915d4a7203fe28bbb65183972d6a360e",
+    "Expected": "https://video-fixture.xhcdn.com/selected/clip.mp4?token=owned%2Bvalue&x=1"
+  },
+  {
+    "Version": 7,
+    "Seed": 2147483647,
+    "Encoded": "07ffffff7f313bfedf4bb543d98515e75fbd36e00e7e9dbd267a9492ec20db68790a76bf8eaa8b6fb7e5f1f10db3d596a60eefcef9c9cfde03c35957ef6d71f4383df1f4517d2e2300886815c255",
+    "Expected": "https://video-fixture.xhcdn.com/selected/clip.mp4?token=owned%2Bvalue&x=1"
+  },
+  {
+    "Version": 7,
+    "Seed": 2147483648,
+    "Encoded": "07000000807bc53a9d79a6c84ac6f6ada601e34f3c0014b1bb33bc9d7963b817b2103dfe1a551e2ca5896755f6dfcf794d417bd4dd2bb4512cc09719fe39915d4a7203fe28bbb65183972d6a360e",
+    "Expected": "https://video-fixture.xhcdn.com/selected/clip.mp4?token=owned%2Bvalue&x=1"
+  },
+  {
+    "Version": 7,
+    "Seed": 4294967295,
+    "Encoded": "07ffffffff313bfedf4bb543d98515e75fbd36e00e7e9dbd267a9492ec20db68790a76bf8eaa8b6fb7e5f1f10db3d596a60eefcef9c9cfde03c35957ef6d71f4383df1f4517d2e2300886815c255",
+    "Expected": "https://video-fixture.xhcdn.com/selected/clip.mp4?token=owned%2Bvalue&x=1"
+  }
+]

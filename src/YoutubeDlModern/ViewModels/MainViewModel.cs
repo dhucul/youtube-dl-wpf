@@ -7,7 +7,9 @@ namespace YoutubeDlModern.ViewModels;
 
 public partial class MainViewModel : ObservableObject, IDisposable
 {
-    private readonly YtDlpEngine _engine;
+    private readonly IYtDlpEngine _engine;
+    private readonly SettingsService _engineSettings;
+    private bool _nativeLiveState;
     private readonly bool _checkEngineVersionOnStart;
     private readonly DispatcherTimer _notifyTimer;
     private readonly CancellationTokenSource _lifetimeCts = new();
@@ -31,10 +33,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
         DownloadQueueService queueService,
         SettingsService settings,
         HistoryService history,
-        YtDlpEngine engine,
+        IYtDlpEngine engine,
         FfmpegManager ffmpeg)
     {
         _engine = engine;
+        _engineSettings=settings;_nativeLiveState=engine.IsBuiltIn;
         _checkEngineVersionOnStart = settings.Data.General.CheckEngineUpdatesOnStart;
 
         Queue = new QueueViewModel(queueService, settings, engine);
@@ -63,7 +66,14 @@ public partial class MainViewModel : ObservableObject, IDisposable
             _notifyTimer.Stop();
         };
 
+        settings.Changed+=OnEngineSettingsChanged;
         StartEngineStatusRefresh();
+    }
+    private void OnEngineSettingsChanged()
+    {
+        if(_isDisposed||_nativeLiveState==_engine.IsBuiltIn)return;
+        _nativeLiveState=_engine.IsBuiltIn;
+        _notifyTimer.Dispatcher.InvokeAsync(()=>{if(!_isDisposed)StartEngineStatusRefresh();});
     }
 
     private void StartEngineStatusRefresh(bool forceVersionCheck = false)
@@ -78,7 +88,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
         try
         {
             string status;
-            if (!_engine.IsInstalled)
+            if (_engine.IsBuiltIn)
+            {
+                status = _engine.DisplayName + " " + YoutubeDl.Engine.NativeEngine.Version;
+            }
+            else if (!_engine.IsInstalled)
             {
                 status = "engine: not installed";
             }
@@ -140,6 +154,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         if (_isDisposed) return;
         _isDisposed = true;
+        _engineSettings.Changed-=OnEngineSettingsChanged;
         _notifyTimer.Stop();
         _lifetimeCts.Cancel();
         Queue.Dispose();

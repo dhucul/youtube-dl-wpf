@@ -1,0 +1,34 @@
+{
+  "playabilityStatus": { "status": "OK" },
+  "videoDetails": {
+    "videoId": "abcdefghijk",
+    "title": "Fixture {title} with \"quotes\"",
+    "author": "Test creator",
+    "shortDescription": "A description with }; and an escaped slash \\.",
+    "lengthSeconds": "19",
+    "isLiveContent": false,
+    "thumbnail": { "thumbnails": [
+      { "url": "https://i.ytimg.com/vi/abcdefghijk/small.jpg", "width": 120, "height": 90 },
+      { "url": "https://i.ytimg.com/vi/abcdefghijk/large.jpg", "width": 1280, "height": 720 }
+    ] }
+  },
+  "streamingData": {
+    "expiresInSeconds": "21600",
+    "serverAbrStreamingUrl": "https://r1.googlevideo.com/videoplayback?fixture=sabr",
+    "formats": [
+      { "itag": 18, "url": "https://r1.googlevideo.com/videoplayback?fixture=combined", "mimeType": "video/mp4; codecs=\"avc1.42001E, mp4a.40.2\"", "width": 640, "height": 360, "fps": 30, "bitrate": 500000, "contentLength": "8", "qualityLabel": "360p" }
+    ],
+    "adaptiveFormats": [
+      { "itag": 137, "url": "https://r1.googlevideo.com/videoplayback?fixture=video", "mimeType": "video/mp4; codecs=\"avc1.640028\"", "width": 1920, "height": 1080, "fps": 30, "bitrate": 2000000, "contentLength": "5", "qualityLabel": "1080p" },
+      { "itag": 140, "url": "https://r1.googlevideo.com/videoplayback?fixture=audio", "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"", "bitrate": 128000, "contentLength": "5", "audioTrack": { "id": "en.0", "audioIsDefault": true } },
+      { "itag": 251, "url": "https://r1.googlevideo.com/videoplayback?fixture=opus", "mimeType": "audio/webm; codecs=\"opus\"", "bitrate": 160000, "contentLength": "4", "audioTrack": { "id": "en.0", "audioIsDefault": true } },
+      { "itag": 299, "signatureCipher": "url=https%3A%2F%2Fr1.googlevideo.com%2Fvideoplayback%3Ffixture%3Dsignature&sp=sig&s=encrypted", "mimeType": "video/mp4; codecs=\"avc1.64002A\"", "height": 1080, "fps": 60 },
+      { "itag": 248, "url": "https://r1.googlevideo.com/videoplayback?fixture=throttle&n=transformation-required", "mimeType": "video/webm; codecs=\"vp09.00.40.08\"", "height": 1080 },
+      { "itag": 399, "mimeType": "video/mp4; codecs=\"av01.0.08M.08\"", "height": 1080 }
+    ]
+  },
+  "captions": { "playerCaptionsTracklistRenderer": { "captionTracks": [
+    { "baseUrl": "https://www.youtube.com/api/timedtext?v=abcdefghijk&lang=en", "languageCode": "en" },
+    { "baseUrl": "https://www.youtube.com/api/timedtext?v=abcdefghijk&lang=es", "languageCode": "es", "kind": "asr" }
+  ] } }
+}

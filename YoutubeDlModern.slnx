@@ -1,6 +1,10 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/YoutubeDl.Engine/YoutubeDl.Engine.csproj" />
+    <Project Path="src/YoutubeDl.Engine.PlayerRuntime/YoutubeDl.Engine.PlayerRuntime.csproj" />
+    <Project Path="src/YoutubeDl.Engine.BrowserRuntime/YoutubeDl.Engine.BrowserRuntime.csproj" />
     <Project Path="src/YoutubeDlModern/YoutubeDlModern.csproj" />
   </Folder>
   <Project Path="tests/YoutubeDlModern.Tests/YoutubeDlModern.Tests.csproj" />
+  <Project Path="tests/YoutubeDl.Engine.Tests/YoutubeDl.Engine.Tests.csproj" />
 </Solution>

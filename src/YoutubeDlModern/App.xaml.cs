@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Threading;
 using YoutubeDlModern.Services;
 using YoutubeDlModern.ViewModels;
@@ -38,10 +38,20 @@ public partial class App : Application
     }
 
     public static SettingsService Settings { get; private set; } = null!;
-    public static YtDlpEngine Engine { get; private set; } = null!;
+    public static IYtDlpEngine Engine { get; private set; } = null!;
     public static FfmpegManager Ffmpeg { get; private set; } = null!;
     public static HistoryService History { get; private set; } = null!;
     public static DownloadQueueService Queue { get; private set; } = null!;
+
+    internal static IYtDlpEngine CreateDownloadEngine(SettingsService settings) => new NativeEngineAdapter(settings: settings);
+
+    internal static string? ResolveStorageDirectory(string[] arguments)
+    {
+        var index = Array.IndexOf(arguments, "--data-directory");
+        if (index < 0) return null;
+        if (index + 1 >= arguments.Length || string.IsNullOrWhiteSpace(arguments[index + 1]) || arguments[index + 1].StartsWith("--", StringComparison.Ordinal)) throw new ArgumentException("The data-directory option needs a folder path.");
+        return System.IO.Path.GetFullPath(arguments[index + 1]);
+    }
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -49,12 +59,15 @@ public partial class App : Application
 
         DispatcherUnhandledException += OnUnhandledException;
 
-        Settings = new SettingsService();
+        var storageDirectory = ResolveStorageDirectory(e.Args);
+        var verifyStartup = e.Args.Contains("--verify-startup", StringComparer.Ordinal);
+        if (verifyStartup && storageDirectory is null) throw new ArgumentException("Startup verification requires an isolated data directory.");
+        Settings = new SettingsService(storageDirectory);
         Settings.Load();
 
-        Engine = new YtDlpEngine(Settings);
+        Engine = CreateDownloadEngine(Settings);
         Ffmpeg = new FfmpegManager(Settings);
-        History = new HistoryService();
+        History = new HistoryService(storageDirectory);
         History.Load();
         Queue = new DownloadQueueService(Engine, Ffmpeg, Settings, History);
 
@@ -68,7 +81,27 @@ public partial class App : Application
             args.Cancel = true;
             _ = RequestShutdownAsync();
         };
-        window.Show();
+        if (verifyStartup)
+        {
+            Dispatcher.BeginInvoke(async () =>
+            {
+                try
+                {
+                    await mainVm.RefreshEngineStatusAsync();
+                    var view = (FrameworkElement)window.Content;
+                    view.Measure(new Size(1120, 760)); view.Arrange(new Rect(0, 0, 1120, 760)); view.UpdateLayout();
+                    var bitmap = new System.Windows.Media.Imaging.RenderTargetBitmap(1120, 760, 96, 96, System.Windows.Media.PixelFormats.Pbgra32); bitmap.Render(view);
+                    var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder(); encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(bitmap));
+                    System.IO.Directory.CreateDirectory(storageDirectory!);
+                    using (var output = System.IO.File.Create(System.IO.Path.Combine(storageDirectory!, "startup.png"))) encoder.Save(output);
+                    var report = new { Engine.IsBuiltIn, Engine.IsInstalled, Engine.DisplayName, Version = await Engine.GetVersionAsync(), mainVm.EngineStatusText, NativeAdapter = Engine is NativeEngineAdapter, HistoryEntries = History.Entries.Count };
+                    await System.IO.File.WriteAllTextAsync(System.IO.Path.Combine(storageDirectory!, "startup-verification.json"), System.Text.Json.JsonSerializer.Serialize(report, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+                    await RequestShutdownAsync();
+                }
+                catch { await RequestShutdownAsync(-1); }
+            });
+        }
+        else window.Show();
     }
 
     protected override void OnExit(ExitEventArgs e)

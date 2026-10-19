@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>YoutubeDl.Engine</RootNamespace>
+    <AssemblyName>YoutubeDl.Engine</AssemblyName>
+    <Description>In-process media discovery and download engine for YoutubeDL Modern.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Update="Licenses\V8-NOTICE.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

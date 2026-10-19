@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Description>Bounded managed interpreter for public YouTube player URL transformations.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../YoutubeDl.Engine/YoutubeDl.Engine.csproj" />
+    <PackageReference Include="Jint" Version="4.17.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Licenses/*.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

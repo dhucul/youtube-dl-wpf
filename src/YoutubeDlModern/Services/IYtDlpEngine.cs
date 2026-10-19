@@ -5,6 +5,12 @@ namespace YoutubeDlModern.Services;
 public interface IYtDlpEngine
 {
     bool IsInstalled { get; }
+    bool IsBuiltIn => false;
+    string DisplayName => "yt-dlp";
+    string EnginePath => "";
+    string EngineDir => AppContext.BaseDirectory;
+    Task<string?> GetVersionAsync(CancellationToken ct = default) { ct.ThrowIfCancellationRequested(); return Task.FromResult<string?>(null); }
+    Task ReinstallAsync(Action<string> log, CancellationToken ct) => EnsureInstalledAsync(null, ct);
     Task<VideoInfo> GetVideoInfoAsync(string url, CancellationToken ct, AnalysisOptions? options = null);
     Task<IReadOnlyList<FormatInfo>> ListFormatsAsync(string url, CancellationToken ct,
         AnalysisOptions? options = null, bool isPlaylist = false);

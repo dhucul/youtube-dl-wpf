@@ -1,0 +1,23 @@
+# Native caption and sidecar pipeline
+
+Exposed authored and automatic caption tracks are downloaded in C# through the same HTTP session as the media, retaining its cookies, proxy, user agent, and referer. Direct caption saving and native DASH conversion do not require ffmpeg. HLS rendition synchronization uses ffprobe from the existing ffmpeg tools to measure the media clock. Language files use `<media-stem>.<language>.<extension>` so multiple tracks do not overwrite each other.
+
+`WriteSubs` selects authored tracks; `WriteAutoSubs` selects automatic tracks. `EmbedSubs` also selects authored tracks. When both types offer the same language, the authored track is preferred. With no language selector, English is preferred and otherwise the first available track is used. Comma-separated regular expressions match complete language identifiers; `all` includes all available languages and a leading `-` excludes matches. Expressions have a timeout and the selection length is bounded.
+
+Caption bodies are bounded to 2 MiB. UTF-8 decoding, WebVTT headers, empty/HTML responses, language identifiers, and supported file extensions are checked before publication. Sidecars are written to a temporary file and replaced atomically. A failed or canceled caption response leaves an existing caption unchanged. Embedding-only captions are temporary and cleaned on success or failure.
+
+The ffmpeg pipeline embeds multiple captions with language metadata. MP4/MOV use `mov_text`, Matroska uses SubRip, and WebM requests WebVTT. Generated MP4 and Matroska outputs are checked for stream codecs, language labels, and extracted caption text. Existing source subtitle streams are replaced by the selected tracks when embedding new captions. Other containers fail explicitly; WebM and audio-only embedding still need media verification. Saving supports exposed VTT, SRT, ASS/SSA, TTML/DFXP and LRC. Preferred-format selection and SRT/VTT/ASS/LRC conversion now share this pipeline. VTT/SRT saving and all four conversion outputs are verified; see `SUBTITLE-FORMATS.md` for exact input, timing and styling boundaries.
+
+Description, info JSON, and thumbnail sidecars also use atomic writes. Info JSON preserves the actual media identifier. Thumbnail extensions are derived from recognized JPEG, PNG, or WebP signatures, and thumbnail downloads reuse the media HTTP session. Native cover embedding is now verified for common video/audio containers, including simultaneous captions and chapters; see `THUMBNAILS.md` for tested formats and remaining coverage.
+
+Static DASH captions now join this pipeline. Plain caption documents and fragmented MP4 WebVTT can be selected by language; indexed files, templates and ranged lists are supported. Native C# conversion preserves cue text/settings and timing before saving or embedding. A live Angel One download saved and embedded English and French tracks, and both retained their text after extraction from the output. See `DASH-CAPTIONS.md` for precise scope and remaining formats.
+
+HLS WebVTT renditions also join the native pipeline, including timestamp-map synchronization, wraparound, ranged/encrypted segments and repeated-cue handling. Explicit audio/video pairs preserve the selected subtitles. The public HLS sample saved and embedded both languages with matching extracted text. See `HLS-CAPTIONS.md` for timing requirements and remaining cases.
+
+Native TTML/DFXP parsing now supports bounded media-time expressions, nested/sequential intervals and timed spans, with SRT/VTT output without ffmpeg. Live English/German DASH text tracks converted and embedded with matching cues; see `TTML.md` for verified scope and remaining presentation modes.
+
+Chapter embedding now uses validated, escaped FFmetadata and cleans temporary chapter documents. MP4/Matroska checks retain literal punctuation, multiline titles, and millisecond boundaries. Info sidecars preserve chapter markers. Other chapter sources and containers require verification.
+
+An exposed automatic caption document was saved live from the public PeerTube clip `73556243-7a9b-496c-a740-f80e42ee0ad9`. YouTube live caption authorization, translated/generated language tracks, remaining caption formats and preference semantics, additional transcript-only workflows, all upstream selection syntax, and production WPF integration remain pending. The native adapter now maps all-subtitle, preferred-format and conversion settings; see `SUBTITLE-FORMATS.md`. Metadata presence alone does not establish that every live caption endpoint is accessible.
+
+The embedding arguments follow the [ffmpeg stream mapping and metadata documentation](https://ffmpeg.org/ffmpeg.html).

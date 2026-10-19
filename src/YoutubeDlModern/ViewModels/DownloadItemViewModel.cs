@@ -24,7 +24,8 @@ public partial class DownloadItemViewModel : ObservableObject
     {
         _queue = queue;
         Url = url;
-        Options = options;
+        Options = options.CopyForQueue();
+        if (preview?.NativePlaylistSnapshot is { } selection) Options.NativePlaylistSnapshot = selection;
         SettingsSnapshot = settingsSnapshot;
         _title = preview?.IsPlaylist == true
             ? $"Playlist: {preview.DisplayTitle} ({preview.Entries?.Count ?? 0} videos)"

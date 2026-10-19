@@ -292,7 +292,8 @@ public partial class QueueViewModel : ObservableObject, IDisposable
         catch (OperationCanceledException) { /* user canceled the fetch */ }
         catch (Exception ex)
         {
-            FetchError = ex.Message;
+            if (!fetchCts.IsCancellationRequested && ReferenceEquals(_fetchCts, fetchCts))
+                FetchError = ex.Message;
         }
         finally
         {
@@ -418,7 +419,9 @@ public partial class QueueViewModel : ObservableObject, IDisposable
         }
         catch (Exception ex)
         {
-            FetchError = ex.Message;
+            if (!formatsCts.IsCancellationRequested && ReferenceEquals(_formatsCts, formatsCts) &&
+                ReferenceEquals(Preview, inspectedPreview))
+                FetchError = ex.Message;
         }
         finally
         {

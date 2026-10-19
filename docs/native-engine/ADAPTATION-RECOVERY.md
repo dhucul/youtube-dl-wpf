@@ -1,0 +1,35 @@
+# Changed adaptations, captions and cross-session recovery — 0.168.0
+
+This batch continues the independent C# replacement. Full replacement remains open and production startup continues to use YtDlpEngine.
+
+## Track transitions
+
+One bounded selector now handles media and fragmented DASH captions. Exact IDs take precedence, followed by a unique matching profile in the original explicit adaptation. A successor under a changed explicit adaptation can be accepted only when its codec, dimensions/quality, language, role, channel configuration, sampling rate, viewpoint and accessibility facts match and the result is unique. Video reassociation requires known dimensions and roles; audio/text reassociation also requires a known language. Missing/ambiguous profiles and changed roles remain refusals. Once accepted, both adaptation identity and representation identity are pinned for that period, including after restart.
+
+Fragmented WebVTT (`wvtt`) and supported TTML (`stpp`) captions can therefore continue across changed adaptation/representation IDs while retaining language, role, codec and period-clock boundaries. A caption initialization or sample-origin change inside an accepted period still fails. This is ordinary track selection, as described by [dash.js multiperiod handling](https://dashif.org/dash.js/pages/usage/multiperiod.html); it does not infer renaming rights from period-connectivity signaling in the [DASH-IF timing model](https://dashif.org/Guidelines-TimingModel/).
+
+## Recovery across new sessions
+
+V2 media, initialization and caption bindings use the selected semantic profile, period identity and source timeline rather than signed delivery URLs or the set of period references present when the first graph was observed. Accepted physical group/representation bindings are saved separately and checked on a fresh overlap. Restarting with different generation URLs or only later periods no longer changes the logical identity of already captured media.
+
+A new session must still retrieve and verify an available overlap. Media initialization and overlap bytes must match saved SHA-256 digests; the saved prefix is independently digest-checked before import. Captions validate fresh initialization, payload, timing and period bindings against the durable snapshot. Changed tracks, changed media/caption bytes, corrupt journals, missing prefix data and cancellation retain refusal behavior. Saved descriptors contain hashes, IDs and timing facts, not playback URLs or credentials.
+
+Media and caption checkpoints use explicit v2 scope markers. Older incomplete schemas are not silently reinterpreted or migrated into the new binding format; ordinary publication recovery and completed-output inventories retain their existing handling. Broader cross-version migration remains open. Successful owned-workspace cleanup retains its existing contract.
+
+An ended DASH snapshot can now enter the recording/recovery projection when live recording controls are present. It must retain the live availability origin. Caption restoration uses the live capture path, and manifest reuse respects the projection mode. Ordinary VOD without a live origin is still refused for recording controls. An ended window lacking both its beginning and a saved prefix cannot satisfy live-from-start.
+
+## Verification
+
+All **2,999 native checks** (2,092 core + 907 media), **76 app checks** and **70 focused checks** passed. Release build has zero warnings/errors. The batch adds 39 core and 24 media checks, including two force-stopped generated workers. Two fresh public WebVTT/TTML workflows recover durable prefixes in new sessions with changed resource URLs and removed earlier periods. Fourteen files independently fully decode; four exact ordered main/original packet inventories match. Both saved caption payload inventories survive embedding. Public/final engine SHA values match.
+
+The batch adds 39 core and 24 generated-media checks. They cover media/text adaptation changes, same-group preference, ambiguity, unknown roles/languages, viewpoint/accessibility mutation, composite-ID collisions, canonical fact retention, stable fresh-session bindings, caption identity transitions, initialization mutation and restart byte/binding refusal. Native recordings verify paired/audio/video roles, WebVTT/TTML saving and embedding, clipped boundaries, new URL generations and absent older periods. Two generated workers are forcibly stopped after durable media/caption prefixes; fresh processes/sessions restore the complete recording. Successful videos retain all 80 decoded source frames, or 70 for the clipped layout. Failures preserve prior media, captions, archives and zero callbacks; archive repeats issue no HTTP or callbacks.
+
+Two fresh public workflows use actual live assets with WebVTT and TTML from the [DASH-IF simulator](https://github.com/Dash-Industry-Forum/livesim2/wiki/URL-Parameters). Controlled manifest transformations rename adaptation/caption identities by period and give resources different generation-scoped proxy URLs. An injected transfer failure follows at least four durable media segments in each of two tracks and saved captions from two periods. A new HTTP/authorization session resumes with older periods removed, verifies a fresh overlap and publishes the recovered media/captions without requesting retired periods. The transformations, proxy and interruption are fixtures; no private issuer or saved account is accessed.
+
+Fourteen public main/original/component/source-period files independently fully decode, and four exact ordered main/original video/audio packet inventories match. Both saved caption documents are independently checked against extracted embedded captions: every saved payload survives (21 WebVTT cues and 20 TTML cues in this capture). The packet comparisons verify metadata preservation of already assembled/clipped media. The final public probe engine hash matches the repository binary. Public archive repeats make zero HTTP requests and add no callbacks.
+
+Evidence lives in `work/adaptation-recovery-batch` and `work/adaptation-recovery-probe/bin/Release/net10.0/verified-0.168.0`. Earlier diagnostic logs remain preserved. No real-account, hostile-local-user, hardware-power-loss or exactly-once external-callback guarantee is added.
+
+## Remaining work
+
+Proactive selection intent, broader quality/role/language policy, caption codec conversion, unknown/ambiguous identities, cross-version checkpoint migration, additional long/private renewed sessions and crash/write interleavings remain open. Real provider/player/proof/signing/login contracts, VOD/SABR handoff, late closures removing captured complete segments, advanced transport/decoder/color modes, defaults/locale/full selector grammar and full catalog/options/packaged-production acceptance follow. Inventory lineage/limits, legacy changed anchors and cross-source/storage gaps stay on the backlog. Real-account verification remains user-deferred. Frozen scope stays 1,731 extractor keys, 126 app options and 276 long-option names, with no full-parity claim.

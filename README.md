@@ -1,15 +1,17 @@
 # YoutubeDL Modern
 
-YoutubeDL Modern is a Windows desktop front end for [yt-dlp](https://github.com/yt-dlp/yt-dlp). It keeps the familiar youtube-dl workflow while providing a native WPF interface for analyzing links, choosing formats, managing a download queue, and reviewing completed downloads.
+YoutubeDL Modern is a Windows desktop downloader with a built-in C# engine. It keeps the familiar youtube-dl workflow while providing a native WPF interface for analyzing links, choosing formats, managing a download queue, and reviewing completed downloads.
 
 > Only download media that you are allowed to save. This project is not affiliated with youtube-dl, yt-dlp, or ffmpeg.
+
+Version 1.1.5 fixes cancellation and process cleanup, progress ordering, stale preview errors, speed-limit validation, durations over 24 hours, concurrent output publication, and temporary Windows resume-file locks. All 5,022 native engine/media checks and 200 application regression checks pass. It retains the 1.1.4 YouTube, public Facebook and non-explicit common-site workflows. Other sites and advanced legacy options have partial coverage; see [release scope and verification](docs/native-engine/PRACTICAL-RELEASE.md).
 
 ## Features
 
 - Analyze a video or playlist before downloading, with thumbnail and metadata preview
 - Paste several URLs at once or import a youtube-dl-style batch file
 - Download video with audio, video only, or extracted audio
-- Choose a quality preset, a site-provided format, or a custom yt-dlp format selector
+- Choose a quality preset, a site-provided format, or a supported custom format selector
 - Select playlist ranges and individual playlist items
 - Download, convert, and embed subtitles
 - Save or embed thumbnails, metadata, and chapters
@@ -17,19 +19,19 @@ YoutubeDL Modern is a Windows desktop front end for [yt-dlp](https://github.com/
 - Pause, resume, cancel, remove, and run downloads in parallel
 - Keep a persistent download history with shortcuts to the file and folder
 - Configure advanced youtube-dl/yt-dlp options for files, formats, networking, selection, authentication, and post-processing
-- Install and reinstall the verified, application-pinned yt-dlp engine from the app; locate or install ffmpeg when post-processing needs it
+- Use the built-in downloader; locate or install ffmpeg when media processing needs it
 
 ## Getting started
 
 1. Launch YoutubeDL Modern.
-2. If the Downloads page reports that the engine is missing, select **Install engine**.
+2. The downloader is built in. Install ffmpeg from **About** when combining streams or converting audio requires it.
 3. Paste a video or playlist URL and select **Analyze**. You can also press **Enter** in the URL box.
 4. Choose the download type, quality, output folder, and any optional settings.
 5. Select **Add to queue**, then use the queue controls to pause, resume, or cancel work.
 
 Multiple space- or newline-separated URLs are queued directly. Use **Batch file...** to import URLs from a text file. Press **F1** anywhere in the app to open the built-in help page.
 
-Most downloads work with the yt-dlp engine alone. ffmpeg is required for tasks such as combining separate video and audio streams, extracting audio, converting media, and embedding subtitles or artwork. It can be installed from the About page.
+No yt-dlp or Python installation is required. ffmpeg is required for tasks such as combining separate video and audio streams, extracting audio, converting media, and embedding subtitles or artwork. It can be installed from the About page.
 
 ## Detailed usage
 
@@ -38,7 +40,7 @@ Most downloads work with the yt-dlp engine alone. ffmpeg is required for tasks s
 Use **Analysis options** before selecting **Analyze**:
 
 - **Quick** skips some format-availability checks and is the fastest choice for ordinary links.
-- **Full** performs the normal yt-dlp metadata and format checks.
+- **Full** reads normal metadata and format inventory; fresh playback is checked when downloading.
 - **Playlist** explicitly requests playlist metadata so entries can be previewed and selected.
 
 The preview shows the title, uploader, duration, site, thumbnail, and known subtitle languages. **Cancel** stops a slow lookup, **Discard** clears the result, and **Choose format** loads the exact streams reported by the site.
@@ -56,10 +58,10 @@ A batch text file uses one URL per line. Blank lines and comment lines beginning
 - **Video + audio** selects streams matching the quality, codec, and frame-rate limits, then uses ffmpeg when separate streams must be merged.
 - **Video only** downloads a video stream without sound.
 - **Audio only** extracts or converts the best audio to the selected format. For MP3 VBR, `0` is the highest quality; values such as `192K` request a fixed bitrate.
-- Resolution presets such as 1080p are maximums, allowing yt-dlp to fall back when the exact height is unavailable.
-- **Choose format** selects a specific site-provided stream. **Custom** accepts a yt-dlp `-f` expression such as `bestvideo[height<=1080]+bestaudio`.
+- Resolution presets such as 1080p are maximums, allowing the downloader to select a lower offered height when the exact height is unavailable.
+- **Choose format** selects a specific site-provided stream. **Custom** accepts supported `-f` expressions such as `bestvideo[height<=1080]+bestaudio`.
 
-Leaving the output container on **auto** gives yt-dlp the most flexibility. A selected container may require remuxing, and not every video/audio codec combination is valid in every container.
+Leaving the output container on **auto** lets the downloader choose a compatible container. A selected container may require remuxing, and not every video/audio codec combination is valid in every container.
 
 ### Playlists
 
@@ -81,17 +83,17 @@ Subtitle conversion and preferred subtitle formats are under **Settings > Subtit
 
 Downloads begin automatically as concurrency slots become available. The configured parallel-download limit is between 1 and 8.
 
-- **Pause** stops the current engine process but keeps the item. With normal partial-file settings, **Resume** can continue downloaded data.
+- **Pause** cancels current transfer work but keeps the item. With normal partial-file settings, **Resume** can continue downloaded data.
 - **Cancel** stops the item. **Remove** deletes only the queue card.
 - **Start all**, **Pause all**, and **Clear completed** apply bulk actions without deleting downloaded media.
-- Expand **Engine log** on a card for the underlying yt-dlp output.
+- Expand **Engine log** on a card for the downloader output.
 - Each finalized file appears in **History**, including files completed before a later playlist failure or cancellation. Use **Play** and **Folder** there to open the result. Removing or clearing history never deletes media.
 
 ### Saved settings
 
 Select **Save** before expecting edited settings to apply. New queue items capture a settings snapshot when they are added, so later edits do not change existing items. **Reset to defaults** updates the editable values; save afterward to persist them.
 
-The download archive is distinct from History: it records media IDs for yt-dlp and can skip previously downloaded items even after visual history is cleared.
+The download archive is distinct from History: it records media IDs for the downloader and can skip previously downloaded items even after visual history is cleared.
 
 ### Examples
 
@@ -116,7 +118,7 @@ Authentication defaults can also be saved under **Settings > Authentication**. S
 
 ## Troubleshooting
 
-- **A site suddenly stops working:** Install a newer application release for newer yt-dlp support. **About > Reinstall engine** repairs the version pinned by this application. Supported sites change frequently.
+- **A site suddenly stops working:** Install a newer application release for downloader fixes. Supported sites change frequently.
 - **Merging or audio extraction fails:** Install ffmpeg from **About**, or set its folder under **Settings > Post-processing**.
 - **Private media cannot be analyzed:** Supply browser cookies or a cookies file for both analysis and download.
 - **A playlist is larger than expected:** Clear **Download playlist**, enter playlist items such as `1-3,7`, or enable the global single-video option in Settings.
@@ -127,7 +129,7 @@ Authentication defaults can also be saved under **Settings > Authentication**. S
 | Data | Location |
 | --- | --- |
 | Settings and history | `%APPDATA%\YoutubeDlModern` |
-| Managed yt-dlp and ffmpeg files | `%LOCALAPPDATA%\YoutubeDlModern` |
+| Managed media tools | `%LOCALAPPDATA%\YoutubeDlModern` |
 | Default downloads | `%USERPROFILE%\Downloads\YoutubeDL Modern` |
 
 Removing history does not delete downloaded media. Settings can be returned to their defaults from the Settings page.
@@ -149,7 +151,7 @@ dotnet run --project .\src\YoutubeDlModern\YoutubeDlModern.csproj
 
 Global extra arguments apply to downloads. Metadata analysis accepts only connection and extraction overrides, ignores external configuration files, and always runs in simulation mode.
 
-The app downloads its pinned yt-dlp release only when you choose to install or reinstall it. New engine versions arrive with application releases. ffmpeg is also downloaded on demand.
+The C# engine ships with the app. Engine fixes arrive with application releases. ffmpeg can be downloaded on demand.
 
 ### Run regression checks
 
@@ -177,4 +179,4 @@ installer/             Inno Setup definition
 dev-scripts/           Packaging and development helpers
 ```
 
-The app targets `net10.0-windows` and uses the CommunityToolkit.Mvvm package. There is no separate web service: yt-dlp and ffmpeg processes run locally, and settings/history are stored in the current Windows profile.
+The app targets `net10.0-windows` and uses the CommunityToolkit.Mvvm package. There is no separate web service: the C# engine and ffmpeg run locally, and settings/history are stored in the current Windows profile.

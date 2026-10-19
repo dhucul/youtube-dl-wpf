@@ -1,0 +1,1006 @@
+{
+  "schemaVersion": 1,
+  "capturedOn": "2026-10-07",
+  "sources": [
+    "src/YoutubeDlModern/Models/AppSettings.cs",
+    "src/YoutubeDlModern/Models/DownloadOptions.cs"
+  ],
+  "featureCount": 126,
+  "notes": "Every app setting, analysis option, and per-download option needs an explicit native implementation and migration decision. See upstream-options.json for the upstream CLI option inventory.",
+  "features": [
+    {
+      "id": "General.DownloadDirectory",
+      "category": "General",
+      "dataType": "string",
+      "status": "pending"
+    },
+    {
+      "id": "General.OutputTemplate",
+      "category": "General",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Common native metadata/playlist fields, paths, formatting/defaults, and final converted extensions are tested; complete grammar and production integration remain pending. Version0.150.0:interrupted durable writes and receipt-last cleanup,indexed nested/absolute recovery,scoped provider lifetime/canonical repeated reads/private inventory/validated grant installation. Partial scope;see WRITE-CLEANUP-RECOVERY.md. Version0.152.0:committed changed-job retirement,original archive context,registered recovery across folder changes,OAuth draining/generation/account validation,HTTP clone guards and session-free Kaltura default referrers. Partial scope;see CHANGED-JOB-SESSIONS.md. Version0.154.0:complete no-overwrite media inventories before body requests,retained-original skip,manifest-only static HLS layouts,missing-retained-file fill,distinct post-overwrite policy and partial-data retention. Partial scope;see NO-OVERWRITE-TRANSFERS.md. Version 0.156.0: automatic-audio and retained local merge inference, static DASH shared selection, declared SABR complete-set checks, missing-file fill and caption uncertainty guards. Partial scope; see ADAPTIVE-NO-OVERWRITE.md. Version 0.158.0: completed live output inventories, declared numbered HTTP-sequence sources/pairs, same-job initial manifest reuse with freshness checks, and policy/missing/corrupt/changed-job fallback. Partial scope; see LIVE-OUTPUT-INVENTORIES.md. Version 0.160.0: durable publication inventory intent, recovery replay before receipt cleanup, version-one and known legacy-receipt migration, blocked-write retry and bounded temporary cleanup. Partial scope; see INVENTORY-PUBLICATION-RECOVERY.md. Version 0.162.0: process-shared inventory serialization, bounded reads/cleanup, digest-preserved prior-record retention, configured/literal/ancestor legacy locations, conservative duplicate arbitration and storage outage recovery. Partial scope; see INVENTORY-RETENTION-STORAGE.md. Version 0.164.0: atomic graph/root renewal, exact source-versus-visible period timing, declared Time/Number slots and bounded history, stable per-job resource bindings, compatible HEVC/VP9/AV1/Opus/FLAC decoded clipping and longer bounded shared leases. Partial scope; account verification user-deferred; see LIVE-PERIOD-SESSIONS.md. Version 0.166.0: pinned/unique compatible representation transitions, canonical profile facts, literal outer DASH selection boundary, used-resource protection/unused retirement, and proof-based issuer ending. Partial scope; account verification user-deferred; see REPRESENTATION-CONTRACTS.md. Version 0.168.0: changed adaptation/caption selection, viewpoint/accessibility guards, accepted track pinning, stable v2 recovery scopes, fresh-session verified prefix restoration and ended live projection. Partial scope; account verification user-deferred; see ADAPTATION-RECOVERY.md. Version 0.170.0: explicit live DASH preference/compatible-bitrate policy, wvtt/stpp period conversion, per-period caption codec recovery and compatible schema-1 envelopes verified with the frozen 0.168.0 writer. Native API subset; WPF policy integration and broader migrations remain open. See SELECTION-MIGRATION.md. Version 0.172.0: opt-in WPF live DASH policy controls and immutable job routing, guarded adaptive quality ladders, explicit supported decoder/dimension normalization, exact retained source periods and mixed-caption recovery. Native-only settings are outside the frozen classic-option catalog. Partial scope; see WPF-LADDERS.md. Version 0.174.0: explicit conversion codecs and audio layouts/rates, tagged SDR/PQ/HLG-to-SDR color conversion, supported aspect/rotation normalization, compatible default policy/recovery keys, exact retained source periods and fresh-session mixed-caption recovery. Native-only WPF settings stay outside the frozen classic-option catalog. Partial scope; see COLOR-AUDIO.md. Version 0.176.0: guarded ten-bit HDR/static metadata preservation, tagged wide-gamut/RGB conversion, every-frame metadata inspection, exact native HDR10+ stream-copy publication and original retention, interrupted live/caption recovery and compatible default policy/recovery keys. Partial scope; see HDR-GAMUT.md. Version 0.178.0: metadata-aware HDR10+/Dolby Vision 8.1/8.4 HEVC re-encoding and changing static profiles, exact picture/metadata timeline verification, Dolby mux signaling/aliases, retained coded sources and interrupted mixed-caption recovery. Generated verified subset; see HDR-METADATA.md. Version 0.180.0: explicit bounded spatial HDR, reordered/multiple-window HDR10+ packet binding, Dolby active-area remapping and profiles 5/10, independent geometry/picture verification, retained source packets and interrupted caption recovery. Verified subset; see HDR-SPATIAL.md. Version 0.182.0: bounded HDR transform/padding statistics and native neutral MEL conversion, exact retained source packets, independent pictures/metadata, mixed captions and interrupted session recovery. Verified subset; see HDR-TRANSFORM.md. Version 0.184.0: native FEL residual composition, affine crop/shear/reflection and measured HDR10+ histograms, exact original enhancement/source packets, captions/recovery/publication guards and bounded transient receipt replacement. Verified subset; see HDR-RECONSTRUCTION.md. Version 0.186.0: supported compressed/dependent Dolby expansion, custom PQ matrix reconstruction, perspective and per-window measured HDR10+ statistics; exact original packets and publication/recovery contracts retained. Verified subset; see HDR-DOMAINS.md. Version 0.188.0: native limited/extended HEVC/AV1 Dolby sequence expansion, supported non-PQ conversion and explicit conic/ellipse-envelope authoring; original packets, defaults and recovery contracts remain verified subsets. See HDR-SELECTORS.md."
+    },
+    {
+      "id": "General.MaxConcurrentDownloads",
+      "category": "General",
+      "dataType": "int",
+      "status": "pending"
+    },
+    {
+      "id": "General.IgnoreErrors",
+      "category": "General",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": "Native playlist stop/continue behavior and retained partial results are tested; full settings integration remains pending."
+    },
+    {
+      "id": "General.AbortOnError",
+      "category": "General",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": "Resolved-title predicates,completed-item limits,archive/filtered/failure skips,side-effect suppression and abort/job override mapping are tested. A live NFB title-filtered series stopped after one complete item. Complete legacy interactions and production integration remain pending; see DOWNLOAD-SELECTION.md."
+    },
+    {
+      "id": "General.DownloadArchive",
+      "category": "General",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Native archive lookup/recording, atomic UTF-8 preservation, playlist outcomes, cooperating-process locks, and WPF setting mapping are tested. A live Kaltura retry skipped without HTTP. Full legacy identity equivalence, large archives and remaining option interactions are pending. Version0.132.0:complete delegated article and Kaltura DASH native-adapter outputs retain originals,ordered source packets,relative picture clocks and hosted archive/callback identities. TS/M2TS metadata/remux derives decode clocks while preserving presentation timing. Partial scope;see CONSUMER-DASH.md. Version0.134.0:complete hosting inventories retain source positions and repeated membership;selected item controls fetch only fresh required child metadata/media,expected hosted archives skip transfer/callbacks, and complete originals/ordered packets survive publication. Partial scope;see HOSTING-COLLECTIONS.md. Version0.136.0:complete public/legacy playlist selection and inspected identities,publisher-specific mixed hosting,stable Wistia caption language/format identities,source-preserving saving/conversion/embedding,exact scoped API caption bodies,caption-only transfer and protected failure/renewal checks. Partial scope;see PLAYLIST-CAPTIONS.md. Version0.138.0: inspected collection membership/occurrence revalidation, unavailable/member-host changes, fresh scoped materialized leases, clear Vimeo JSON adaptive initialization and graph renewal, packet/original/archive/callback/failure protection. Partial scope; see MIXED-COLLECTIONS.md. Version0.140.0:static HLS/DASH completed-fragment recovery with fresh identity/authorization and exact strong validators,local SHA integrity,ordered concurrency,process termination,caption failure,original retention and atomic callback/archive protection;restart mode does not reuse saved fragments. Partial scope;see ADAPTIVE-RECOVERY.md. Version0.142.0:current-authorized live/SABR prefix journal replay,window/identity/timing/payload checks,shared live start,end and terminal denial;fresh browser publisher-referrer proof and original/callback/archive protection. Partial scope;see LIVE-SABR-AUTHORIZATION.md. Version0.144.0:dropped live prefixes and removed DASH periods with fresh overlap/source/format/payload integrity,shared original windows,decrypted AES receipts;authorized SABR prefix skipping,terminal denial and preview restrictions;original/archive/callback protection. Partial scope;see WINDOW-PREFIX-RECOVERY.md. Version0.146.0:durable HLS/DASH caption input/timing/period snapshots with fresh access and integrity gates,AES/ranges/conversion/embedding;actual force-stopped live/SABR workers and incomplete UMP-frame recovery,fresh-only cookies/contexts,atomic narrowed media boundaries,original/archive/callback protection. Partial scope;see DURABLE-LIVE-CAPTIONS.md. Version0.148.0:durable processing/publication receipts,checked rollback/committed output reuse,archive reconciliation and at-most-once unlocked callbacks;owned Windows processor lifetime;issuer shutdown/identity and truncated SABR context checks. Partial scope;see PUBLICATION-SESSION-RECOVERY.md. Version0.150.0:interrupted durable writes and receipt-last cleanup,indexed nested/absolute recovery,scoped provider lifetime/canonical repeated reads/private inventory/validated grant installation. Partial scope;see WRITE-CLEANUP-RECOVERY.md. Version0.152.0:committed changed-job retirement,original archive context,registered recovery across folder changes,OAuth draining/generation/account validation,HTTP clone guards and session-free Kaltura default referrers. Partial scope;see CHANGED-JOB-SESSIONS.md. Version0.154.0:complete no-overwrite media inventories before body requests,retained-original skip,manifest-only static HLS layouts,missing-retained-file fill,distinct post-overwrite policy and partial-data retention. Partial scope;see NO-OVERWRITE-TRANSFERS.md. Version 0.156.0: automatic-audio and retained local merge inference, static DASH shared selection, declared SABR complete-set checks, missing-file fill and caption uncertainty guards. Partial scope; see ADAPTIVE-NO-OVERWRITE.md. Version 0.158.0: completed live output inventories, declared numbered HTTP-sequence sources/pairs, same-job initial manifest reuse with freshness checks, and policy/missing/corrupt/changed-job fallback. Partial scope; see LIVE-OUTPUT-INVENTORIES.md. Version 0.160.0: durable publication inventory intent, recovery replay before receipt cleanup, version-one and known legacy-receipt migration, blocked-write retry and bounded temporary cleanup. Partial scope; see INVENTORY-PUBLICATION-RECOVERY.md. Version 0.162.0: process-shared inventory serialization, bounded reads/cleanup, digest-preserved prior-record retention, configured/literal/ancestor legacy locations, conservative duplicate arbitration and storage outage recovery. Partial scope; see INVENTORY-RETENTION-STORAGE.md. Version 0.164.0: atomic graph/root renewal, exact source-versus-visible period timing, declared Time/Number slots and bounded history, stable per-job resource bindings, compatible HEVC/VP9/AV1/Opus/FLAC decoded clipping and longer bounded shared leases. Partial scope; account verification user-deferred; see LIVE-PERIOD-SESSIONS.md. Version 0.166.0: pinned/unique compatible representation transitions, canonical profile facts, literal outer DASH selection boundary, used-resource protection/unused retirement, and proof-based issuer ending. Partial scope; account verification user-deferred; see REPRESENTATION-CONTRACTS.md. Version 0.168.0: changed adaptation/caption selection, viewpoint/accessibility guards, accepted track pinning, stable v2 recovery scopes, fresh-session verified prefix restoration and ended live projection. Partial scope; account verification user-deferred; see ADAPTATION-RECOVERY.md. Version 0.170.0: explicit live DASH preference/compatible-bitrate policy, wvtt/stpp period conversion, per-period caption codec recovery and compatible schema-1 envelopes verified with the frozen 0.168.0 writer. Native API subset; WPF policy integration and broader migrations remain open. See SELECTION-MIGRATION.md. Version 0.172.0: opt-in WPF live DASH policy controls and immutable job routing, guarded adaptive quality ladders, explicit supported decoder/dimension normalization, exact retained source periods and mixed-caption recovery. Native-only settings are outside the frozen classic-option catalog. Partial scope; see WPF-LADDERS.md. Version 0.174.0: explicit conversion codecs and audio layouts/rates, tagged SDR/PQ/HLG-to-SDR color conversion, supported aspect/rotation normalization, compatible default policy/recovery keys, exact retained source periods and fresh-session mixed-caption recovery. Native-only WPF settings stay outside the frozen classic-option catalog. Partial scope; see COLOR-AUDIO.md. Version 0.176.0: guarded ten-bit HDR/static metadata preservation, tagged wide-gamut/RGB conversion, every-frame metadata inspection, exact native HDR10+ stream-copy publication and original retention, interrupted live/caption recovery and compatible default policy/recovery keys. Partial scope; see HDR-GAMUT.md. Version 0.178.0: metadata-aware HDR10+/Dolby Vision 8.1/8.4 HEVC re-encoding and changing static profiles, exact picture/metadata timeline verification, Dolby mux signaling/aliases, retained coded sources and interrupted mixed-caption recovery. Generated verified subset; see HDR-METADATA.md. Version 0.180.0: explicit bounded spatial HDR, reordered/multiple-window HDR10+ packet binding, Dolby active-area remapping and profiles 5/10, independent geometry/picture verification, retained source packets and interrupted caption recovery. Verified subset; see HDR-SPATIAL.md. Version 0.182.0: bounded HDR transform/padding statistics and native neutral MEL conversion, exact retained source packets, independent pictures/metadata, mixed captions and interrupted session recovery. Verified subset; see HDR-TRANSFORM.md. Version 0.184.0: native FEL residual composition, affine crop/shear/reflection and measured HDR10+ histograms, exact original enhancement/source packets, captions/recovery/publication guards and bounded transient receipt replacement. Verified subset; see HDR-RECONSTRUCTION.md. Version 0.186.0: supported compressed/dependent Dolby expansion, custom PQ matrix reconstruction, perspective and per-window measured HDR10+ statistics; exact original packets and publication/recovery contracts retained. Verified subset; see HDR-DOMAINS.md. Version 0.188.0: native limited/extended HEVC/AV1 Dolby sequence expansion, supported non-PQ conversion and explicit conic/ellipse-envelope authoring; original packets, defaults and recovery contracts remain verified subsets. See HDR-SELECTORS.md. Version 0.190.0: supported core search/collection metadata-only inventory and selected fresh playback, scoped API/cookie account contexts, OAuth renewal, identity/pagination/membership and archive/output protection. Provider-declared subset; no global account/full-parity claim. See CORE-PLATFORM-INVENTORIES.md. Version 0.192.0: SoundCloud metadata-only public upload/related/search inventories, selected membership/identity refresh and clear progressive/HLS renewal with archive/output/callback protection; provider subset, no full-parity claim. See AUDIO-INVENTORIES.md."
+    },
+    {
+      "id": "General.NoPlaylist",
+      "category": "General",
+      "dataType": "bool",
+      "status": "pending"
+    },
+    {
+      "id": "General.RestrictFilenames",
+      "category": "General",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": "Native ASCII restriction, metadata separator sanitization, reserved Windows names, and bounded Unicode-safe filenames are tested; exact upstream parity remains pending."
+    },
+    {
+      "id": "General.NoOverwrites",
+      "category": "General",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": "Predictable existing outputs skip before transfer/processing and final saves recheck; skipped results preserve media/sidecars and produce no new-file callback. Remaining overwrite interactions remain pending. Forced overwrite arguments clear media/post protection and disable continuation; ordered request semantics verified. Complete media-versus-related-file defaults remain pending. See CONTROL-PLANE-BATCH.md. Version0.148.0:durable processing/publication receipts,checked rollback/committed output reuse,archive reconciliation and at-most-once unlocked callbacks;owned Windows processor lifetime;issuer shutdown/identity and truncated SABR context checks. Partial scope;see PUBLICATION-SESSION-RECOVERY.md. Version0.150.0:interrupted durable writes and receipt-last cleanup,indexed nested/absolute recovery,scoped provider lifetime/canonical repeated reads/private inventory/validated grant installation. Partial scope;see WRITE-CLEANUP-RECOVERY.md. Version0.152.0:committed changed-job retirement,original archive context,registered recovery across folder changes,OAuth draining/generation/account validation,HTTP clone guards and session-free Kaltura default referrers. Partial scope;see CHANGED-JOB-SESSIONS.md. Version0.154.0:complete no-overwrite media inventories before body requests,retained-original skip,manifest-only static HLS layouts,missing-retained-file fill,distinct post-overwrite policy and partial-data retention. Partial scope;see NO-OVERWRITE-TRANSFERS.md. Version 0.156.0: automatic-audio and retained local merge inference, static DASH shared selection, declared SABR complete-set checks, missing-file fill and caption uncertainty guards. Partial scope; see ADAPTIVE-NO-OVERWRITE.md. Version 0.158.0: completed live output inventories, declared numbered HTTP-sequence sources/pairs, same-job initial manifest reuse with freshness checks, and policy/missing/corrupt/changed-job fallback. Partial scope; see LIVE-OUTPUT-INVENTORIES.md. Version 0.160.0: durable publication inventory intent, recovery replay before receipt cleanup, version-one and known legacy-receipt migration, blocked-write retry and bounded temporary cleanup. Partial scope; see INVENTORY-PUBLICATION-RECOVERY.md. Version 0.162.0: process-shared inventory serialization, bounded reads/cleanup, digest-preserved prior-record retention, configured/literal/ancestor legacy locations, conservative duplicate arbitration and storage outage recovery. Partial scope; see INVENTORY-RETENTION-STORAGE.md. Version 0.164.0: atomic graph/root renewal, exact source-versus-visible period timing, declared Time/Number slots and bounded history, stable per-job resource bindings, compatible HEVC/VP9/AV1/Opus/FLAC decoded clipping and longer bounded shared leases. Partial scope; account verification user-deferred; see LIVE-PERIOD-SESSIONS.md. Version 0.166.0: pinned/unique compatible representation transitions, canonical profile facts, literal outer DASH selection boundary, used-resource protection/unused retirement, and proof-based issuer ending. Partial scope; account verification user-deferred; see REPRESENTATION-CONTRACTS.md. Version 0.168.0: changed adaptation/caption selection, viewpoint/accessibility guards, accepted track pinning, stable v2 recovery scopes, fresh-session verified prefix restoration and ended live projection. Partial scope; account verification user-deferred; see ADAPTATION-RECOVERY.md. Version 0.170.0: explicit live DASH preference/compatible-bitrate policy, wvtt/stpp period conversion, per-period caption codec recovery and compatible schema-1 envelopes verified with the frozen 0.168.0 writer. Native API subset; WPF policy integration and broader migrations remain open. See SELECTION-MIGRATION.md. Version 0.172.0: opt-in WPF live DASH policy controls and immutable job routing, guarded adaptive quality ladders, explicit supported decoder/dimension normalization, exact retained source periods and mixed-caption recovery. Native-only settings are outside the frozen classic-option catalog. Partial scope; see WPF-LADDERS.md. Version 0.174.0: explicit conversion codecs and audio layouts/rates, tagged SDR/PQ/HLG-to-SDR color conversion, supported aspect/rotation normalization, compatible default policy/recovery keys, exact retained source periods and fresh-session mixed-caption recovery. Native-only WPF settings stay outside the frozen classic-option catalog. Partial scope; see COLOR-AUDIO.md. Version 0.176.0: guarded ten-bit HDR/static metadata preservation, tagged wide-gamut/RGB conversion, every-frame metadata inspection, exact native HDR10+ stream-copy publication and original retention, interrupted live/caption recovery and compatible default policy/recovery keys. Partial scope; see HDR-GAMUT.md. Version 0.178.0: metadata-aware HDR10+/Dolby Vision 8.1/8.4 HEVC re-encoding and changing static profiles, exact picture/metadata timeline verification, Dolby mux signaling/aliases, retained coded sources and interrupted mixed-caption recovery. Generated verified subset; see HDR-METADATA.md. Version 0.180.0: explicit bounded spatial HDR, reordered/multiple-window HDR10+ packet binding, Dolby active-area remapping and profiles 5/10, independent geometry/picture verification, retained source packets and interrupted caption recovery. Verified subset; see HDR-SPATIAL.md. Version 0.182.0: bounded HDR transform/padding statistics and native neutral MEL conversion, exact retained source packets, independent pictures/metadata, mixed captions and interrupted session recovery. Verified subset; see HDR-TRANSFORM.md. Version 0.184.0: native FEL residual composition, affine crop/shear/reflection and measured HDR10+ histograms, exact original enhancement/source packets, captions/recovery/publication guards and bounded transient receipt replacement. Verified subset; see HDR-RECONSTRUCTION.md. Version 0.186.0: supported compressed/dependent Dolby expansion, custom PQ matrix reconstruction, perspective and per-window measured HDR10+ statistics; exact original packets and publication/recovery contracts retained. Verified subset; see HDR-DOMAINS.md. Version 0.188.0: native limited/extended HEVC/AV1 Dolby sequence expansion, supported non-PQ conversion and explicit conic/ellipse-envelope authoring; original packets, defaults and recovery contracts remain verified subsets. See HDR-SELECTORS.md. Version 0.190.0: supported core search/collection metadata-only inventory and selected fresh playback, scoped API/cookie account contexts, OAuth renewal, identity/pagination/membership and archive/output protection. Provider-declared subset; no global account/full-parity claim. See CORE-PLATFORM-INVENTORIES.md. Version 0.192.0: SoundCloud metadata-only public upload/related/search inventories, selected membership/identity refresh and clear progressive/HLS renewal with archive/output/callback protection; provider subset, no full-parity claim. See AUDIO-INVENTORIES.md."
+    },
+    {
+      "id": "General.NoContinue",
+      "category": "General",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": "Native progressive/whole-resource DASH restart and HLS/segmented-DASH retry policy omit stale resume ranges and validators; denial/pre-cancellation preserve previous files; re-enabling resume uses the new entity. WPF mapping and job argument precedence tested. Live Streamable interruption/restart fully decoded. Remaining fragment/session resume and production integration pending. Version0.140.0:static HLS/DASH completed-fragment recovery with fresh identity/authorization and exact strong validators,local SHA integrity,ordered concurrency,process termination,caption failure,original retention and atomic callback/archive protection;restart mode does not reuse saved fragments. Partial scope;see ADAPTIVE-RECOVERY.md. Version0.142.0:current-authorized live/SABR prefix journal replay,window/identity/timing/payload checks,shared live start,end and terminal denial;fresh browser publisher-referrer proof and original/callback/archive protection. Partial scope;see LIVE-SABR-AUTHORIZATION.md. Version0.144.0:dropped live prefixes and removed DASH periods with fresh overlap/source/format/payload integrity,shared original windows,decrypted AES receipts;authorized SABR prefix skipping,terminal denial and preview restrictions;original/archive/callback protection. Partial scope;see WINDOW-PREFIX-RECOVERY.md. Version0.146.0:durable HLS/DASH caption input/timing/period snapshots with fresh access and integrity gates,AES/ranges/conversion/embedding;actual force-stopped live/SABR workers and incomplete UMP-frame recovery,fresh-only cookies/contexts,atomic narrowed media boundaries,original/archive/callback protection. Partial scope;see DURABLE-LIVE-CAPTIONS.md. Version0.148.0:durable processing/publication receipts,checked rollback/committed output reuse,archive reconciliation and at-most-once unlocked callbacks;owned Windows processor lifetime;issuer shutdown/identity and truncated SABR context checks. Partial scope;see PUBLICATION-SESSION-RECOVERY.md. Version0.150.0:interrupted durable writes and receipt-last cleanup,indexed nested/absolute recovery,scoped provider lifetime/canonical repeated reads/private inventory/validated grant installation. Partial scope;see WRITE-CLEANUP-RECOVERY.md. Version0.152.0:committed changed-job retirement,original archive context,registered recovery across folder changes,OAuth draining/generation/account validation,HTTP clone guards and session-free Kaltura default referrers. Partial scope;see CHANGED-JOB-SESSIONS.md. Version0.154.0:complete no-overwrite media inventories before body requests,retained-original skip,manifest-only static HLS layouts,missing-retained-file fill,distinct post-overwrite policy and partial-data retention. Partial scope;see NO-OVERWRITE-TRANSFERS.md. Version 0.156.0: automatic-audio and retained local merge inference, static DASH shared selection, declared SABR complete-set checks, missing-file fill and caption uncertainty guards. Partial scope; see ADAPTIVE-NO-OVERWRITE.md. Version 0.158.0: completed live output inventories, declared numbered HTTP-sequence sources/pairs, same-job initial manifest reuse with freshness checks, and policy/missing/corrupt/changed-job fallback. Partial scope; see LIVE-OUTPUT-INVENTORIES.md. Version 0.160.0: durable publication inventory intent, recovery replay before receipt cleanup, version-one and known legacy-receipt migration, blocked-write retry and bounded temporary cleanup. Partial scope; see INVENTORY-PUBLICATION-RECOVERY.md. Version 0.162.0: process-shared inventory serialization, bounded reads/cleanup, digest-preserved prior-record retention, configured/literal/ancestor legacy locations, conservative duplicate arbitration and storage outage recovery. Partial scope; see INVENTORY-RETENTION-STORAGE.md. Version 0.164.0: atomic graph/root renewal, exact source-versus-visible period timing, declared Time/Number slots and bounded history, stable per-job resource bindings, compatible HEVC/VP9/AV1/Opus/FLAC decoded clipping and longer bounded shared leases. Partial scope; account verification user-deferred; see LIVE-PERIOD-SESSIONS.md. Version 0.166.0: pinned/unique compatible representation transitions, canonical profile facts, literal outer DASH selection boundary, used-resource protection/unused retirement, and proof-based issuer ending. Partial scope; account verification user-deferred; see REPRESENTATION-CONTRACTS.md. Version 0.168.0: changed adaptation/caption selection, viewpoint/accessibility guards, accepted track pinning, stable v2 recovery scopes, fresh-session verified prefix restoration and ended live projection. Partial scope; account verification user-deferred; see ADAPTATION-RECOVERY.md. Version 0.170.0: explicit live DASH preference/compatible-bitrate policy, wvtt/stpp period conversion, per-period caption codec recovery and compatible schema-1 envelopes verified with the frozen 0.168.0 writer. Native API subset; WPF policy integration and broader migrations remain open. See SELECTION-MIGRATION.md. Version 0.172.0: opt-in WPF live DASH policy controls and immutable job routing, guarded adaptive quality ladders, explicit supported decoder/dimension normalization, exact retained source periods and mixed-caption recovery. Native-only settings are outside the frozen classic-option catalog. Partial scope; see WPF-LADDERS.md. Version 0.174.0: explicit conversion codecs and audio layouts/rates, tagged SDR/PQ/HLG-to-SDR color conversion, supported aspect/rotation normalization, compatible default policy/recovery keys, exact retained source periods and fresh-session mixed-caption recovery. Native-only WPF settings stay outside the frozen classic-option catalog. Partial scope; see COLOR-AUDIO.md. Version 0.176.0: guarded ten-bit HDR/static metadata preservation, tagged wide-gamut/RGB conversion, every-frame metadata inspection, exact native HDR10+ stream-copy publication and original retention, interrupted live/caption recovery and compatible default policy/recovery keys. Partial scope; see HDR-GAMUT.md. Version 0.178.0: metadata-aware HDR10+/Dolby Vision 8.1/8.4 HEVC re-encoding and changing static profiles, exact picture/metadata timeline verification, Dolby mux signaling/aliases, retained coded sources and interrupted mixed-caption recovery. Generated verified subset; see HDR-METADATA.md. Version 0.180.0: explicit bounded spatial HDR, reordered/multiple-window HDR10+ packet binding, Dolby active-area remapping and profiles 5/10, independent geometry/picture verification, retained source packets and interrupted caption recovery. Verified subset; see HDR-SPATIAL.md. Version 0.182.0: bounded HDR transform/padding statistics and native neutral MEL conversion, exact retained source packets, independent pictures/metadata, mixed captions and interrupted session recovery. Verified subset; see HDR-TRANSFORM.md. Version 0.184.0: native FEL residual composition, affine crop/shear/reflection and measured HDR10+ histograms, exact original enhancement/source packets, captions/recovery/publication guards and bounded transient receipt replacement. Verified subset; see HDR-RECONSTRUCTION.md. Version 0.186.0: supported compressed/dependent Dolby expansion, custom PQ matrix reconstruction, perspective and per-window measured HDR10+ statistics; exact original packets and publication/recovery contracts retained. Verified subset; see HDR-DOMAINS.md. Version 0.188.0: native limited/extended HEVC/AV1 Dolby sequence expansion, supported non-PQ conversion and explicit conic/ellipse-envelope authoring; original packets, defaults and recovery contracts remain verified subsets. See HDR-SELECTORS.md."
+    },
+    {
+      "id": "General.NoPart",
+      "category": "General",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": "Native saved/job/argument direct-transfer mapping, progressive/adaptive/ordered transfer names, validated resume, cancellation and rollback of prior output/timestamps pass. Eight live media/original files fully decoded with exact unconverted samples and archive skips. Full option/site parity and production cutover remain pending; see NO-PART.md. Version0.140.0:static HLS/DASH completed-fragment recovery with fresh identity/authorization and exact strong validators,local SHA integrity,ordered concurrency,process termination,caption failure,original retention and atomic callback/archive protection;restart mode does not reuse saved fragments. Partial scope;see ADAPTIVE-RECOVERY.md. Version0.142.0:current-authorized live/SABR prefix journal replay,window/identity/timing/payload checks,shared live start,end and terminal denial;fresh browser publisher-referrer proof and original/callback/archive protection. Partial scope;see LIVE-SABR-AUTHORIZATION.md. Version0.144.0:dropped live prefixes and removed DASH periods with fresh overlap/source/format/payload integrity,shared original windows,decrypted AES receipts;authorized SABR prefix skipping,terminal denial and preview restrictions;original/archive/callback protection. Partial scope;see WINDOW-PREFIX-RECOVERY.md. Version0.146.0:durable HLS/DASH caption input/timing/period snapshots with fresh access and integrity gates,AES/ranges/conversion/embedding;actual force-stopped live/SABR workers and incomplete UMP-frame recovery,fresh-only cookies/contexts,atomic narrowed media boundaries,original/archive/callback protection. Partial scope;see DURABLE-LIVE-CAPTIONS.md. Version0.148.0:durable processing/publication receipts,checked rollback/committed output reuse,archive reconciliation and at-most-once unlocked callbacks;owned Windows processor lifetime;issuer shutdown/identity and truncated SABR context checks. Partial scope;see PUBLICATION-SESSION-RECOVERY.md. Version0.150.0:interrupted durable writes and receipt-last cleanup,indexed nested/absolute recovery,scoped provider lifetime/canonical repeated reads/private inventory/validated grant installation. Partial scope;see WRITE-CLEANUP-RECOVERY.md. Version0.152.0:committed changed-job retirement,original archive context,registered recovery across folder changes,OAuth draining/generation/account validation,HTTP clone guards and session-free Kaltura default referrers. Partial scope;see CHANGED-JOB-SESSIONS.md. Version0.154.0:complete no-overwrite media inventories before body requests,retained-original skip,manifest-only static HLS layouts,missing-retained-file fill,distinct post-overwrite policy and partial-data retention. Partial scope;see NO-OVERWRITE-TRANSFERS.md. Version 0.156.0: automatic-audio and retained local merge inference, static DASH shared selection, declared SABR complete-set checks, missing-file fill and caption uncertainty guards. Partial scope; see ADAPTIVE-NO-OVERWRITE.md. Version 0.158.0: completed live output inventories, declared numbered HTTP-sequence sources/pairs, same-job initial manifest reuse with freshness checks, and policy/missing/corrupt/changed-job fallback. Partial scope; see LIVE-OUTPUT-INVENTORIES.md. Version 0.160.0: durable publication inventory intent, recovery replay before receipt cleanup, version-one and known legacy-receipt migration, blocked-write retry and bounded temporary cleanup. Partial scope; see INVENTORY-PUBLICATION-RECOVERY.md. Version 0.162.0: process-shared inventory serialization, bounded reads/cleanup, digest-preserved prior-record retention, configured/literal/ancestor legacy locations, conservative duplicate arbitration and storage outage recovery. Partial scope; see INVENTORY-RETENTION-STORAGE.md. Version 0.164.0: atomic graph/root renewal, exact source-versus-visible period timing, declared Time/Number slots and bounded history, stable per-job resource bindings, compatible HEVC/VP9/AV1/Opus/FLAC decoded clipping and longer bounded shared leases. Partial scope; account verification user-deferred; see LIVE-PERIOD-SESSIONS.md. Version 0.166.0: pinned/unique compatible representation transitions, canonical profile facts, literal outer DASH selection boundary, used-resource protection/unused retirement, and proof-based issuer ending. Partial scope; account verification user-deferred; see REPRESENTATION-CONTRACTS.md. Version 0.168.0: changed adaptation/caption selection, viewpoint/accessibility guards, accepted track pinning, stable v2 recovery scopes, fresh-session verified prefix restoration and ended live projection. Partial scope; account verification user-deferred; see ADAPTATION-RECOVERY.md. Version 0.170.0: explicit live DASH preference/compatible-bitrate policy, wvtt/stpp period conversion, per-period caption codec recovery and compatible schema-1 envelopes verified with the frozen 0.168.0 writer. Native API subset; WPF policy integration and broader migrations remain open. See SELECTION-MIGRATION.md. Version 0.172.0: opt-in WPF live DASH policy controls and immutable job routing, guarded adaptive quality ladders, explicit supported decoder/dimension normalization, exact retained source periods and mixed-caption recovery. Native-only settings are outside the frozen classic-option catalog. Partial scope; see WPF-LADDERS.md. Version 0.174.0: explicit conversion codecs and audio layouts/rates, tagged SDR/PQ/HLG-to-SDR color conversion, supported aspect/rotation normalization, compatible default policy/recovery keys, exact retained source periods and fresh-session mixed-caption recovery. Native-only WPF settings stay outside the frozen classic-option catalog. Partial scope; see COLOR-AUDIO.md. Version 0.176.0: guarded ten-bit HDR/static metadata preservation, tagged wide-gamut/RGB conversion, every-frame metadata inspection, exact native HDR10+ stream-copy publication and original retention, interrupted live/caption recovery and compatible default policy/recovery keys. Partial scope; see HDR-GAMUT.md. Version 0.178.0: metadata-aware HDR10+/Dolby Vision 8.1/8.4 HEVC re-encoding and changing static profiles, exact picture/metadata timeline verification, Dolby mux signaling/aliases, retained coded sources and interrupted mixed-caption recovery. Generated verified subset; see HDR-METADATA.md. Version 0.180.0: explicit bounded spatial HDR, reordered/multiple-window HDR10+ packet binding, Dolby active-area remapping and profiles 5/10, independent geometry/picture verification, retained source packets and interrupted caption recovery. Verified subset; see HDR-SPATIAL.md. Version 0.182.0: bounded HDR transform/padding statistics and native neutral MEL conversion, exact retained source packets, independent pictures/metadata, mixed captions and interrupted session recovery. Verified subset; see HDR-TRANSFORM.md. Version 0.184.0: native FEL residual composition, affine crop/shear/reflection and measured HDR10+ histograms, exact original enhancement/source packets, captions/recovery/publication guards and bounded transient receipt replacement. Verified subset; see HDR-RECONSTRUCTION.md. Version 0.186.0: supported compressed/dependent Dolby expansion, custom PQ matrix reconstruction, perspective and per-window measured HDR10+ statistics; exact original packets and publication/recovery contracts retained. Verified subset; see HDR-DOMAINS.md. Version 0.188.0: native limited/extended HEVC/AV1 Dolby sequence expansion, supported non-PQ conversion and explicit conic/ellipse-envelope authoring; original packets, defaults and recovery contracts remain verified subsets. See HDR-SELECTORS.md."
+    },
+    {
+      "id": "General.NoMtime",
+      "category": "General",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": "Native saved/job/argument timestamp mapping, valid/disabled/missing/resumed progressive dates, conversion/original/component retention, transactional publication, prior-file preservation and live six-file exact server/current timestamp workflows pass. Adaptive/filetime/related-resource and production parity remain pending; see FILE-TIMESTAMPS.md."
+    },
+    {
+      "id": "General.WriteDescription",
+      "category": "General",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": "Atomic native description sidecars are tested; complete option/settings parity remains pending."
+    },
+    {
+      "id": "General.WriteInfoJson",
+      "category": "General",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": "Native JSON sidecars preserve the media ID and duration; complete upstream schema/settings parity remains pending."
+    },
+    {
+      "id": "General.WriteThumbnail",
+      "category": "General",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": "Native image-derived sidecar extensions and shared HTTP session are tested; complete settings parity remains pending."
+    },
+    {
+      "id": "General.WriteAllThumbnails",
+      "category": "General",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": "Mapped into native media/standalone workflows and supported extra arguments. Bounded inventories,deduplication,safe IDs,actual JPEG/PNG/WebP/GIF/BMP/AVIF suffixes,original retention,preferred embedding,no-overwrite and failure cleanup verified;live TED/Vidyard sets decoded. Remaining provider inventories/naming parity and production integration pending;see THUMBNAILS.md."
+    },
+    {
+      "id": "General.CacheDir",
+      "category": "General",
+      "dataType": "string",
+      "status": "implemented_subset",
+      "nativeEvidence": "Version 0.194.0: saved analysis/download cache directories and --cache-dir/--no-cache-dir precedence map to native public versioned YouTube player source storage. Bounded version/URL/hash/TTL envelopes, independent runtime sessions, atomic writes, corruption/stale/IO recovery, cancellation and authenticated/cookie/custom-header/query exclusions verified. Explicit path enables storage; default remains no disk cache. Cache controls preserve default request/publication/recovery identity. Cleanup/eviction/default-location and other provider consumers remain pending. See PROVIDER-CACHE.md. Version 0.196.0: --quiet/--no-quiet, --no-progress/--progress, --no-warnings and --rm-cache-dir have typed native behavior. Output flags control logger/progress channels while retaining results, inspection warning facts and file callbacks. Cleanup touches only recognized files in the explicit native-public-player-v1 child, preserves foreign/nested data, honors cancellation and is excluded from read-only analysis. Operational flags preserve request/publication/recovery serialization. Saved/job precedence and immutable app snapshots verified; twelve other classic refusal boundaries remain. See MUSIC-FAMILIES.md."
+    },
+    {
+      "id": "General.NoCacheDir",
+      "category": "General",
+      "dataType": "bool",
+      "status": "pending"
+    },
+    {
+      "id": "General.ExtraArgs",
+      "category": "General",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Supported tokens map to typed native fields without executing a CLI;global arguments precede job overrides. Simulation,skip-download,no-formats metadata,force-archive,standalone-file flags and selected existing fields are verified. Unknown options/positional URLs fail explicitly. Full grammar/options and production integration remain pending;see METADATA-ONLY.md. All-thumbnail saving is now supported;see THUMBNAILS.md. Shared audio/tool/inverse arguments and arity-aware native analysis, ordered saved/job overrides, preflight, six cross-provider live workflows and conversion timing are verified; complete argument/default/alias semantics remain pending. See CONTROL-PLANE-BATCH.md. Authentication controls and native HLS live-duration/from-start controls preserve typed saved/job argument order and analysis scope. Complete upstream grammar/default parity remains pending. See AUTHENTICATION-SESSIONS.md and LIVE-RECORDING.md. Existing live controls now drive common-clock separate HLS and bounded dynamic DASH windows; decoder/retention/callback/archive effects verified. Advanced period/caption/grammar/default interactions remain pending. See ADAPTIVE-LIVE-RENEWAL.md. Version0.122.0 adds compatible multi-period clear MP4 live DASH, timed/ranged SegmentList, shifted fixed-template origins and pending timelines; generated paired playback and actual72s two-period public video with retained packet inventory verified. Overlapping-boundary clipping and advanced live/caption/default parity remain pending. See DASH-CONTINUITY.md. Version0.124.0 captures program-mapped live HLS WebVTT and clear DASH wvtt/stpp, then saves/converts/embeds recording-relative captions across periods; bounded/ranged/encrypted resources and shared budgets. H264/AAC/ALAC period/window clipping retains complete source periods and AAC timing through remux. Generated exact video/lossless-audio and actual public two-period subtitle workflows verified. Further clock/codec/style/private/default/parity cases remain pending. See LIVE-CAPTIONS-CLIPPING.md. Version0.126.0 adds provider-scoped YouTube cookie account selection and API hashes/private Web playback, Vimeo video-password and issuer API file tokens, exact progressive/caption signed-link renewal and matching SABR context refresh. Account identities/redirects/retries/denial/cancellation are bounded and verified. Real private accounts remain user-deferred; login/OAuth grant, adaptive graph and full account/option parity remain pending. See ACCOUNT-RENEWAL.md. Version0.128.0 adds publisher-identity HLS/DASH signed graph renewal, canonical/effective URL handling, selected track/key/init/range/caption/period preservation, external-browser loopback consent, Google PKCE/refresh/account API playlists, Vimeo scoped code exchange/adaptive API/captions. Complete generated-media and public playback/archive/packet verification passed. Google API login still needs separate playback cookies for private media; real account/remote grant evidence remains user-deferred, with additional layouts and full parity open. See ADAPTIVE-ACCOUNT-RENEWAL.md. Version0.130.0 adds provider/account/media-scoped hosting credentials and generic exact-embed delegation, Wistia API bearer, JW publisher-supplied signing, Brightcove JWT, Kaltura login/netrc/initial OTP/session identity renewal and clear shared progressive/caption/HLS/DASH leases. Materialized JW/Brightcove playlists carry membership-bound renewal. Complete media/source packet and public playback evidence passed; real account/signing/remote renewal remains user-deferred. No full provider or option parity claim. See SHARED-HOSTING-RENEWAL.md. Version0.134.0:complete hosting inventories retain source positions and repeated membership;selected item controls fetch only fresh required child metadata/media,expected hosted archives skip transfer/callbacks, and complete originals/ordered packets survive publication. Partial scope;see HOSTING-COLLECTIONS.md. Version0.136.0:complete public/legacy playlist selection and inspected identities,publisher-specific mixed hosting,stable Wistia caption language/format identities,source-preserving saving/conversion/embedding,exact scoped API caption bodies,caption-only transfer and protected failure/renewal checks. Partial scope;see PLAYLIST-CAPTIONS.md. Version0.138.0: inspected collection membership/occurrence revalidation, unavailable/member-host changes, fresh scoped materialized leases, clear Vimeo JSON adaptive initialization and graph renewal, packet/original/archive/callback/failure protection. Partial scope; see MIXED-COLLECTIONS.md. Version0.140.0:static HLS/DASH completed-fragment recovery with fresh identity/authorization and exact strong validators,local SHA integrity,ordered concurrency,process termination,caption failure,original retention and atomic callback/archive protection;restart mode does not reuse saved fragments. Partial scope;see ADAPTIVE-RECOVERY.md. Version0.142.0:current-authorized live/SABR prefix journal replay,window/identity/timing/payload checks,shared live start,end and terminal denial;fresh browser publisher-referrer proof and original/callback/archive protection. Partial scope;see LIVE-SABR-AUTHORIZATION.md. Version0.144.0:dropped live prefixes and removed DASH periods with fresh overlap/source/format/payload integrity,shared original windows,decrypted AES receipts;authorized SABR prefix skipping,terminal denial and preview restrictions;original/archive/callback protection. Partial scope;see WINDOW-PREFIX-RECOVERY.md. Version0.146.0:durable HLS/DASH caption input/timing/period snapshots with fresh access and integrity gates,AES/ranges/conversion/embedding;actual force-stopped live/SABR workers and incomplete UMP-frame recovery,fresh-only cookies/contexts,atomic narrowed media boundaries,original/archive/callback protection. Partial scope;see DURABLE-LIVE-CAPTIONS.md. Version0.148.0:durable processing/publication receipts,checked rollback/committed output reuse,archive reconciliation and at-most-once unlocked callbacks;owned Windows processor lifetime;issuer shutdown/identity and truncated SABR context checks. Partial scope;see PUBLICATION-SESSION-RECOVERY.md. Version0.150.0:interrupted durable writes and receipt-last cleanup,indexed nested/absolute recovery,scoped provider lifetime/canonical repeated reads/private inventory/validated grant installation. Partial scope;see WRITE-CLEANUP-RECOVERY.md. Version0.152.0:committed changed-job retirement,original archive context,registered recovery across folder changes,OAuth draining/generation/account validation,HTTP clone guards and session-free Kaltura default referrers. Partial scope;see CHANGED-JOB-SESSIONS.md. Version0.154.0:complete no-overwrite media inventories before body requests,retained-original skip,manifest-only static HLS layouts,missing-retained-file fill,distinct post-overwrite policy and partial-data retention. Partial scope;see NO-OVERWRITE-TRANSFERS.md. Version 0.156.0: automatic-audio and retained local merge inference, static DASH shared selection, declared SABR complete-set checks, missing-file fill and caption uncertainty guards. Partial scope; see ADAPTIVE-NO-OVERWRITE.md. Version 0.158.0: completed live output inventories, declared numbered HTTP-sequence sources/pairs, same-job initial manifest reuse with freshness checks, and policy/missing/corrupt/changed-job fallback. Partial scope; see LIVE-OUTPUT-INVENTORIES.md. Version 0.160.0: durable publication inventory intent, recovery replay before receipt cleanup, version-one and known legacy-receipt migration, blocked-write retry and bounded temporary cleanup. Partial scope; see INVENTORY-PUBLICATION-RECOVERY.md. Version 0.162.0: process-shared inventory serialization, bounded reads/cleanup, digest-preserved prior-record retention, configured/literal/ancestor legacy locations, conservative duplicate arbitration and storage outage recovery. Partial scope; see INVENTORY-RETENTION-STORAGE.md. Version 0.164.0: atomic graph/root renewal, exact source-versus-visible period timing, declared Time/Number slots and bounded history, stable per-job resource bindings, compatible HEVC/VP9/AV1/Opus/FLAC decoded clipping and longer bounded shared leases. Partial scope; account verification user-deferred; see LIVE-PERIOD-SESSIONS.md. Version 0.166.0: pinned/unique compatible representation transitions, canonical profile facts, literal outer DASH selection boundary, used-resource protection/unused retirement, and proof-based issuer ending. Partial scope; account verification user-deferred; see REPRESENTATION-CONTRACTS.md. Version 0.168.0: changed adaptation/caption selection, viewpoint/accessibility guards, accepted track pinning, stable v2 recovery scopes, fresh-session verified prefix restoration and ended live projection. Partial scope; account verification user-deferred; see ADAPTATION-RECOVERY.md. Version 0.170.0: explicit live DASH preference/compatible-bitrate policy, wvtt/stpp period conversion, per-period caption codec recovery and compatible schema-1 envelopes verified with the frozen 0.168.0 writer. Native API subset; WPF policy integration and broader migrations remain open. See SELECTION-MIGRATION.md. Version 0.172.0: opt-in WPF live DASH policy controls and immutable job routing, guarded adaptive quality ladders, explicit supported decoder/dimension normalization, exact retained source periods and mixed-caption recovery. Native-only settings are outside the frozen classic-option catalog. Partial scope; see WPF-LADDERS.md. Version 0.174.0: explicit conversion codecs and audio layouts/rates, tagged SDR/PQ/HLG-to-SDR color conversion, supported aspect/rotation normalization, compatible default policy/recovery keys, exact retained source periods and fresh-session mixed-caption recovery. Native-only WPF settings stay outside the frozen classic-option catalog. Partial scope; see COLOR-AUDIO.md. Version 0.176.0: guarded ten-bit HDR/static metadata preservation, tagged wide-gamut/RGB conversion, every-frame metadata inspection, exact native HDR10+ stream-copy publication and original retention, interrupted live/caption recovery and compatible default policy/recovery keys. Partial scope; see HDR-GAMUT.md. Version 0.178.0: metadata-aware HDR10+/Dolby Vision 8.1/8.4 HEVC re-encoding and changing static profiles, exact picture/metadata timeline verification, Dolby mux signaling/aliases, retained coded sources and interrupted mixed-caption recovery. Generated verified subset; see HDR-METADATA.md. Version 0.180.0: explicit bounded spatial HDR, reordered/multiple-window HDR10+ packet binding, Dolby active-area remapping and profiles 5/10, independent geometry/picture verification, retained source packets and interrupted caption recovery. Verified subset; see HDR-SPATIAL.md. Version 0.182.0: bounded HDR transform/padding statistics and native neutral MEL conversion, exact retained source packets, independent pictures/metadata, mixed captions and interrupted session recovery. Verified subset; see HDR-TRANSFORM.md. Version 0.184.0: native FEL residual composition, affine crop/shear/reflection and measured HDR10+ histograms, exact original enhancement/source packets, captions/recovery/publication guards and bounded transient receipt replacement. Verified subset; see HDR-RECONSTRUCTION.md. Version 0.186.0: supported compressed/dependent Dolby expansion, custom PQ matrix reconstruction, perspective and per-window measured HDR10+ statistics; exact original packets and publication/recovery contracts retained. Verified subset; see HDR-DOMAINS.md. Version 0.188.0: native limited/extended HEVC/AV1 Dolby sequence expansion, supported non-PQ conversion and explicit conic/ellipse-envelope authoring; original packets, defaults and recovery contracts remain verified subsets. See HDR-SELECTORS.md. Version 0.196.0: --quiet/--no-quiet, --no-progress/--progress, --no-warnings and --rm-cache-dir have typed native behavior. Output flags control logger/progress channels while retaining results, inspection warning facts and file callbacks. Cleanup touches only recognized files in the explicit native-public-player-v1 child, preserves foreign/nested data, honors cancellation and is excluded from read-only analysis. Operational flags preserve request/publication/recovery serialization. Saved/job precedence and immutable app snapshots verified; twelve other classic refusal boundaries remain. See MUSIC-FAMILIES.md. Version 0.198.0 adds typed --fixup and --postprocessor-args/--ppa; see PROCESSING-OPTIONS.md. Version 0.200.0 adds --exec/--no-exec and SponsorBlock mark/remove/disable subsets; see EXEC-SPONSORBLOCK.md. Version 0.202.0 adds --downloader/--external-downloader and their argument aliases for verified native/curl subsets. Version 0.204.0 adds provider-scoped --geo-verification-proxy for RTVE public API verification."
+    },
+    {
+      "id": "General.CheckEngineUpdatesOnStart",
+      "category": "General",
+      "dataType": "bool",
+      "status": "pending"
+    },
+    {
+      "id": "Format.DefaultQuality",
+      "category": "Format",
+      "dataType": "string",
+      "status": "pending"
+    },
+    {
+      "id": "Format.MergeOutputFormat",
+      "category": "Format",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "MERGE-FORMATS.md: native exposed-pair/SABR/HLS/DASH merge-only container preference,ordered codec-compatible fallback,actual local codec inspection,single-file isolation,app mapping and generated/live verification;all codec/container and multi-stream parity pending Version 0.156.0: automatic-audio and retained local merge inference, static DASH shared selection, declared SABR complete-set checks, missing-file fill and caption uncertainty guards. Partial scope; see ADAPTIVE-NO-OVERWRITE.md. Version 0.158.0: completed live output inventories, declared numbered HTTP-sequence sources/pairs, same-job initial manifest reuse with freshness checks, and policy/missing/corrupt/changed-job fallback. Partial scope; see LIVE-OUTPUT-INVENTORIES.md. Version 0.160.0: durable publication inventory intent, recovery replay before receipt cleanup, version-one and known legacy-receipt migration, blocked-write retry and bounded temporary cleanup. Partial scope; see INVENTORY-PUBLICATION-RECOVERY.md. Version 0.164.0: atomic graph/root renewal, exact source-versus-visible period timing, declared Time/Number slots and bounded history, stable per-job resource bindings, compatible HEVC/VP9/AV1/Opus/FLAC decoded clipping and longer bounded shared leases. Partial scope; account verification user-deferred; see LIVE-PERIOD-SESSIONS.md. Version 0.166.0: pinned/unique compatible representation transitions, canonical profile facts, literal outer DASH selection boundary, used-resource protection/unused retirement, and proof-based issuer ending. Partial scope; account verification user-deferred; see REPRESENTATION-CONTRACTS.md. Version 0.168.0: changed adaptation/caption selection, viewpoint/accessibility guards, accepted track pinning, stable v2 recovery scopes, fresh-session verified prefix restoration and ended live projection. Partial scope; account verification user-deferred; see ADAPTATION-RECOVERY.md. Version 0.170.0: explicit live DASH preference/compatible-bitrate policy, wvtt/stpp period conversion, per-period caption codec recovery and compatible schema-1 envelopes verified with the frozen 0.168.0 writer. Native API subset; WPF policy integration and broader migrations remain open. See SELECTION-MIGRATION.md. Version 0.172.0: opt-in WPF live DASH policy controls and immutable job routing, guarded adaptive quality ladders, explicit supported decoder/dimension normalization, exact retained source periods and mixed-caption recovery. Native-only settings are outside the frozen classic-option catalog. Partial scope; see WPF-LADDERS.md. Version 0.174.0: explicit conversion codecs and audio layouts/rates, tagged SDR/PQ/HLG-to-SDR color conversion, supported aspect/rotation normalization, compatible default policy/recovery keys, exact retained source periods and fresh-session mixed-caption recovery. Native-only WPF settings stay outside the frozen classic-option catalog. Partial scope; see COLOR-AUDIO.md. Version 0.176.0: guarded ten-bit HDR/static metadata preservation, tagged wide-gamut/RGB conversion, every-frame metadata inspection, exact native HDR10+ stream-copy publication and original retention, interrupted live/caption recovery and compatible default policy/recovery keys. Partial scope; see HDR-GAMUT.md. Version 0.178.0: metadata-aware HDR10+/Dolby Vision 8.1/8.4 HEVC re-encoding and changing static profiles, exact picture/metadata timeline verification, Dolby mux signaling/aliases, retained coded sources and interrupted mixed-caption recovery. Generated verified subset; see HDR-METADATA.md. Version 0.180.0: explicit bounded spatial HDR, reordered/multiple-window HDR10+ packet binding, Dolby active-area remapping and profiles 5/10, independent geometry/picture verification, retained source packets and interrupted caption recovery. Verified subset; see HDR-SPATIAL.md. Version 0.182.0: bounded HDR transform/padding statistics and native neutral MEL conversion, exact retained source packets, independent pictures/metadata, mixed captions and interrupted session recovery. Verified subset; see HDR-TRANSFORM.md. Version 0.184.0: native FEL residual composition, affine crop/shear/reflection and measured HDR10+ histograms, exact original enhancement/source packets, captions/recovery/publication guards and bounded transient receipt replacement. Verified subset; see HDR-RECONSTRUCTION.md. Version 0.186.0: supported compressed/dependent Dolby expansion, custom PQ matrix reconstruction, perspective and per-window measured HDR10+ statistics; exact original packets and publication/recovery contracts retained. Verified subset; see HDR-DOMAINS.md. Version 0.188.0: native limited/extended HEVC/AV1 Dolby sequence expansion, supported non-PQ conversion and explicit conic/ellipse-envelope authoring; original packets, defaults and recovery contracts remain verified subsets. See HDR-SELECTORS.md."
+    },
+    {
+      "id": "Format.PreferFreeFormats",
+      "category": "Format",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": "MERGE-FORMATS.md: same-resolution/frame-rate free-container preference,automatic pairing/default-audio pool,ranked/filtered/literal selector behavior,DASH and app mapping;public YouTube VP9/Opus verified;full format-sort/provider quality parity pending"
+    },
+    {
+      "id": "Format.AudioFormat",
+      "category": "Format",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Actual codec/default-track probing, automatic copy containers, explicit app audio formats, native quality profiles, packet/sample preservation and live best-audio extraction verified. See AUDIO.md; exact upstream profile calibration, advanced cases and production integration remain pending. Shared CLI overrides and six live conversions passed complete decoding; Vorbis sample clocks corrected and all extracted audio receives full pre-publication decoding. Full quality/multi-format grammar remains pending. See CONTROL-PLANE-BATCH.md. Version 0.156.0: automatic-audio and retained local merge inference, static DASH shared selection, declared SABR complete-set checks, missing-file fill and caption uncertainty guards. Partial scope; see ADAPTIVE-NO-OVERWRITE.md. Version 0.158.0: completed live output inventories, declared numbered HTTP-sequence sources/pairs, same-job initial manifest reuse with freshness checks, and policy/missing/corrupt/changed-job fallback. Partial scope; see LIVE-OUTPUT-INVENTORIES.md. Version 0.160.0: durable publication inventory intent, recovery replay before receipt cleanup, version-one and known legacy-receipt migration, blocked-write retry and bounded temporary cleanup. Partial scope; see INVENTORY-PUBLICATION-RECOVERY.md. Version 0.164.0: atomic graph/root renewal, exact source-versus-visible period timing, declared Time/Number slots and bounded history, stable per-job resource bindings, compatible HEVC/VP9/AV1/Opus/FLAC decoded clipping and longer bounded shared leases. Partial scope; account verification user-deferred; see LIVE-PERIOD-SESSIONS.md. Version 0.166.0: pinned/unique compatible representation transitions, canonical profile facts, literal outer DASH selection boundary, used-resource protection/unused retirement, and proof-based issuer ending. Partial scope; account verification user-deferred; see REPRESENTATION-CONTRACTS.md. Version 0.168.0: changed adaptation/caption selection, viewpoint/accessibility guards, accepted track pinning, stable v2 recovery scopes, fresh-session verified prefix restoration and ended live projection. Partial scope; account verification user-deferred; see ADAPTATION-RECOVERY.md. Version 0.170.0: explicit live DASH preference/compatible-bitrate policy, wvtt/stpp period conversion, per-period caption codec recovery and compatible schema-1 envelopes verified with the frozen 0.168.0 writer. Native API subset; WPF policy integration and broader migrations remain open. See SELECTION-MIGRATION.md. Version 0.172.0: opt-in WPF live DASH policy controls and immutable job routing, guarded adaptive quality ladders, explicit supported decoder/dimension normalization, exact retained source periods and mixed-caption recovery. Native-only settings are outside the frozen classic-option catalog. Partial scope; see WPF-LADDERS.md. Version 0.174.0: explicit conversion codecs and audio layouts/rates, tagged SDR/PQ/HLG-to-SDR color conversion, supported aspect/rotation normalization, compatible default policy/recovery keys, exact retained source periods and fresh-session mixed-caption recovery. Native-only WPF settings stay outside the frozen classic-option catalog. Partial scope; see COLOR-AUDIO.md."
+    },
+    {
+      "id": "Format.AudioQuality",
+      "category": "Format",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Actual codec/default-track probing, automatic copy containers, explicit app audio formats, native quality profiles, packet/sample preservation and live best-audio extraction verified. See AUDIO.md; exact upstream profile calibration, advanced cases and production integration remain pending. Shared CLI overrides and six live conversions passed complete decoding; Vorbis sample clocks corrected and all extracted audio receives full pre-publication decoding. Full quality/multi-format grammar remains pending. See CONTROL-PLANE-BATCH.md."
+    },
+    {
+      "id": "Format.RecodeVideo",
+      "category": "Format",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Six app conversion profiles,stream/frame checks,compatible captions,rotation,cancellation and exact original retention are verified. Per-group post-overwrite protection preserves existing processed files while allowing fresh originals. App and job precedence plus live conversion/repeat skips passed; full legacy interactions and production integration remain pending. See VIDEO-RECODING.md."
+    },
+    {
+      "id": "Format.KeepVideo",
+      "category": "Format",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": "Mapped to KeepOriginal; exact source bytes and adaptive components retained with template-aware multi-output publication, rollback, partial no-overwrite and new-file reporting. See KEEP-ORIGINAL.md; remaining legacy semantics and production integration are pending. Ordered CLI keep/no-keep policies passed generated and live multi-provider checks; retained versus omitted originals and archive callbacks verified. See CONTROL-PLANE-BATCH.md. Live AAC conversion retains complete captured TS/fMP4 source windows; six live outputs fully decoded, callbacks/archives verified. See LIVE-RECORDING.md. Separate live HLS/DASH retained components fully decoded; both merged outputs preserve all336video/630audio source packet payloads in order. See ADAPTIVE-LIVE-RENEWAL.md. Version0.122.0 adds compatible multi-period clear MP4 live DASH, timed/ranged SegmentList, shifted fixed-template origins and pending timelines; generated paired playback and actual72s two-period public video with retained packet inventory verified. Overlapping-boundary clipping and advanced live/caption/default parity remain pending. See DASH-CONTINUITY.md. Version0.124.0 captures program-mapped live HLS WebVTT and clear DASH wvtt/stpp, then saves/converts/embeds recording-relative captions across periods; bounded/ranged/encrypted resources and shared budgets. H264/AAC/ALAC period/window clipping retains complete source periods and AAC timing through remux. Generated exact video/lossless-audio and actual public two-period subtitle workflows verified. Further clock/codec/style/private/default/parity cases remain pending. See LIVE-CAPTIONS-CLIPPING.md. Version0.132.0:complete delegated article and Kaltura DASH native-adapter outputs retain originals,ordered source packets,relative picture clocks and hosted archive/callback identities. TS/M2TS metadata/remux derives decode clocks while preserving presentation timing. Partial scope;see CONSUMER-DASH.md. Version0.134.0:complete hosting inventories retain source positions and repeated membership;selected item controls fetch only fresh required child metadata/media,expected hosted archives skip transfer/callbacks, and complete originals/ordered packets survive publication. Partial scope;see HOSTING-COLLECTIONS.md. Version0.136.0:complete public/legacy playlist selection and inspected identities,publisher-specific mixed hosting,stable Wistia caption language/format identities,source-preserving saving/conversion/embedding,exact scoped API caption bodies,caption-only transfer and protected failure/renewal checks. Partial scope;see PLAYLIST-CAPTIONS.md. Version0.138.0: inspected collection membership/occurrence revalidation, unavailable/member-host changes, fresh scoped materialized leases, clear Vimeo JSON adaptive initialization and graph renewal, packet/original/archive/callback/failure protection. Partial scope; see MIXED-COLLECTIONS.md. Version0.140.0:static HLS/DASH completed-fragment recovery with fresh identity/authorization and exact strong validators,local SHA integrity,ordered concurrency,process termination,caption failure,original retention and atomic callback/archive protection;restart mode does not reuse saved fragments. Partial scope;see ADAPTIVE-RECOVERY.md. Version0.142.0:current-authorized live/SABR prefix journal replay,window/identity/timing/payload checks,shared live start,end and terminal denial;fresh browser publisher-referrer proof and original/callback/archive protection. Partial scope;see LIVE-SABR-AUTHORIZATION.md. Version0.144.0:dropped live prefixes and removed DASH periods with fresh overlap/source/format/payload integrity,shared original windows,decrypted AES receipts;authorized SABR prefix skipping,terminal denial and preview restrictions;original/archive/callback protection. Partial scope;see WINDOW-PREFIX-RECOVERY.md. Version0.146.0:durable HLS/DASH caption input/timing/period snapshots with fresh access and integrity gates,AES/ranges/conversion/embedding;actual force-stopped live/SABR workers and incomplete UMP-frame recovery,fresh-only cookies/contexts,atomic narrowed media boundaries,original/archive/callback protection. Partial scope;see DURABLE-LIVE-CAPTIONS.md. Version0.148.0:durable processing/publication receipts,checked rollback/committed output reuse,archive reconciliation and at-most-once unlocked callbacks;owned Windows processor lifetime;issuer shutdown/identity and truncated SABR context checks. Partial scope;see PUBLICATION-SESSION-RECOVERY.md. Version0.150.0:interrupted durable writes and receipt-last cleanup,indexed nested/absolute recovery,scoped provider lifetime/canonical repeated reads/private inventory/validated grant installation. Partial scope;see WRITE-CLEANUP-RECOVERY.md. Version0.152.0:committed changed-job retirement,original archive context,registered recovery across folder changes,OAuth draining/generation/account validation,HTTP clone guards and session-free Kaltura default referrers. Partial scope;see CHANGED-JOB-SESSIONS.md. Version0.154.0:complete no-overwrite media inventories before body requests,retained-original skip,manifest-only static HLS layouts,missing-retained-file fill,distinct post-overwrite policy and partial-data retention. Partial scope;see NO-OVERWRITE-TRANSFERS.md. Version 0.156.0: automatic-audio and retained local merge inference, static DASH shared selection, declared SABR complete-set checks, missing-file fill and caption uncertainty guards. Partial scope; see ADAPTIVE-NO-OVERWRITE.md. Version 0.158.0: completed live output inventories, declared numbered HTTP-sequence sources/pairs, same-job initial manifest reuse with freshness checks, and policy/missing/corrupt/changed-job fallback. Partial scope; see LIVE-OUTPUT-INVENTORIES.md. Version 0.160.0: durable publication inventory intent, recovery replay before receipt cleanup, version-one and known legacy-receipt migration, blocked-write retry and bounded temporary cleanup. Partial scope; see INVENTORY-PUBLICATION-RECOVERY.md. Version 0.162.0: process-shared inventory serialization, bounded reads/cleanup, digest-preserved prior-record retention, configured/literal/ancestor legacy locations, conservative duplicate arbitration and storage outage recovery. Partial scope; see INVENTORY-RETENTION-STORAGE.md. Version 0.164.0: atomic graph/root renewal, exact source-versus-visible period timing, declared Time/Number slots and bounded history, stable per-job resource bindings, compatible HEVC/VP9/AV1/Opus/FLAC decoded clipping and longer bounded shared leases. Partial scope; account verification user-deferred; see LIVE-PERIOD-SESSIONS.md. Version 0.166.0: pinned/unique compatible representation transitions, canonical profile facts, literal outer DASH selection boundary, used-resource protection/unused retirement, and proof-based issuer ending. Partial scope; account verification user-deferred; see REPRESENTATION-CONTRACTS.md. Version 0.168.0: changed adaptation/caption selection, viewpoint/accessibility guards, accepted track pinning, stable v2 recovery scopes, fresh-session verified prefix restoration and ended live projection. Partial scope; account verification user-deferred; see ADAPTATION-RECOVERY.md. Version 0.170.0: explicit live DASH preference/compatible-bitrate policy, wvtt/stpp period conversion, per-period caption codec recovery and compatible schema-1 envelopes verified with the frozen 0.168.0 writer. Native API subset; WPF policy integration and broader migrations remain open. See SELECTION-MIGRATION.md. Version 0.172.0: opt-in WPF live DASH policy controls and immutable job routing, guarded adaptive quality ladders, explicit supported decoder/dimension normalization, exact retained source periods and mixed-caption recovery. Native-only settings are outside the frozen classic-option catalog. Partial scope; see WPF-LADDERS.md. Version 0.174.0: explicit conversion codecs and audio layouts/rates, tagged SDR/PQ/HLG-to-SDR color conversion, supported aspect/rotation normalization, compatible default policy/recovery keys, exact retained source periods and fresh-session mixed-caption recovery. Native-only WPF settings stay outside the frozen classic-option catalog. Partial scope; see COLOR-AUDIO.md. Version 0.176.0: guarded ten-bit HDR/static metadata preservation, tagged wide-gamut/RGB conversion, every-frame metadata inspection, exact native HDR10+ stream-copy publication and original retention, interrupted live/caption recovery and compatible default policy/recovery keys. Partial scope; see HDR-GAMUT.md. Version 0.178.0: metadata-aware HDR10+/Dolby Vision 8.1/8.4 HEVC re-encoding and changing static profiles, exact picture/metadata timeline verification, Dolby mux signaling/aliases, retained coded sources and interrupted mixed-caption recovery. Generated verified subset; see HDR-METADATA.md. Version 0.180.0: explicit bounded spatial HDR, reordered/multiple-window HDR10+ packet binding, Dolby active-area remapping and profiles 5/10, independent geometry/picture verification, retained source packets and interrupted caption recovery. Verified subset; see HDR-SPATIAL.md. Version 0.182.0: bounded HDR transform/padding statistics and native neutral MEL conversion, exact retained source packets, independent pictures/metadata, mixed captions and interrupted session recovery. Verified subset; see HDR-TRANSFORM.md. Version 0.184.0: native FEL residual composition, affine crop/shear/reflection and measured HDR10+ histograms, exact original enhancement/source packets, captions/recovery/publication guards and bounded transient receipt replacement. Verified subset; see HDR-RECONSTRUCTION.md. Version 0.186.0: supported compressed/dependent Dolby expansion, custom PQ matrix reconstruction, perspective and per-window measured HDR10+ statistics; exact original packets and publication/recovery contracts retained. Verified subset; see HDR-DOMAINS.md. Version 0.188.0: native limited/extended HEVC/AV1 Dolby sequence expansion, supported non-PQ conversion and explicit conic/ellipse-envelope authoring; original packets, defaults and recovery contracts remain verified subsets. See HDR-SELECTORS.md."
+    },
+    {
+      "id": "Format.NoPostOverwrites",
+      "category": "Format",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": "Six app conversion profiles,stream/frame checks,compatible captions,rotation,cancellation and exact original retention are verified. Per-group post-overwrite protection preserves existing processed files while allowing fresh originals. App and job precedence plus live conversion/repeat skips passed; full legacy interactions and production integration remain pending. See VIDEO-RECODING.md."
+    },
+    {
+      "id": "Subtitle.WriteSubs",
+      "category": "Subtitle",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": " Version0.124.0 captures program-mapped live HLS WebVTT and clear DASH wvtt/stpp, then saves/converts/embeds recording-relative captions across periods; bounded/ranged/encrypted resources and shared budgets. H264/AAC/ALAC period/window clipping retains complete source periods and AAC timing through remux. Generated exact video/lossless-audio and actual public two-period subtitle workflows verified. Further clock/codec/style/private/default/parity cases remain pending. See LIVE-CAPTIONS-CLIPPING.md. Version0.136.0:declared Wistia language/format/provenance tracks support bounded saving/conversion/embedding,caption-only output and exact scoped API/renewal handling;two public formats retain all56saved/embeddedcue payloads and exact timing.See PLAYLIST-CAPTIONS.md."
+    },
+    {
+      "id": "Subtitle.WriteAutoSubs",
+      "category": "Subtitle",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": " Version0.124.0 captures program-mapped live HLS WebVTT and clear DASH wvtt/stpp, then saves/converts/embeds recording-relative captions across periods; bounded/ranged/encrypted resources and shared budgets. H264/AAC/ALAC period/window clipping retains complete source periods and AAC timing through remux. Generated exact video/lossless-audio and actual public two-period subtitle workflows verified. Further clock/codec/style/private/default/parity cases remain pending. See LIVE-CAPTIONS-CLIPPING.md. Version0.136.0:declared Wistia language/format/provenance tracks support bounded saving/conversion/embedding,caption-only output and exact scoped API/renewal handling;two public formats retain all56saved/embeddedcue payloads and exact timing.See PLAYLIST-CAPTIONS.md."
+    },
+    {
+      "id": "Subtitle.WriteAllSubs",
+      "category": "Subtitle",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": " Version0.124.0 captures program-mapped live HLS WebVTT and clear DASH wvtt/stpp, then saves/converts/embeds recording-relative captions across periods; bounded/ranged/encrypted resources and shared budgets. H264/AAC/ALAC period/window clipping retains complete source periods and AAC timing through remux. Generated exact video/lossless-audio and actual public two-period subtitle workflows verified. Further clock/codec/style/private/default/parity cases remain pending. See LIVE-CAPTIONS-CLIPPING.md."
+    },
+    {
+      "id": "Subtitle.SubLangs",
+      "category": "Subtitle",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "An empty native job language selection inherits the saved subtitle language expression; explicit job and all-language settings retain their existing precedence. Adapter regression verifies the saved fallback; shared subtitle-language selector and conversion tests pass. Full selector/settings/live-site parity and production integration remain pending;see APP-ADAPTER-INTEGRATION.md. Version0.124.0 captures program-mapped live HLS WebVTT and clear DASH wvtt/stpp, then saves/converts/embeds recording-relative captions across periods; bounded/ranged/encrypted resources and shared budgets. H264/AAC/ALAC period/window clipping retains complete source periods and AAC timing through remux. Generated exact video/lossless-audio and actual public two-period subtitle workflows verified. Further clock/codec/style/private/default/parity cases remain pending. See LIVE-CAPTIONS-CLIPPING.md. Version0.136.0:declared Wistia language/format/provenance tracks support bounded saving/conversion/embedding,caption-only output and exact scoped API/renewal handling;two public formats retain all56saved/embeddedcue payloads and exact timing.See PLAYLIST-CAPTIONS.md."
+    },
+    {
+      "id": "Subtitle.SubFormat",
+      "category": "Subtitle",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": " Version0.124.0 captures program-mapped live HLS WebVTT and clear DASH wvtt/stpp, then saves/converts/embeds recording-relative captions across periods; bounded/ranged/encrypted resources and shared budgets. H264/AAC/ALAC period/window clipping retains complete source periods and AAC timing through remux. Generated exact video/lossless-audio and actual public two-period subtitle workflows verified. Further clock/codec/style/private/default/parity cases remain pending. See LIVE-CAPTIONS-CLIPPING.md. Version0.136.0:declared Wistia language/format/provenance tracks support bounded saving/conversion/embedding,caption-only output and exact scoped API/renewal handling;two public formats retain all56saved/embeddedcue payloads and exact timing.See PLAYLIST-CAPTIONS.md."
+    },
+    {
+      "id": "Subtitle.ConvertSubs",
+      "category": "Subtitle",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": " Version0.124.0 captures program-mapped live HLS WebVTT and clear DASH wvtt/stpp, then saves/converts/embeds recording-relative captions across periods; bounded/ranged/encrypted resources and shared budgets. H264/AAC/ALAC period/window clipping retains complete source periods and AAC timing through remux. Generated exact video/lossless-audio and actual public two-period subtitle workflows verified. Further clock/codec/style/private/default/parity cases remain pending. See LIVE-CAPTIONS-CLIPPING.md. Version0.136.0:declared Wistia language/format/provenance tracks support bounded saving/conversion/embedding,caption-only output and exact scoped API/renewal handling;two public formats retain all56saved/embeddedcue payloads and exact timing.See PLAYLIST-CAPTIONS.md."
+    },
+    {
+      "id": "Subtitle.EmbedSubs",
+      "category": "Subtitle",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": " Version0.124.0 captures program-mapped live HLS WebVTT and clear DASH wvtt/stpp, then saves/converts/embeds recording-relative captions across periods; bounded/ranged/encrypted resources and shared budgets. H264/AAC/ALAC period/window clipping retains complete source periods and AAC timing through remux. Generated exact video/lossless-audio and actual public two-period subtitle workflows verified. Further clock/codec/style/private/default/parity cases remain pending. See LIVE-CAPTIONS-CLIPPING.md. Version0.136.0:declared Wistia language/format/provenance tracks support bounded saving/conversion/embedding,caption-only output and exact scoped API/renewal handling;two public formats retain all56saved/embeddedcue payloads and exact timing.See PLAYLIST-CAPTIONS.md."
+    },
+    {
+      "id": "Network.Proxy",
+      "category": "Network",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Mapped into native requests with ordered job overrides. Real HTTP/TLS/source-address/IP-family/proxy/header checks and a forced-IPv4 live download passed. Complete network-option interactions and production cutover remain pending; see NETWORK-SETTINGS.md. Browser-backed YouTube now supports validated HTTP/HTTPS proxies,aggregate rate limits and explicit certificate overrides;local browser and full live proxy/rate verification passed. See BROWSER-NETWORK.md."
+    },
+    {
+      "id": "Network.SocketTimeout",
+      "category": "Network",
+      "dataType": "int",
+      "status": "partial",
+      "nativeEvidence": "Mapped into native requests with ordered job overrides. Real HTTP/TLS/source-address/IP-family/proxy/header checks and a forced-IPv4 live download passed. Complete network-option interactions and production cutover remain pending; see NETWORK-SETTINGS.md."
+    },
+    {
+      "id": "Network.SourceAddress",
+      "category": "Network",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Mapped into native requests with ordered job overrides. Real HTTP/TLS/source-address/IP-family/proxy/header checks and a forced-IPv4 live download passed. Complete network-option interactions and production cutover remain pending; see NETWORK-SETTINGS.md."
+    },
+    {
+      "id": "Network.IpVersion",
+      "category": "Network",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Mapped into native requests with ordered job overrides. Real HTTP/TLS/source-address/IP-family/proxy/header checks and a forced-IPv4 live download passed. Complete network-option interactions and production cutover remain pending; see NETWORK-SETTINGS.md."
+    },
+    {
+      "id": "Network.GeoBypass",
+      "category": "Network",
+      "dataType": "bool",
+      "status": "pending"
+    },
+    {
+      "id": "Network.GeoVerificationProxy",
+      "category": "Network",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Provider-scoped RTVE/RNE public API verification proxy, with source credentials/queries/authorization excluded, normal media routing retained, bounded issuer renewal and actual native/curl HTTPS proxy-isolation/denial/certificate checks. Saved/job/analysis mapping and unsupported-provider refusal are verified. Country/IP overrides, credentialed proxies and other provider verification contracts remain open. See RTVE-AUDIO.md. Version 0.206.0 adds declaring TVP, ARTE and ORF public API routes, each verified with separate owned HTTPS verification/media proxies, bounded renewal and retained denials. No country/IP override or AdobePass behavior is fabricated; all five remaining global settings stay refused. See PROVIDER-FAMILIES.md. Version 0.208.0 adds ORF ON and radio declaring public API routes with the existing isolated verification session. No country/IP override or AdobePass behavior is implied. See ORF-BROADCAST.md."
+    },
+    {
+      "id": "Network.GeoBypassCountry",
+      "category": "Network",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Version 0.210.0 implements the captured X-Forwarded-For contract: country selection from 240 frozen compatibility ranges or a validated IPv4 CIDR, cryptographic per-job selection, stable renewal/child sessions, classic last-option precedence, native/WPF/analysis mapping and actual native/curl HTTP transmission. Unrelated public services clear the header and actual denials remain failures. This header does not change the socket address or guarantee geographic access. Default automatic provider inference, broader contracts and full option parity remain open. See RADIO-COMPLETION.md."
+    },
+    {
+      "id": "Network.GeoBypassIpBlock",
+      "category": "Network",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Version 0.210.0 implements the captured X-Forwarded-For contract: country selection from 240 frozen compatibility ranges or a validated IPv4 CIDR, cryptographic per-job selection, stable renewal/child sessions, classic last-option precedence, native/WPF/analysis mapping and actual native/curl HTTP transmission. Unrelated public services clear the header and actual denials remain failures. This header does not change the socket address or guarantee geographic access. Default automatic provider inference, broader contracts and full option parity remain open. See RADIO-COMPLETION.md."
+    },
+    {
+      "id": "Network.RateLimit",
+      "category": "Network",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Positive byte/K/M/G parsing and aggregate cancellation-aware reservations across parallel media workers verified,including pending work across clock windows. Invalid rates fail before HTTP. Remaining metadata/caption paths,precision/performance and complete legacy semantics pending;see PARALLEL-FRAGMENTS.md. Browser-backed YouTube now supports validated HTTP/HTTPS proxies,aggregate rate limits and explicit certificate overrides;local browser and full live proxy/rate verification passed. See BROWSER-NETWORK.md."
+    },
+    {
+      "id": "Network.Retries",
+      "category": "Network",
+      "dataType": "int",
+      "status": "partial",
+      "nativeEvidence": "Native analysis now uses saved validated retry counts and native job mapping preserves0-1000without clamping. App tests cover0,23,1000and rejection of1001before HTTP; shared native interrupted-transfer tests and a live23-retry configured Mixcloud job pass. Infinite retries and complete legacy interactions/production integration remain pending;see APP-ADAPTER-INTEGRATION.md. Version0.140.0:static HLS/DASH completed-fragment recovery with fresh identity/authorization and exact strong validators,local SHA integrity,ordered concurrency,process termination,caption failure,original retention and atomic callback/archive protection;restart mode does not reuse saved fragments. Partial scope;see ADAPTIVE-RECOVERY.md. Version0.142.0:current-authorized live/SABR prefix journal replay,window/identity/timing/payload checks,shared live start,end and terminal denial;fresh browser publisher-referrer proof and original/callback/archive protection. Partial scope;see LIVE-SABR-AUTHORIZATION.md. Version0.144.0:dropped live prefixes and removed DASH periods with fresh overlap/source/format/payload integrity,shared original windows,decrypted AES receipts;authorized SABR prefix skipping,terminal denial and preview restrictions;original/archive/callback protection. Partial scope;see WINDOW-PREFIX-RECOVERY.md. Version0.146.0:durable HLS/DASH caption input/timing/period snapshots with fresh access and integrity gates,AES/ranges/conversion/embedding;actual force-stopped live/SABR workers and incomplete UMP-frame recovery,fresh-only cookies/contexts,atomic narrowed media boundaries,original/archive/callback protection. Partial scope;see DURABLE-LIVE-CAPTIONS.md. Version0.148.0:durable processing/publication receipts,checked rollback/committed output reuse,archive reconciliation and at-most-once unlocked callbacks;owned Windows processor lifetime;issuer shutdown/identity and truncated SABR context checks. Partial scope;see PUBLICATION-SESSION-RECOVERY.md. Version0.150.0:interrupted durable writes and receipt-last cleanup,indexed nested/absolute recovery,scoped provider lifetime/canonical repeated reads/private inventory/validated grant installation. Partial scope;see WRITE-CLEANUP-RECOVERY.md. Version0.152.0:committed changed-job retirement,original archive context,registered recovery across folder changes,OAuth draining/generation/account validation,HTTP clone guards and session-free Kaltura default referrers. Partial scope;see CHANGED-JOB-SESSIONS.md. Version0.154.0:complete no-overwrite media inventories before body requests,retained-original skip,manifest-only static HLS layouts,missing-retained-file fill,distinct post-overwrite policy and partial-data retention. Partial scope;see NO-OVERWRITE-TRANSFERS.md. Version 0.156.0: automatic-audio and retained local merge inference, static DASH shared selection, declared SABR complete-set checks, missing-file fill and caption uncertainty guards. Partial scope; see ADAPTIVE-NO-OVERWRITE.md. Version 0.158.0: completed live output inventories, declared numbered HTTP-sequence sources/pairs, same-job initial manifest reuse with freshness checks, and policy/missing/corrupt/changed-job fallback. Partial scope; see LIVE-OUTPUT-INVENTORIES.md. Version 0.160.0: durable publication inventory intent, recovery replay before receipt cleanup, version-one and known legacy-receipt migration, blocked-write retry and bounded temporary cleanup. Partial scope; see INVENTORY-PUBLICATION-RECOVERY.md. Version 0.162.0: process-shared inventory serialization, bounded reads/cleanup, digest-preserved prior-record retention, configured/literal/ancestor legacy locations, conservative duplicate arbitration and storage outage recovery. Partial scope; see INVENTORY-RETENTION-STORAGE.md. Version 0.164.0: atomic graph/root renewal, exact source-versus-visible period timing, declared Time/Number slots and bounded history, stable per-job resource bindings, compatible HEVC/VP9/AV1/Opus/FLAC decoded clipping and longer bounded shared leases. Partial scope; account verification user-deferred; see LIVE-PERIOD-SESSIONS.md. Version 0.166.0: pinned/unique compatible representation transitions, canonical profile facts, literal outer DASH selection boundary, used-resource protection/unused retirement, and proof-based issuer ending. Partial scope; account verification user-deferred; see REPRESENTATION-CONTRACTS.md. Version 0.168.0: changed adaptation/caption selection, viewpoint/accessibility guards, accepted track pinning, stable v2 recovery scopes, fresh-session verified prefix restoration and ended live projection. Partial scope; account verification user-deferred; see ADAPTATION-RECOVERY.md. Version 0.170.0: explicit live DASH preference/compatible-bitrate policy, wvtt/stpp period conversion, per-period caption codec recovery and compatible schema-1 envelopes verified with the frozen 0.168.0 writer. Native API subset; WPF policy integration and broader migrations remain open. See SELECTION-MIGRATION.md. Version 0.172.0: opt-in WPF live DASH policy controls and immutable job routing, guarded adaptive quality ladders, explicit supported decoder/dimension normalization, exact retained source periods and mixed-caption recovery. Native-only settings are outside the frozen classic-option catalog. Partial scope; see WPF-LADDERS.md. Version 0.174.0: explicit conversion codecs and audio layouts/rates, tagged SDR/PQ/HLG-to-SDR color conversion, supported aspect/rotation normalization, compatible default policy/recovery keys, exact retained source periods and fresh-session mixed-caption recovery. Native-only WPF settings stay outside the frozen classic-option catalog. Partial scope; see COLOR-AUDIO.md. Version 0.176.0: guarded ten-bit HDR/static metadata preservation, tagged wide-gamut/RGB conversion, every-frame metadata inspection, exact native HDR10+ stream-copy publication and original retention, interrupted live/caption recovery and compatible default policy/recovery keys. Partial scope; see HDR-GAMUT.md. Version 0.178.0: metadata-aware HDR10+/Dolby Vision 8.1/8.4 HEVC re-encoding and changing static profiles, exact picture/metadata timeline verification, Dolby mux signaling/aliases, retained coded sources and interrupted mixed-caption recovery. Generated verified subset; see HDR-METADATA.md. Version 0.180.0: explicit bounded spatial HDR, reordered/multiple-window HDR10+ packet binding, Dolby active-area remapping and profiles 5/10, independent geometry/picture verification, retained source packets and interrupted caption recovery. Verified subset; see HDR-SPATIAL.md. Version 0.182.0: bounded HDR transform/padding statistics and native neutral MEL conversion, exact retained source packets, independent pictures/metadata, mixed captions and interrupted session recovery. Verified subset; see HDR-TRANSFORM.md. Version 0.184.0: native FEL residual composition, affine crop/shear/reflection and measured HDR10+ histograms, exact original enhancement/source packets, captions/recovery/publication guards and bounded transient receipt replacement. Verified subset; see HDR-RECONSTRUCTION.md. Version 0.186.0: supported compressed/dependent Dolby expansion, custom PQ matrix reconstruction, perspective and per-window measured HDR10+ statistics; exact original packets and publication/recovery contracts retained. Verified subset; see HDR-DOMAINS.md. Version 0.188.0: native limited/extended HEVC/AV1 Dolby sequence expansion, supported non-PQ conversion and explicit conic/ellipse-envelope authoring; original packets, defaults and recovery contracts remain verified subsets. See HDR-SELECTORS.md."
+    },
+    {
+      "id": "Network.FragmentRetries",
+      "category": "Network",
+      "dataType": "int",
+      "status": "partial",
+      "nativeEvidence": "Mapped independently from general retries;HLS/DASH media,initialization and ranged/indexed caption transfers use the effective count. Zero-disable and permitted retry cases verified. Remaining caption/key paths and full interactions pending;see PARALLEL-FRAGMENTS.md. Version0.140.0:static HLS/DASH completed-fragment recovery with fresh identity/authorization and exact strong validators,local SHA integrity,ordered concurrency,process termination,caption failure,original retention and atomic callback/archive protection;restart mode does not reuse saved fragments. Partial scope;see ADAPTIVE-RECOVERY.md. Version0.142.0:current-authorized live/SABR prefix journal replay,window/identity/timing/payload checks,shared live start,end and terminal denial;fresh browser publisher-referrer proof and original/callback/archive protection. Partial scope;see LIVE-SABR-AUTHORIZATION.md. Version0.144.0:dropped live prefixes and removed DASH periods with fresh overlap/source/format/payload integrity,shared original windows,decrypted AES receipts;authorized SABR prefix skipping,terminal denial and preview restrictions;original/archive/callback protection. Partial scope;see WINDOW-PREFIX-RECOVERY.md. Version0.146.0:durable HLS/DASH caption input/timing/period snapshots with fresh access and integrity gates,AES/ranges/conversion/embedding;actual force-stopped live/SABR workers and incomplete UMP-frame recovery,fresh-only cookies/contexts,atomic narrowed media boundaries,original/archive/callback protection. Partial scope;see DURABLE-LIVE-CAPTIONS.md. Version0.148.0:durable processing/publication receipts,checked rollback/committed output reuse,archive reconciliation and at-most-once unlocked callbacks;owned Windows processor lifetime;issuer shutdown/identity and truncated SABR context checks. Partial scope;see PUBLICATION-SESSION-RECOVERY.md. Version0.150.0:interrupted durable writes and receipt-last cleanup,indexed nested/absolute recovery,scoped provider lifetime/canonical repeated reads/private inventory/validated grant installation. Partial scope;see WRITE-CLEANUP-RECOVERY.md. Version0.152.0:committed changed-job retirement,original archive context,registered recovery across folder changes,OAuth draining/generation/account validation,HTTP clone guards and session-free Kaltura default referrers. Partial scope;see CHANGED-JOB-SESSIONS.md. Version0.154.0:complete no-overwrite media inventories before body requests,retained-original skip,manifest-only static HLS layouts,missing-retained-file fill,distinct post-overwrite policy and partial-data retention. Partial scope;see NO-OVERWRITE-TRANSFERS.md. Version 0.156.0: automatic-audio and retained local merge inference, static DASH shared selection, declared SABR complete-set checks, missing-file fill and caption uncertainty guards. Partial scope; see ADAPTIVE-NO-OVERWRITE.md. Version 0.158.0: completed live output inventories, declared numbered HTTP-sequence sources/pairs, same-job initial manifest reuse with freshness checks, and policy/missing/corrupt/changed-job fallback. Partial scope; see LIVE-OUTPUT-INVENTORIES.md. Version 0.160.0: durable publication inventory intent, recovery replay before receipt cleanup, version-one and known legacy-receipt migration, blocked-write retry and bounded temporary cleanup. Partial scope; see INVENTORY-PUBLICATION-RECOVERY.md. Version 0.164.0: atomic graph/root renewal, exact source-versus-visible period timing, declared Time/Number slots and bounded history, stable per-job resource bindings, compatible HEVC/VP9/AV1/Opus/FLAC decoded clipping and longer bounded shared leases. Partial scope; account verification user-deferred; see LIVE-PERIOD-SESSIONS.md. Version 0.166.0: pinned/unique compatible representation transitions, canonical profile facts, literal outer DASH selection boundary, used-resource protection/unused retirement, and proof-based issuer ending. Partial scope; account verification user-deferred; see REPRESENTATION-CONTRACTS.md. Version 0.168.0: changed adaptation/caption selection, viewpoint/accessibility guards, accepted track pinning, stable v2 recovery scopes, fresh-session verified prefix restoration and ended live projection. Partial scope; account verification user-deferred; see ADAPTATION-RECOVERY.md. Version 0.170.0: explicit live DASH preference/compatible-bitrate policy, wvtt/stpp period conversion, per-period caption codec recovery and compatible schema-1 envelopes verified with the frozen 0.168.0 writer. Native API subset; WPF policy integration and broader migrations remain open. See SELECTION-MIGRATION.md. Version 0.172.0: opt-in WPF live DASH policy controls and immutable job routing, guarded adaptive quality ladders, explicit supported decoder/dimension normalization, exact retained source periods and mixed-caption recovery. Native-only settings are outside the frozen classic-option catalog. Partial scope; see WPF-LADDERS.md. Version 0.174.0: explicit conversion codecs and audio layouts/rates, tagged SDR/PQ/HLG-to-SDR color conversion, supported aspect/rotation normalization, compatible default policy/recovery keys, exact retained source periods and fresh-session mixed-caption recovery. Native-only WPF settings stay outside the frozen classic-option catalog. Partial scope; see COLOR-AUDIO.md. Version 0.176.0: guarded ten-bit HDR/static metadata preservation, tagged wide-gamut/RGB conversion, every-frame metadata inspection, exact native HDR10+ stream-copy publication and original retention, interrupted live/caption recovery and compatible default policy/recovery keys. Partial scope; see HDR-GAMUT.md. Version 0.178.0: metadata-aware HDR10+/Dolby Vision 8.1/8.4 HEVC re-encoding and changing static profiles, exact picture/metadata timeline verification, Dolby mux signaling/aliases, retained coded sources and interrupted mixed-caption recovery. Generated verified subset; see HDR-METADATA.md. Version 0.180.0: explicit bounded spatial HDR, reordered/multiple-window HDR10+ packet binding, Dolby active-area remapping and profiles 5/10, independent geometry/picture verification, retained source packets and interrupted caption recovery. Verified subset; see HDR-SPATIAL.md. Version 0.182.0: bounded HDR transform/padding statistics and native neutral MEL conversion, exact retained source packets, independent pictures/metadata, mixed captions and interrupted session recovery. Verified subset; see HDR-TRANSFORM.md. Version 0.184.0: native FEL residual composition, affine crop/shear/reflection and measured HDR10+ histograms, exact original enhancement/source packets, captions/recovery/publication guards and bounded transient receipt replacement. Verified subset; see HDR-RECONSTRUCTION.md. Version 0.186.0: supported compressed/dependent Dolby expansion, custom PQ matrix reconstruction, perspective and per-window measured HDR10+ statistics; exact original packets and publication/recovery contracts retained. Verified subset; see HDR-DOMAINS.md. Version 0.188.0: native limited/extended HEVC/AV1 Dolby sequence expansion, supported non-PQ conversion and explicit conic/ellipse-envelope authoring; original packets, defaults and recovery contracts remain verified subsets. See HDR-SELECTORS.md."
+    },
+    {
+      "id": "Network.SkipUnavailableFragments",
+      "category": "Network",
+      "dataType": "bool",
+      "status": "pending"
+    },
+    {
+      "id": "Network.HttpChunkSize",
+      "category": "Network",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Native saved/job/argument bounded chunk mapping binds contiguous offsets, totals and validators, resumes interrupted chunks and obtains a complete response when ranges cannot be verified. Required HLS/indexed-DASH/caption ranges preserve parent offsets and bytes. Ten progressive and eight real PeerTube HLS files fully decoded with actual range observations, cancellation protection and archive skips. Wider interactions/provider coverage and full parity remain pending; see HTTP-CHUNKS.md and RANGE-CHUNKS.md."
+    },
+    {
+      "id": "Network.BufferSize",
+      "category": "Network",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Native saved/job/argument initial buffer mapping reaches progressive/adaptive/ordered transfers and SABR readers. Fixed/resizing reads, separate concurrent buffers and retained partial bytes are checked. Ten live files fully decoded; corrected actual read-size measurements, cancellation/resume, exact samples and archive skips passed. Related-resource and full parity remain pending; see DOWNLOAD-BUFFERS.md."
+    },
+    {
+      "id": "Network.NoResizeBuffer",
+      "category": "Network",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": "Native saved/job/argument fixed/resizing policy reaches progressive/adaptive/ordered transfers and SABR readers. Live fixed 4 KB reads and automatic 4 KB or 8 KB to 32 KB growth were measured independently; ten files fully decoded with exact samples, cancellation/resume and archive skips. Related-resource and full parity remain pending; see DOWNLOAD-BUFFERS.md."
+    },
+    {
+      "id": "Network.PlaylistReverse",
+      "category": "Network",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": "Native selected work list reverses without changing original positions, previews, archive identities or callbacks; partial failure/stop/cancellation tested. WPF setting and argument override mapped. Live Vidyard entries1,3 completed as3,1 and fully decoded. Full selection grammar and production integration pending. Version 0.190.0: supported core search/collection metadata-only inventory and selected fresh playback, scoped API/cookie account contexts, OAuth renewal, identity/pagination/membership and archive/output protection. Provider-declared subset; no global account/full-parity claim. See CORE-PLATFORM-INVENTORIES.md. Version 0.192.0: SoundCloud metadata-only public upload/related/search inventories, selected membership/identity refresh and clear progressive/HLS renewal with archive/output/callback protection; provider subset, no full-parity claim. See AUDIO-INVENTORIES.md."
+    },
+    {
+      "id": "Network.PlaylistRandom",
+      "category": "Network",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": "Native selected entries shuffle after optional reversal; seeded checks preserve exact inventory and unavailable positions without source mutation. Cancellation, archives, WPF mapping and job overrides tested. Full selection/lazy-playlist interactions and production integration pending. Version 0.190.0: supported core search/collection metadata-only inventory and selected fresh playback, scoped API/cookie account contexts, OAuth renewal, identity/pagination/membership and archive/output protection. Provider-declared subset; no global account/full-parity claim. See CORE-PLATFORM-INVENTORIES.md. Version 0.192.0: SoundCloud metadata-only public upload/related/search inventories, selected membership/identity refresh and clear progressive/HLS renewal with archive/output/callback protection; provider subset, no full-parity claim. See AUDIO-INVENTORIES.md."
+    },
+    {
+      "id": "Network.ExternalDownloader",
+      "category": "Network",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Native/curl choices and bounded curl arguments; actual external HTTP/HTTPS file and HTTP-sequence network transfers, private stdin configuration, scoped cookies/redirects/proxy, native signed-link renewal, validator/chunk resume, limits/cancellation/lifetime and protected processing/publication. Other backends, protocol selection maps, arbitrary arguments and HLS/DASH/SABR/live delegation remain unsupported. See EXTERNAL-DOWNLOADER.md."
+    },
+    {
+      "id": "Network.ExternalDownloaderArgs",
+      "category": "Network",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Native/curl choices and bounded curl arguments; actual external HTTP/HTTPS file and HTTP-sequence network transfers, private stdin configuration, scoped cookies/redirects/proxy, native signed-link renewal, validator/chunk resume, limits/cancellation/lifetime and protected processing/publication. Other backends, protocol selection maps, arbitrary arguments and HLS/DASH/SABR/live delegation remain unsupported. See EXTERNAL-DOWNLOADER.md."
+    },
+    {
+      "id": "Network.SleepInterval",
+      "category": "Network",
+      "dataType": "int",
+      "status": "partial",
+      "nativeEvidence": "Saved/job/fractional argument delay mapping, fixed/random finite range validation, cancellation, skips, playlists and separate progressive/HLS/DASH component waits pass. Live saved delays precede real audio requests, preserve complete media/originals and archives, and cancel before media without publication. Availability/account and production parity remain pending; see DOWNLOAD-DELAYS.md."
+    },
+    {
+      "id": "Network.MaxSleepInterval",
+      "category": "Network",
+      "dataType": "int",
+      "status": "partial",
+      "nativeEvidence": "Saved/job/fractional argument delay mapping, fixed/random finite range validation, cancellation, skips, playlists and separate progressive/HLS/DASH component waits pass. Live saved delays precede real audio requests, preserve complete media/originals and archives, and cancel before media without publication. Availability/account and production parity remain pending; see DOWNLOAD-DELAYS.md."
+    },
+    {
+      "id": "Network.NoCheckCertificate",
+      "category": "Network",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": "Mapped into native requests with ordered job overrides. Real HTTP/TLS/source-address/IP-family/proxy/header checks and a forced-IPv4 live download passed. Complete network-option interactions and production cutover remain pending; see NETWORK-SETTINGS.md. Browser-backed YouTube now supports validated HTTP/HTTPS proxies,aggregate rate limits and explicit certificate overrides;local browser and full live proxy/rate verification passed. See BROWSER-NETWORK.md."
+    },
+    {
+      "id": "Network.UserAgent",
+      "category": "Network",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Mapped into native requests with ordered job overrides. Real HTTP/TLS/source-address/IP-family/proxy/header checks and a forced-IPv4 live download passed. Complete network-option interactions and production cutover remain pending; see NETWORK-SETTINGS.md."
+    },
+    {
+      "id": "Network.Referer",
+      "category": "Network",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Mapped into native requests with ordered job overrides. Real HTTP/TLS/source-address/IP-family/proxy/header checks and a forced-IPv4 live download passed. Complete network-option interactions and production cutover remain pending; see NETWORK-SETTINGS.md."
+    },
+    {
+      "id": "Network.CustomHeaders",
+      "category": "Network",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Mapped into native requests with ordered job overrides. Real HTTP/TLS/source-address/IP-family/proxy/header checks and a forced-IPv4 live download passed. Complete network-option interactions and production cutover remain pending; see NETWORK-SETTINGS.md."
+    },
+    {
+      "id": "Network.ConcurrentFragments",
+      "category": "Network",
+      "dataType": "int",
+      "status": "partial",
+      "nativeEvidence": "Bounded1-32 active/buffered HLS and segmented/indexed DASH transfers preserve order,initialization,crypto,range identity and failure cleanup;app mapping,generated media and publicN4 HLS/DASH verified. Remaining caption/live scheduling and exact legacy interactions pending;see PARALLEL-FRAGMENTS.md. Version0.140.0:static HLS/DASH completed-fragment recovery with fresh identity/authorization and exact strong validators,local SHA integrity,ordered concurrency,process termination,caption failure,original retention and atomic callback/archive protection;restart mode does not reuse saved fragments. Partial scope;see ADAPTIVE-RECOVERY.md. Version0.142.0:current-authorized live/SABR prefix journal replay,window/identity/timing/payload checks,shared live start,end and terminal denial;fresh browser publisher-referrer proof and original/callback/archive protection. Partial scope;see LIVE-SABR-AUTHORIZATION.md. Version0.144.0:dropped live prefixes and removed DASH periods with fresh overlap/source/format/payload integrity,shared original windows,decrypted AES receipts;authorized SABR prefix skipping,terminal denial and preview restrictions;original/archive/callback protection. Partial scope;see WINDOW-PREFIX-RECOVERY.md. Version0.146.0:durable HLS/DASH caption input/timing/period snapshots with fresh access and integrity gates,AES/ranges/conversion/embedding;actual force-stopped live/SABR workers and incomplete UMP-frame recovery,fresh-only cookies/contexts,atomic narrowed media boundaries,original/archive/callback protection. Partial scope;see DURABLE-LIVE-CAPTIONS.md. Version0.148.0:durable processing/publication receipts,checked rollback/committed output reuse,archive reconciliation and at-most-once unlocked callbacks;owned Windows processor lifetime;issuer shutdown/identity and truncated SABR context checks. Partial scope;see PUBLICATION-SESSION-RECOVERY.md. Version0.150.0:interrupted durable writes and receipt-last cleanup,indexed nested/absolute recovery,scoped provider lifetime/canonical repeated reads/private inventory/validated grant installation. Partial scope;see WRITE-CLEANUP-RECOVERY.md. Version0.152.0:committed changed-job retirement,original archive context,registered recovery across folder changes,OAuth draining/generation/account validation,HTTP clone guards and session-free Kaltura default referrers. Partial scope;see CHANGED-JOB-SESSIONS.md. Version0.154.0:complete no-overwrite media inventories before body requests,retained-original skip,manifest-only static HLS layouts,missing-retained-file fill,distinct post-overwrite policy and partial-data retention. Partial scope;see NO-OVERWRITE-TRANSFERS.md. Version 0.156.0: automatic-audio and retained local merge inference, static DASH shared selection, declared SABR complete-set checks, missing-file fill and caption uncertainty guards. Partial scope; see ADAPTIVE-NO-OVERWRITE.md. Version 0.158.0: completed live output inventories, declared numbered HTTP-sequence sources/pairs, same-job initial manifest reuse with freshness checks, and policy/missing/corrupt/changed-job fallback. Partial scope; see LIVE-OUTPUT-INVENTORIES.md. Version 0.160.0: durable publication inventory intent, recovery replay before receipt cleanup, version-one and known legacy-receipt migration, blocked-write retry and bounded temporary cleanup. Partial scope; see INVENTORY-PUBLICATION-RECOVERY.md. Version 0.162.0: process-shared inventory serialization, bounded reads/cleanup, digest-preserved prior-record retention, configured/literal/ancestor legacy locations, conservative duplicate arbitration and storage outage recovery. Partial scope; see INVENTORY-RETENTION-STORAGE.md. Version 0.164.0: atomic graph/root renewal, exact source-versus-visible period timing, declared Time/Number slots and bounded history, stable per-job resource bindings, compatible HEVC/VP9/AV1/Opus/FLAC decoded clipping and longer bounded shared leases. Partial scope; account verification user-deferred; see LIVE-PERIOD-SESSIONS.md. Version 0.166.0: pinned/unique compatible representation transitions, canonical profile facts, literal outer DASH selection boundary, used-resource protection/unused retirement, and proof-based issuer ending. Partial scope; account verification user-deferred; see REPRESENTATION-CONTRACTS.md. Version 0.168.0: changed adaptation/caption selection, viewpoint/accessibility guards, accepted track pinning, stable v2 recovery scopes, fresh-session verified prefix restoration and ended live projection. Partial scope; account verification user-deferred; see ADAPTATION-RECOVERY.md. Version 0.170.0: explicit live DASH preference/compatible-bitrate policy, wvtt/stpp period conversion, per-period caption codec recovery and compatible schema-1 envelopes verified with the frozen 0.168.0 writer. Native API subset; WPF policy integration and broader migrations remain open. See SELECTION-MIGRATION.md. Version 0.172.0: opt-in WPF live DASH policy controls and immutable job routing, guarded adaptive quality ladders, explicit supported decoder/dimension normalization, exact retained source periods and mixed-caption recovery. Native-only settings are outside the frozen classic-option catalog. Partial scope; see WPF-LADDERS.md. Version 0.174.0: explicit conversion codecs and audio layouts/rates, tagged SDR/PQ/HLG-to-SDR color conversion, supported aspect/rotation normalization, compatible default policy/recovery keys, exact retained source periods and fresh-session mixed-caption recovery. Native-only WPF settings stay outside the frozen classic-option catalog. Partial scope; see COLOR-AUDIO.md."
+    },
+    {
+      "id": "Selection.PlaylistStart",
+      "category": "Selection",
+      "dataType": "int",
+      "status": "partial",
+      "nativeEvidence": "Native ordered signed indexes,inclusive/open/stepped colon and legacy ranges,first-occurrence deduplication,explicit-item precedence,empty successful skips and preflight validation are tested. Original indexes and selected-order autonumbers persist in templates/JSON. Typed/global/job adapter overrides and live negative stepped selection passed. Lazy/large-inventory and remaining production interactions pending. Version 0.190.0: supported core search/collection metadata-only inventory and selected fresh playback, scoped API/cookie account contexts, OAuth renewal, identity/pagination/membership and archive/output protection. Provider-declared subset; no global account/full-parity claim. See CORE-PLATFORM-INVENTORIES.md. Version 0.192.0: SoundCloud metadata-only public upload/related/search inventories, selected membership/identity refresh and clear progressive/HLS renewal with archive/output/callback protection; provider subset, no full-parity claim. See AUDIO-INVENTORIES.md."
+    },
+    {
+      "id": "Selection.PlaylistEnd",
+      "category": "Selection",
+      "dataType": "int",
+      "status": "partial",
+      "nativeEvidence": "Native ordered signed indexes,inclusive/open/stepped colon and legacy ranges,first-occurrence deduplication,explicit-item precedence,empty successful skips and preflight validation are tested. Original indexes and selected-order autonumbers persist in templates/JSON. Typed/global/job adapter overrides and live negative stepped selection passed. Lazy/large-inventory and remaining production interactions pending. Version 0.190.0: supported core search/collection metadata-only inventory and selected fresh playback, scoped API/cookie account contexts, OAuth renewal, identity/pagination/membership and archive/output protection. Provider-declared subset; no global account/full-parity claim. See CORE-PLATFORM-INVENTORIES.md. Version 0.192.0: SoundCloud metadata-only public upload/related/search inventories, selected membership/identity refresh and clear progressive/HLS renewal with archive/output/callback protection; provider subset, no full-parity claim. See AUDIO-INVENTORIES.md."
+    },
+    {
+      "id": "Selection.PlaylistItems",
+      "category": "Selection",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Native ordered signed indexes,inclusive/open/stepped colon and legacy ranges,first-occurrence deduplication,explicit-item precedence,empty successful skips and preflight validation are tested. Original indexes and selected-order autonumbers persist in templates/JSON. Typed/global/job adapter overrides and live negative stepped selection passed. Lazy/large-inventory and remaining production interactions pending. Version 0.190.0: supported core search/collection metadata-only inventory and selected fresh playback, scoped API/cookie account contexts, OAuth renewal, identity/pagination/membership and archive/output protection. Provider-declared subset; no global account/full-parity claim. See CORE-PLATFORM-INVENTORIES.md. Version 0.192.0: SoundCloud metadata-only public upload/related/search inventories, selected membership/identity refresh and clear progressive/HLS renewal with archive/output/callback protection; provider subset, no full-parity claim. See AUDIO-INVENTORIES.md."
+    },
+    {
+      "id": "Selection.MatchTitle",
+      "category": "Selection",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Resolved-title predicates,completed-item limits,archive/filtered/failure skips,side-effect suppression and abort/job override mapping are tested. A live NFB title-filtered series stopped after one complete item. Complete legacy interactions and production integration remain pending; see DOWNLOAD-SELECTION.md. Version 0.190.0: supported core search/collection metadata-only inventory and selected fresh playback, scoped API/cookie account contexts, OAuth renewal, identity/pagination/membership and archive/output protection. Provider-declared subset; no global account/full-parity claim. See CORE-PLATFORM-INVENTORIES.md. Version 0.192.0: SoundCloud metadata-only public upload/related/search inventories, selected membership/identity refresh and clear progressive/HLS renewal with archive/output/callback protection; provider subset, no full-parity claim. See AUDIO-INVENTORIES.md."
+    },
+    {
+      "id": "Selection.RejectTitle",
+      "category": "Selection",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Resolved-title predicates,completed-item limits,archive/filtered/failure skips,side-effect suppression and abort/job override mapping are tested. A live NFB title-filtered series stopped after one complete item. Complete legacy interactions and production integration remain pending; see DOWNLOAD-SELECTION.md. Version 0.190.0: supported core search/collection metadata-only inventory and selected fresh playback, scoped API/cookie account contexts, OAuth renewal, identity/pagination/membership and archive/output protection. Provider-declared subset; no global account/full-parity claim. See CORE-PLATFORM-INVENTORIES.md. Version 0.192.0: SoundCloud metadata-only public upload/related/search inventories, selected membership/identity refresh and clear progressive/HLS renewal with archive/output/callback protection; provider subset, no full-parity claim. See AUDIO-INVENTORIES.md."
+    },
+    {
+      "id": "Selection.MaxDownloads",
+      "category": "Selection",
+      "dataType": "int",
+      "status": "partial",
+      "nativeEvidence": "Resolved-title predicates,completed-item limits,archive/filtered/failure skips,side-effect suppression and abort/job override mapping are tested. A live NFB title-filtered series stopped after one complete item. Complete legacy interactions and production integration remain pending; see DOWNLOAD-SELECTION.md. Version 0.190.0: supported core search/collection metadata-only inventory and selected fresh playback, scoped API/cookie account contexts, OAuth renewal, identity/pagination/membership and archive/output protection. Provider-declared subset; no global account/full-parity claim. See CORE-PLATFORM-INVENTORIES.md. Version 0.192.0: SoundCloud metadata-only public upload/related/search inventories, selected membership/identity refresh and clear progressive/HLS renewal with archive/output/callback protection; provider subset, no full-parity claim. See AUDIO-INVENTORIES.md."
+    },
+    {
+      "id": "Selection.MinFilesize",
+      "category": "Selection",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Native saved/job/argument mapping, inclusive original-source bounds, known/unknown/resumed progressive sizes, terminal refusal, conversion/HLS publication guards and live saved1M-2M audio/archive workflow pass. Adaptive transfer-time bounds, complete upstream interactions and production integration remain pending; see FILE-SIZE-LIMITS.md. Version 0.190.0: supported core search/collection metadata-only inventory and selected fresh playback, scoped API/cookie account contexts, OAuth renewal, identity/pagination/membership and archive/output protection. Provider-declared subset; no global account/full-parity claim. See CORE-PLATFORM-INVENTORIES.md. Version 0.192.0: SoundCloud metadata-only public upload/related/search inventories, selected membership/identity refresh and clear progressive/HLS renewal with archive/output/callback protection; provider subset, no full-parity claim. See AUDIO-INVENTORIES.md."
+    },
+    {
+      "id": "Selection.MaxFilesize",
+      "category": "Selection",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Native saved/job/argument mapping, inclusive original-source bounds, known/unknown/resumed progressive sizes, terminal refusal, conversion/HLS publication guards and live saved1M-2M audio/archive workflow pass. Adaptive transfer-time bounds, complete upstream interactions and production integration remain pending; see FILE-SIZE-LIMITS.md. Version 0.190.0: supported core search/collection metadata-only inventory and selected fresh playback, scoped API/cookie account contexts, OAuth renewal, identity/pagination/membership and archive/output protection. Provider-declared subset; no global account/full-parity claim. See CORE-PLATFORM-INVENTORIES.md. Version 0.192.0: SoundCloud metadata-only public upload/related/search inventories, selected membership/identity refresh and clear progressive/HLS renewal with archive/output/callback protection; provider subset, no full-parity claim. See AUDIO-INVENTORIES.md."
+    },
+    {
+      "id": "Selection.Date",
+      "category": "Selection",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Native typed settings/extra-argument mapping, preflight, date/view/age predicates and generic metadata filters are implemented. Missing legacy facts remain allowed; explicit generic missing/presence controls are supported. Sixteen core and two app checks cover ranges/zero/large counts/units/type/escaping/regex/OR/reset/side-effect protection/limits/facts and early YouTube rejection. Live iHeart saved-date rejection and accepted filters with full decoding/archive verification passed. Complete provider facts, remaining grammar/interactions and production parity remain pending;see METADATA-SELECTION.md. Version 0.190.0: supported core search/collection metadata-only inventory and selected fresh playback, scoped API/cookie account contexts, OAuth renewal, identity/pagination/membership and archive/output protection. Provider-declared subset; no global account/full-parity claim. See CORE-PLATFORM-INVENTORIES.md. Version 0.192.0: SoundCloud metadata-only public upload/related/search inventories, selected membership/identity refresh and clear progressive/HLS renewal with archive/output/callback protection; provider subset, no full-parity claim. See AUDIO-INVENTORIES.md."
+    },
+    {
+      "id": "Selection.DateBefore",
+      "category": "Selection",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Native typed settings/extra-argument mapping, preflight, date/view/age predicates and generic metadata filters are implemented. Missing legacy facts remain allowed; explicit generic missing/presence controls are supported. Sixteen core and two app checks cover ranges/zero/large counts/units/type/escaping/regex/OR/reset/side-effect protection/limits/facts and early YouTube rejection. Live iHeart saved-date rejection and accepted filters with full decoding/archive verification passed. Complete provider facts, remaining grammar/interactions and production parity remain pending;see METADATA-SELECTION.md. Version 0.190.0: supported core search/collection metadata-only inventory and selected fresh playback, scoped API/cookie account contexts, OAuth renewal, identity/pagination/membership and archive/output protection. Provider-declared subset; no global account/full-parity claim. See CORE-PLATFORM-INVENTORIES.md. Version 0.192.0: SoundCloud metadata-only public upload/related/search inventories, selected membership/identity refresh and clear progressive/HLS renewal with archive/output/callback protection; provider subset, no full-parity claim. See AUDIO-INVENTORIES.md."
+    },
+    {
+      "id": "Selection.DateAfter",
+      "category": "Selection",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Native typed settings/extra-argument mapping, preflight, date/view/age predicates and generic metadata filters are implemented. Missing legacy facts remain allowed; explicit generic missing/presence controls are supported. Sixteen core and two app checks cover ranges/zero/large counts/units/type/escaping/regex/OR/reset/side-effect protection/limits/facts and early YouTube rejection. Live iHeart saved-date rejection and accepted filters with full decoding/archive verification passed. Complete provider facts, remaining grammar/interactions and production parity remain pending;see METADATA-SELECTION.md. Version 0.190.0: supported core search/collection metadata-only inventory and selected fresh playback, scoped API/cookie account contexts, OAuth renewal, identity/pagination/membership and archive/output protection. Provider-declared subset; no global account/full-parity claim. See CORE-PLATFORM-INVENTORIES.md. Version 0.192.0: SoundCloud metadata-only public upload/related/search inventories, selected membership/identity refresh and clear progressive/HLS renewal with archive/output/callback protection; provider subset, no full-parity claim. See AUDIO-INVENTORIES.md."
+    },
+    {
+      "id": "Selection.MinViews",
+      "category": "Selection",
+      "dataType": "long",
+      "status": "partial",
+      "nativeEvidence": "Native typed settings/extra-argument mapping, preflight, date/view/age predicates and generic metadata filters are implemented. Missing legacy facts remain allowed; explicit generic missing/presence controls are supported. Sixteen core and two app checks cover ranges/zero/large counts/units/type/escaping/regex/OR/reset/side-effect protection/limits/facts and early YouTube rejection. Live iHeart saved-date rejection and accepted filters with full decoding/archive verification passed. Complete provider facts, remaining grammar/interactions and production parity remain pending;see METADATA-SELECTION.md. Version 0.190.0: supported core search/collection metadata-only inventory and selected fresh playback, scoped API/cookie account contexts, OAuth renewal, identity/pagination/membership and archive/output protection. Provider-declared subset; no global account/full-parity claim. See CORE-PLATFORM-INVENTORIES.md. Version 0.192.0: SoundCloud metadata-only public upload/related/search inventories, selected membership/identity refresh and clear progressive/HLS renewal with archive/output/callback protection; provider subset, no full-parity claim. See AUDIO-INVENTORIES.md."
+    },
+    {
+      "id": "Selection.MaxViews",
+      "category": "Selection",
+      "dataType": "long",
+      "status": "partial",
+      "nativeEvidence": "Native typed settings/extra-argument mapping, preflight, date/view/age predicates and generic metadata filters are implemented. Missing legacy facts remain allowed; explicit generic missing/presence controls are supported. Sixteen core and two app checks cover ranges/zero/large counts/units/type/escaping/regex/OR/reset/side-effect protection/limits/facts and early YouTube rejection. Live iHeart saved-date rejection and accepted filters with full decoding/archive verification passed. Complete provider facts, remaining grammar/interactions and production parity remain pending;see METADATA-SELECTION.md. Version 0.190.0: supported core search/collection metadata-only inventory and selected fresh playback, scoped API/cookie account contexts, OAuth renewal, identity/pagination/membership and archive/output protection. Provider-declared subset; no global account/full-parity claim. See CORE-PLATFORM-INVENTORIES.md. Version 0.192.0: SoundCloud metadata-only public upload/related/search inventories, selected membership/identity refresh and clear progressive/HLS renewal with archive/output/callback protection; provider subset, no full-parity claim. See AUDIO-INVENTORIES.md."
+    },
+    {
+      "id": "Selection.MatchFilter",
+      "category": "Selection",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Native typed settings/extra-argument mapping, preflight, date/view/age predicates and generic metadata filters are implemented. Missing legacy facts remain allowed; explicit generic missing/presence controls are supported. Sixteen core and two app checks cover ranges/zero/large counts/units/type/escaping/regex/OR/reset/side-effect protection/limits/facts and early YouTube rejection. Live iHeart saved-date rejection and accepted filters with full decoding/archive verification passed. Complete provider facts, remaining grammar/interactions and production parity remain pending;see METADATA-SELECTION.md. Version 0.190.0: supported core search/collection metadata-only inventory and selected fresh playback, scoped API/cookie account contexts, OAuth renewal, identity/pagination/membership and archive/output protection. Provider-declared subset; no global account/full-parity claim. See CORE-PLATFORM-INVENTORIES.md. Version 0.192.0: SoundCloud metadata-only public upload/related/search inventories, selected membership/identity refresh and clear progressive/HLS renewal with archive/output/callback protection; provider subset, no full-parity claim. See AUDIO-INVENTORIES.md."
+    },
+    {
+      "id": "Selection.AgeLimit",
+      "category": "Selection",
+      "dataType": "int",
+      "status": "partial",
+      "nativeEvidence": "Native typed settings/extra-argument mapping, preflight, date/view/age predicates and generic metadata filters are implemented. Missing legacy facts remain allowed; explicit generic missing/presence controls are supported. Sixteen core and two app checks cover ranges/zero/large counts/units/type/escaping/regex/OR/reset/side-effect protection/limits/facts and early YouTube rejection. Live iHeart saved-date rejection and accepted filters with full decoding/archive verification passed. Complete provider facts, remaining grammar/interactions and production parity remain pending;see METADATA-SELECTION.md. Version 0.190.0: supported core search/collection metadata-only inventory and selected fresh playback, scoped API/cookie account contexts, OAuth renewal, identity/pagination/membership and archive/output protection. Provider-declared subset; no global account/full-parity claim. See CORE-PLATFORM-INVENTORIES.md. Version 0.192.0: SoundCloud metadata-only public upload/related/search inventories, selected membership/identity refresh and clear progressive/HLS renewal with archive/output/callback protection; provider subset, no full-parity claim. See AUDIO-INVENTORIES.md."
+    },
+    {
+      "id": "Auth.Username",
+      "category": "Auth",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "PeerTube declared account/video-password capabilities, same-origin HTTPS API, one job-owned token session, provided two-factor code, bounded refresh and read-only exact-host netrc lookup are implemented. Other providers remain explicit unsupported boundaries. Protocol/generated protected playback passed; real account/private verification deferred by the user. See AUTHENTICATION-SESSIONS.md. The PeerTube consumer now renews job-owned scoped resource tokens on expiry or once after401/403, sharing rejected-generation refreshes and retaining canonical URLs. Generated private paired playback passed; real account evidence remains deferred. See ADAPTIVE-LIVE-RENEWAL.md. Version0.130.0 adds provider/account/media-scoped hosting credentials and generic exact-embed delegation, Wistia API bearer, JW publisher-supplied signing, Brightcove JWT, Kaltura login/netrc/initial OTP/session identity renewal and clear shared progressive/caption/HLS/DASH leases. Materialized JW/Brightcove playlists carry membership-bound renewal. Complete media/source packet and public playback evidence passed; real account/signing/remote renewal remains user-deferred. No full provider or option parity claim. See SHARED-HOSTING-RENEWAL.md. Version0.150.0:interrupted durable writes and receipt-last cleanup,indexed nested/absolute recovery,scoped provider lifetime/canonical repeated reads/private inventory/validated grant installation. Partial scope;see WRITE-CLEANUP-RECOVERY.md. Version0.152.0:committed changed-job retirement,original archive context,registered recovery across folder changes,OAuth draining/generation/account validation,HTTP clone guards and session-free Kaltura default referrers. Partial scope;see CHANGED-JOB-SESSIONS.md. Version0.154.0:complete no-overwrite media inventories before body requests,retained-original skip,manifest-only static HLS layouts,missing-retained-file fill,distinct post-overwrite policy and partial-data retention. Partial scope;see NO-OVERWRITE-TRANSFERS.md. Version 0.164.0: atomic graph/root renewal, exact source-versus-visible period timing, declared Time/Number slots and bounded history, stable per-job resource bindings, compatible HEVC/VP9/AV1/Opus/FLAC decoded clipping and longer bounded shared leases. Partial scope; account verification user-deferred; see LIVE-PERIOD-SESSIONS.md. Version 0.166.0: pinned/unique compatible representation transitions, canonical profile facts, literal outer DASH selection boundary, used-resource protection/unused retirement, and proof-based issuer ending. Partial scope; account verification user-deferred; see REPRESENTATION-CONTRACTS.md. Version 0.168.0: changed adaptation/caption selection, viewpoint/accessibility guards, accepted track pinning, stable v2 recovery scopes, fresh-session verified prefix restoration and ended live projection. Partial scope; account verification user-deferred; see ADAPTATION-RECOVERY.md. Version 0.190.0: supported core search/collection metadata-only inventory and selected fresh playback, scoped API/cookie account contexts, OAuth renewal, identity/pagination/membership and archive/output protection. Provider-declared subset; no global account/full-parity claim. See CORE-PLATFORM-INVENTORIES.md."
+    },
+    {
+      "id": "Auth.Password",
+      "category": "Auth",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "PeerTube declared account/video-password capabilities, same-origin HTTPS API, one job-owned token session, provided two-factor code, bounded refresh and read-only exact-host netrc lookup are implemented. Other providers remain explicit unsupported boundaries. Protocol/generated protected playback passed; real account/private verification deferred by the user. See AUTHENTICATION-SESSIONS.md. The PeerTube consumer now renews job-owned scoped resource tokens on expiry or once after401/403, sharing rejected-generation refreshes and retaining canonical URLs. Generated private paired playback passed; real account evidence remains deferred. See ADAPTIVE-LIVE-RENEWAL.md. Version0.130.0 adds provider/account/media-scoped hosting credentials and generic exact-embed delegation, Wistia API bearer, JW publisher-supplied signing, Brightcove JWT, Kaltura login/netrc/initial OTP/session identity renewal and clear shared progressive/caption/HLS/DASH leases. Materialized JW/Brightcove playlists carry membership-bound renewal. Complete media/source packet and public playback evidence passed; real account/signing/remote renewal remains user-deferred. No full provider or option parity claim. See SHARED-HOSTING-RENEWAL.md. Version0.150.0:interrupted durable writes and receipt-last cleanup,indexed nested/absolute recovery,scoped provider lifetime/canonical repeated reads/private inventory/validated grant installation. Partial scope;see WRITE-CLEANUP-RECOVERY.md. Version0.152.0:committed changed-job retirement,original archive context,registered recovery across folder changes,OAuth draining/generation/account validation,HTTP clone guards and session-free Kaltura default referrers. Partial scope;see CHANGED-JOB-SESSIONS.md. Version0.154.0:complete no-overwrite media inventories before body requests,retained-original skip,manifest-only static HLS layouts,missing-retained-file fill,distinct post-overwrite policy and partial-data retention. Partial scope;see NO-OVERWRITE-TRANSFERS.md. Version 0.164.0: atomic graph/root renewal, exact source-versus-visible period timing, declared Time/Number slots and bounded history, stable per-job resource bindings, compatible HEVC/VP9/AV1/Opus/FLAC decoded clipping and longer bounded shared leases. Partial scope; account verification user-deferred; see LIVE-PERIOD-SESSIONS.md. Version 0.166.0: pinned/unique compatible representation transitions, canonical profile facts, literal outer DASH selection boundary, used-resource protection/unused retirement, and proof-based issuer ending. Partial scope; account verification user-deferred; see REPRESENTATION-CONTRACTS.md. Version 0.168.0: changed adaptation/caption selection, viewpoint/accessibility guards, accepted track pinning, stable v2 recovery scopes, fresh-session verified prefix restoration and ended live projection. Partial scope; account verification user-deferred; see ADAPTATION-RECOVERY.md. Version 0.190.0: supported core search/collection metadata-only inventory and selected fresh playback, scoped API/cookie account contexts, OAuth renewal, identity/pagination/membership and archive/output protection. Provider-declared subset; no global account/full-parity claim. See CORE-PLATFORM-INVENTORIES.md."
+    },
+    {
+      "id": "Auth.TwoFactor",
+      "category": "Auth",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "PeerTube declared account/video-password capabilities, same-origin HTTPS API, one job-owned token session, provided two-factor code, bounded refresh and read-only exact-host netrc lookup are implemented. Other providers remain explicit unsupported boundaries. Protocol/generated protected playback passed; real account/private verification deferred by the user. See AUTHENTICATION-SESSIONS.md. The PeerTube consumer now renews job-owned scoped resource tokens on expiry or once after401/403, sharing rejected-generation refreshes and retaining canonical URLs. Generated private paired playback passed; real account evidence remains deferred. See ADAPTIVE-LIVE-RENEWAL.md. Version0.130.0 adds provider/account/media-scoped hosting credentials and generic exact-embed delegation, Wistia API bearer, JW publisher-supplied signing, Brightcove JWT, Kaltura login/netrc/initial OTP/session identity renewal and clear shared progressive/caption/HLS/DASH leases. Materialized JW/Brightcove playlists carry membership-bound renewal. Complete media/source packet and public playback evidence passed; real account/signing/remote renewal remains user-deferred. No full provider or option parity claim. See SHARED-HOSTING-RENEWAL.md. Version0.150.0:interrupted durable writes and receipt-last cleanup,indexed nested/absolute recovery,scoped provider lifetime/canonical repeated reads/private inventory/validated grant installation. Partial scope;see WRITE-CLEANUP-RECOVERY.md. Version0.152.0:committed changed-job retirement,original archive context,registered recovery across folder changes,OAuth draining/generation/account validation,HTTP clone guards and session-free Kaltura default referrers. Partial scope;see CHANGED-JOB-SESSIONS.md. Version0.154.0:complete no-overwrite media inventories before body requests,retained-original skip,manifest-only static HLS layouts,missing-retained-file fill,distinct post-overwrite policy and partial-data retention. Partial scope;see NO-OVERWRITE-TRANSFERS.md. Version 0.164.0: atomic graph/root renewal, exact source-versus-visible period timing, declared Time/Number slots and bounded history, stable per-job resource bindings, compatible HEVC/VP9/AV1/Opus/FLAC decoded clipping and longer bounded shared leases. Partial scope; account verification user-deferred; see LIVE-PERIOD-SESSIONS.md. Version 0.166.0: pinned/unique compatible representation transitions, canonical profile facts, literal outer DASH selection boundary, used-resource protection/unused retirement, and proof-based issuer ending. Partial scope; account verification user-deferred; see REPRESENTATION-CONTRACTS.md. Version 0.168.0: changed adaptation/caption selection, viewpoint/accessibility guards, accepted track pinning, stable v2 recovery scopes, fresh-session verified prefix restoration and ended live projection. Partial scope; account verification user-deferred; see ADAPTATION-RECOVERY.md. Version 0.190.0: supported core search/collection metadata-only inventory and selected fresh playback, scoped API/cookie account contexts, OAuth renewal, identity/pagination/membership and archive/output protection. Provider-declared subset; no global account/full-parity claim. See CORE-PLATFORM-INVENTORIES.md."
+    },
+    {
+      "id": "Auth.UseNetrc",
+      "category": "Auth",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": "PeerTube declared account/video-password capabilities, same-origin HTTPS API, one job-owned token session, provided two-factor code, bounded refresh and read-only exact-host netrc lookup are implemented. Other providers remain explicit unsupported boundaries. Protocol/generated protected playback passed; real account/private verification deferred by the user. See AUTHENTICATION-SESSIONS.md. The PeerTube consumer now renews job-owned scoped resource tokens on expiry or once after401/403, sharing rejected-generation refreshes and retaining canonical URLs. Generated private paired playback passed; real account evidence remains deferred. See ADAPTIVE-LIVE-RENEWAL.md. Version0.130.0 adds provider/account/media-scoped hosting credentials and generic exact-embed delegation, Wistia API bearer, JW publisher-supplied signing, Brightcove JWT, Kaltura login/netrc/initial OTP/session identity renewal and clear shared progressive/caption/HLS/DASH leases. Materialized JW/Brightcove playlists carry membership-bound renewal. Complete media/source packet and public playback evidence passed; real account/signing/remote renewal remains user-deferred. No full provider or option parity claim. See SHARED-HOSTING-RENEWAL.md. Version0.150.0:interrupted durable writes and receipt-last cleanup,indexed nested/absolute recovery,scoped provider lifetime/canonical repeated reads/private inventory/validated grant installation. Partial scope;see WRITE-CLEANUP-RECOVERY.md. Version0.152.0:committed changed-job retirement,original archive context,registered recovery across folder changes,OAuth draining/generation/account validation,HTTP clone guards and session-free Kaltura default referrers. Partial scope;see CHANGED-JOB-SESSIONS.md. Version0.154.0:complete no-overwrite media inventories before body requests,retained-original skip,manifest-only static HLS layouts,missing-retained-file fill,distinct post-overwrite policy and partial-data retention. Partial scope;see NO-OVERWRITE-TRANSFERS.md. Version 0.164.0: atomic graph/root renewal, exact source-versus-visible period timing, declared Time/Number slots and bounded history, stable per-job resource bindings, compatible HEVC/VP9/AV1/Opus/FLAC decoded clipping and longer bounded shared leases. Partial scope; account verification user-deferred; see LIVE-PERIOD-SESSIONS.md. Version 0.166.0: pinned/unique compatible representation transitions, canonical profile facts, literal outer DASH selection boundary, used-resource protection/unused retirement, and proof-based issuer ending. Partial scope; account verification user-deferred; see REPRESENTATION-CONTRACTS.md. Version 0.168.0: changed adaptation/caption selection, viewpoint/accessibility guards, accepted track pinning, stable v2 recovery scopes, fresh-session verified prefix restoration and ended live projection. Partial scope; account verification user-deferred; see ADAPTATION-RECOVERY.md. Version 0.190.0: supported core search/collection metadata-only inventory and selected fresh playback, scoped API/cookie account contexts, OAuth renewal, identity/pagination/membership and archive/output protection. Provider-declared subset; no global account/full-parity claim. See CORE-PLATFORM-INVENTORIES.md."
+    },
+    {
+      "id": "Auth.VideoPassword",
+      "category": "Auth",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "PeerTube declared account/video-password capabilities, same-origin HTTPS API, one job-owned token session, provided two-factor code, bounded refresh and read-only exact-host netrc lookup are implemented. Other providers remain explicit unsupported boundaries. Protocol/generated protected playback passed; real account/private verification deferred by the user. See AUTHENTICATION-SESSIONS.md. The PeerTube consumer now renews job-owned scoped resource tokens on expiry or once after401/403, sharing rejected-generation refreshes and retaining canonical URLs. Generated private paired playback passed; real account evidence remains deferred. See ADAPTIVE-LIVE-RENEWAL.md. Version0.126.0 adds provider-scoped YouTube cookie account selection and API hashes/private Web playback, Vimeo video-password and issuer API file tokens, exact progressive/caption signed-link renewal and matching SABR context refresh. Account identities/redirects/retries/denial/cancellation are bounded and verified. Real private accounts remain user-deferred; login/OAuth grant, adaptive graph and full account/option parity remain pending. See ACCOUNT-RENEWAL.md. Version0.128.0 adds publisher-identity HLS/DASH signed graph renewal, canonical/effective URL handling, selected track/key/init/range/caption/period preservation, external-browser loopback consent, Google PKCE/refresh/account API playlists, Vimeo scoped code exchange/adaptive API/captions. Complete generated-media and public playback/archive/packet verification passed. Google API login still needs separate playback cookies for private media; real account/remote grant evidence remains user-deferred, with additional layouts and full parity open. See ADAPTIVE-ACCOUNT-RENEWAL.md. Version0.150.0:interrupted durable writes and receipt-last cleanup,indexed nested/absolute recovery,scoped provider lifetime/canonical repeated reads/private inventory/validated grant installation. Partial scope;see WRITE-CLEANUP-RECOVERY.md. Version0.152.0:committed changed-job retirement,original archive context,registered recovery across folder changes,OAuth draining/generation/account validation,HTTP clone guards and session-free Kaltura default referrers. Partial scope;see CHANGED-JOB-SESSIONS.md. Version0.154.0:complete no-overwrite media inventories before body requests,retained-original skip,manifest-only static HLS layouts,missing-retained-file fill,distinct post-overwrite policy and partial-data retention. Partial scope;see NO-OVERWRITE-TRANSFERS.md. Version 0.164.0: atomic graph/root renewal, exact source-versus-visible period timing, declared Time/Number slots and bounded history, stable per-job resource bindings, compatible HEVC/VP9/AV1/Opus/FLAC decoded clipping and longer bounded shared leases. Partial scope; account verification user-deferred; see LIVE-PERIOD-SESSIONS.md. Version 0.166.0: pinned/unique compatible representation transitions, canonical profile facts, literal outer DASH selection boundary, used-resource protection/unused retirement, and proof-based issuer ending. Partial scope; account verification user-deferred; see REPRESENTATION-CONTRACTS.md. Version 0.168.0: changed adaptation/caption selection, viewpoint/accessibility guards, accepted track pinning, stable v2 recovery scopes, fresh-session verified prefix restoration and ended live projection. Partial scope; account verification user-deferred; see ADAPTATION-RECOVERY.md. Version 0.190.0: supported core search/collection metadata-only inventory and selected fresh playback, scoped API/cookie account contexts, OAuth renewal, identity/pagination/membership and archive/output protection. Provider-declared subset; no global account/full-parity claim. See CORE-PLATFORM-INVENTORIES.md."
+    },
+    {
+      "id": "Auth.ApMso",
+      "category": "Auth",
+      "dataType": "string",
+      "status": "pending"
+    },
+    {
+      "id": "Auth.ApUsername",
+      "category": "Auth",
+      "dataType": "string",
+      "status": "pending"
+    },
+    {
+      "id": "Auth.ApPassword",
+      "category": "Auth",
+      "dataType": "string",
+      "status": "pending"
+    },
+    {
+      "id": "Auth.CookiesFile",
+      "category": "Auth",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Bounded Netscape imports preserve host/domain/path/Secure/HttpOnly/expiry/session/empty values, omit expired cookies, retain capacity and fail for invalid/missing inputs. File choice takes precedence and is mapped from the app. See AUTH-COOKIES.md; full export/update semantics and production parity remain pending. Independent CLI file/browser cookie resets survive native analysis and downloading. See CONTROL-PLANE-BATCH.md. Version 0.164.0: atomic graph/root renewal, exact source-versus-visible period timing, declared Time/Number slots and bounded history, stable per-job resource bindings, compatible HEVC/VP9/AV1/Opus/FLAC decoded clipping and longer bounded shared leases. Partial scope; account verification user-deferred; see LIVE-PERIOD-SESSIONS.md. Version 0.166.0: pinned/unique compatible representation transitions, canonical profile facts, literal outer DASH selection boundary, used-resource protection/unused retirement, and proof-based issuer ending. Partial scope; account verification user-deferred; see REPRESENTATION-CONTRACTS.md. Version 0.168.0: changed adaptation/caption selection, viewpoint/accessibility guards, accepted track pinning, stable v2 recovery scopes, fresh-session verified prefix restoration and ended live projection. Partial scope; account verification user-deferred; see ADAPTATION-RECOVERY.md. Version 0.190.0: supported core search/collection metadata-only inventory and selected fresh playback, scoped API/cookie account contexts, OAuth renewal, identity/pagination/membership and archive/output protection. Provider-declared subset; no global account/full-parity claim. See CORE-PLATFORM-INVENTORIES.md."
+    },
+    {
+      "id": "Auth.CookiesFromBrowser",
+      "category": "Auth",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Native Windows Firefox profiles/containers and Chromium-family plaintext/DPAPI/v10 AES-GCM imports,read-only WAL snapshots,host/scope/expiry checks,diagnostics and authenticated local HTTP verified with generated profiles. App selection/override mapping checked. Application-bound encryption,partitions,live account workflows and complete parity remain pending;see AUTH-COOKIES.md. Version 0.164.0: atomic graph/root renewal, exact source-versus-visible period timing, declared Time/Number slots and bounded history, stable per-job resource bindings, compatible HEVC/VP9/AV1/Opus/FLAC decoded clipping and longer bounded shared leases. Partial scope; account verification user-deferred; see LIVE-PERIOD-SESSIONS.md. Version 0.166.0: pinned/unique compatible representation transitions, canonical profile facts, literal outer DASH selection boundary, used-resource protection/unused retirement, and proof-based issuer ending. Partial scope; account verification user-deferred; see REPRESENTATION-CONTRACTS.md. Version 0.168.0: changed adaptation/caption selection, viewpoint/accessibility guards, accepted track pinning, stable v2 recovery scopes, fresh-session verified prefix restoration and ended live projection. Partial scope; account verification user-deferred; see ADAPTATION-RECOVERY.md. Version 0.190.0: supported core search/collection metadata-only inventory and selected fresh playback, scoped API/cookie account contexts, OAuth renewal, identity/pagination/membership and archive/output protection. Provider-declared subset; no global account/full-parity claim. See CORE-PLATFORM-INVENTORIES.md."
+    },
+    {
+      "id": "PostProcess.EmbedThumbnail",
+      "category": "PostProcess",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": "Independent saving/embedding, common video/audio containers, image conversion, bounded processing, preserved media/captions/chapters, replacement, rollback and one live YouTube artwork workflow verified. See THUMBNAILS.md; production settings integration and full legacy semantics remain pending."
+    },
+    {
+      "id": "PostProcess.EmbedChapters",
+      "category": "PostProcess",
+      "dataType": "bool",
+      "status": "pending"
+    },
+    {
+      "id": "PostProcess.AddMetadata",
+      "category": "PostProcess",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": " Version0.132.0:complete delegated article and Kaltura DASH native-adapter outputs retain originals,ordered source packets,relative picture clocks and hosted archive/callback identities. TS/M2TS metadata/remux derives decode clocks while preserving presentation timing. Partial scope;see CONSUMER-DASH.md."
+    },
+    {
+      "id": "PostProcess.ParseMetadata",
+      "category": "PostProcess",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Native saved/general/job ordered metadata rules, field copies/capture templates/named regexes, bounded preflight/runtime failures, immutable sources, descriptive filters/names/info JSON/global embedded overrides and 13 core/6 media/3 app checks pass. Five live saved-option workflows fully decoded nine files with exact samples/originals, byte-identical disabled output, source position1 and archive skips. Additional stages/grammar/structural/stream/provider and production parity remain pending; see METADATA-PARSING.md."
+    },
+    {
+      "id": "PostProcess.Fixup",
+      "category": "PostProcess",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Native explicit never/warn/detect_or_warn/detect_or_fix/force policies detect mislabeled ADTS/TS sources and optionally perform packet-preserving container repair, retaining originals and protecting no-overwrite targets. Other optional fixup detectors remain pending. See PROCESSING-OPTIONS.md."
+    },
+    {
+      "id": "PostProcess.FfmpegLocation",
+      "category": "PostProcess",
+      "dataType": "string",
+      "status": "pending"
+    },
+    {
+      "id": "PostProcess.PostprocessorArgs",
+      "category": "PostProcess",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Saved/job ordered --postprocessor-args/--ppa native FFmpeg stage/input/output targeting for bounded metadata, quality/bitrate/preset/compression/mux/probe/thread overrides, immutable job isolation and before-discovery rejection. Arbitrary filters/codecs/outputs/tools and full upstream grammar remain pending. See PROCESSING-OPTIONS.md."
+    },
+    {
+      "id": "PostProcess.ExecCommand",
+      "category": "PostProcess",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Native after_move direct programs with separate literal metadata/path arguments, saved/job order and disabling, durable intent, no automatic uncertain replay, process cancellation/lifetime and publication-before-archive rollback. Media/sidecar modification, shell pipelines and other stages remain unsupported. See EXEC-SPONSORBLOCK.md."
+    },
+    {
+      "id": "PostProcess.SponsorBlock",
+      "category": "PostProcess",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Native recorded YouTube mark/remove categories with isolated hash-prefix API, pinned retry plan, composed chapters and mapped VTT/SRT/converted TTML. Supported aligned SDR H264/AAC/ALAC/FLAC MP4/M4A removal preserves kept pictures/clocks/decoded samples and retained originals. Other media/provider/custom-service/title/advanced-track modes remain open. See EXEC-SPONSORBLOCK.md and SPONSORBLOCK-DATA.md."
+    },
+    {
+      "id": "DownloadOptions.DownloadMode",
+      "category": "DownloadOptions",
+      "dataType": "string",
+      "status": "pending"
+    },
+    {
+      "id": "DownloadOptions.QualityPreset",
+      "category": "DownloadOptions",
+      "dataType": "string",
+      "status": "pending"
+    },
+    {
+      "id": "DownloadOptions.CustomFormat",
+      "category": "DownloadOptions",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Native exposed-format IDs, aliases, ranks, filters, fallbacks, and pairing are tested; multistream/multiple outputs/full syntax remain pending."
+    },
+    {
+      "id": "DownloadOptions.VideoCodec",
+      "category": "DownloadOptions",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "H.264/H.265/VP9/AV1 preferences constrain progressive/HLS/DASH selection; a live H.264 PeerTube variant is verified. Unknown facts and full settings parity remain pending."
+    },
+    {
+      "id": "DownloadOptions.MaxFps",
+      "category": "DownloadOptions",
+      "dataType": "int",
+      "status": "partial",
+      "nativeEvidence": "Progressive/HLS/DASH frame-rate limits including inherited rational DASH metadata are tested; a 24-fps live variant met a 30-fps limit. Full sorting/probing/settings parity remains pending."
+    },
+    {
+      "id": "DownloadOptions.Container",
+      "category": "DownloadOptions",
+      "dataType": "string",
+      "status": "pending"
+    },
+    {
+      "id": "DownloadOptions.AudioFormat",
+      "category": "DownloadOptions",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Actual codec/default-track probing, automatic copy containers, explicit app audio formats, native quality profiles, packet/sample preservation and live best-audio extraction verified. See AUDIO.md; exact upstream profile calibration, advanced cases and production integration remain pending. Shared CLI overrides and six live conversions passed complete decoding; Vorbis sample clocks corrected and all extracted audio receives full pre-publication decoding. Full quality/multi-format grammar remains pending. See CONTROL-PLANE-BATCH.md."
+    },
+    {
+      "id": "DownloadOptions.AudioQuality",
+      "category": "DownloadOptions",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Actual codec/default-track probing, automatic copy containers, explicit app audio formats, native quality profiles, packet/sample preservation and live best-audio extraction verified. See AUDIO.md; exact upstream profile calibration, advanced cases and production integration remain pending. Shared CLI overrides and six live conversions passed complete decoding; Vorbis sample clocks corrected and all extracted audio receives full pre-publication decoding. Full quality/multi-format grammar remains pending. See CONTROL-PLANE-BATCH.md."
+    },
+    {
+      "id": "DownloadOptions.WriteSubs",
+      "category": "DownloadOptions",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": "Multiple authored VTT sidecars are fixture-verified without ffmpeg; live access and remaining formats/settings remain pending. Version0.136.0:complete public/legacy playlist selection and inspected identities,publisher-specific mixed hosting,stable Wistia caption language/format identities,source-preserving saving/conversion/embedding,exact scoped API caption bodies,caption-only transfer and protected failure/renewal checks. Partial scope;see PLAYLIST-CAPTIONS.md."
+    },
+    {
+      "id": "DownloadOptions.WriteAutoSubs",
+      "category": "DownloadOptions",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": "Exposed automatic VTT tracks are fixture-verified; live access and translated/generated tracks remain pending. Version0.136.0:complete public/legacy playlist selection and inspected identities,publisher-specific mixed hosting,stable Wistia caption language/format identities,source-preserving saving/conversion/embedding,exact scoped API caption bodies,caption-only transfer and protected failure/renewal checks. Partial scope;see PLAYLIST-CAPTIONS.md."
+    },
+    {
+      "id": "DownloadOptions.EmbedSubs",
+      "category": "DownloadOptions",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": "Multiple MP4/Matroska captions are media-verified for text, language, and codec; other containers/settings remain pending. Version0.136.0:complete public/legacy playlist selection and inspected identities,publisher-specific mixed hosting,stable Wistia caption language/format identities,source-preserving saving/conversion/embedding,exact scoped API caption bodies,caption-only transfer and protected failure/renewal checks. Partial scope;see PLAYLIST-CAPTIONS.md."
+    },
+    {
+      "id": "DownloadOptions.SubLangs",
+      "category": "DownloadOptions",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Whole-language regular expressions, all, and exclusions are tested; all upstream selector semantics/settings remain pending. Version0.136.0:declared Wistia language/format/provenance tracks support bounded saving/conversion/embedding,caption-only output and exact scoped API/renewal handling;two public formats retain all56saved/embeddedcue payloads and exact timing.See PLAYLIST-CAPTIONS.md."
+    },
+    {
+      "id": "DownloadOptions.WriteThumbnail",
+      "category": "DownloadOptions",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": "Independent saving/embedding, common video/audio containers, image conversion, bounded processing, preserved media/captions/chapters, replacement, rollback and one live YouTube artwork workflow verified. See THUMBNAILS.md; production settings integration and full legacy semantics remain pending."
+    },
+    {
+      "id": "DownloadOptions.EmbedThumbnail",
+      "category": "DownloadOptions",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": "Independent saving/embedding, common video/audio containers, image conversion, bounded processing, preserved media/captions/chapters, replacement, rollback and one live YouTube artwork workflow verified. See THUMBNAILS.md; production settings integration and full legacy semantics remain pending."
+    },
+    {
+      "id": "DownloadOptions.AddMetadata",
+      "category": "DownloadOptions",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": " Version0.132.0:complete delegated article and Kaltura DASH native-adapter outputs retain originals,ordered source packets,relative picture clocks and hosted archive/callback identities. TS/M2TS metadata/remux derives decode clocks while preserving presentation timing. Partial scope;see CONSUMER-DASH.md."
+    },
+    {
+      "id": "DownloadOptions.EmbedChapters",
+      "category": "DownloadOptions",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": "Native YouTube/PeerTube chapter extraction and MP4/Matroska embedding are verified; other sources/containers and production settings parity remain pending."
+    },
+    {
+      "id": "DownloadOptions.OutputDirectory",
+      "category": "DownloadOptions",
+      "dataType": "string",
+      "status": "pending"
+    },
+    {
+      "id": "DownloadOptions.OutputTemplate",
+      "category": "DownloadOptions",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Per-download templates override the general template in the experimental adapter; core rendering and output publication are tested; complete grammar/production integration remain pending."
+    },
+    {
+      "id": "DownloadOptions.DownloadPlaylist",
+      "category": "DownloadOptions",
+      "dataType": "bool",
+      "status": "partial",
+      "nativeEvidence": "Public YouTube pagination is live-verified; per-item fixture downloads retain failures/completed files. Other collection/account/site workflows remain pending. Version 0.190.0: supported core search/collection metadata-only inventory and selected fresh playback, scoped API/cookie account contexts, OAuth renewal, identity/pagination/membership and archive/output protection. Provider-declared subset; no global account/full-parity claim. See CORE-PLATFORM-INVENTORIES.md. Version 0.192.0: SoundCloud metadata-only public upload/related/search inventories, selected membership/identity refresh and clear progressive/HLS renewal with archive/output/callback protection; provider subset, no full-parity claim. See AUDIO-INVENTORIES.md."
+    },
+    {
+      "id": "DownloadOptions.PlaylistItems",
+      "category": "DownloadOptions",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Native ordered signed indexes,inclusive/open/stepped colon and legacy ranges,first-occurrence deduplication,explicit-item precedence,empty successful skips and preflight validation are tested. Original indexes and selected-order autonumbers persist in templates/JSON. Typed/global/job adapter overrides and live negative stepped selection passed. Lazy/large-inventory and remaining production interactions pending. Version 0.190.0: supported core search/collection metadata-only inventory and selected fresh playback, scoped API/cookie account contexts, OAuth renewal, identity/pagination/membership and archive/output protection. Provider-declared subset; no global account/full-parity claim. See CORE-PLATFORM-INVENTORIES.md. Version 0.192.0: SoundCloud metadata-only public upload/related/search inventories, selected membership/identity refresh and clear progressive/HLS renewal with archive/output/callback protection; provider subset, no full-parity claim. See AUDIO-INVENTORIES.md."
+    },
+    {
+      "id": "DownloadOptions.PlaylistStart",
+      "category": "DownloadOptions",
+      "dataType": "int",
+      "status": "partial",
+      "nativeEvidence": "Native ordered signed indexes,inclusive/open/stepped colon and legacy ranges,first-occurrence deduplication,explicit-item precedence,empty successful skips and preflight validation are tested. Original indexes and selected-order autonumbers persist in templates/JSON. Typed/global/job adapter overrides and live negative stepped selection passed. Lazy/large-inventory and remaining production interactions pending. Version 0.190.0: supported core search/collection metadata-only inventory and selected fresh playback, scoped API/cookie account contexts, OAuth renewal, identity/pagination/membership and archive/output protection. Provider-declared subset; no global account/full-parity claim. See CORE-PLATFORM-INVENTORIES.md. Version 0.192.0: SoundCloud metadata-only public upload/related/search inventories, selected membership/identity refresh and clear progressive/HLS renewal with archive/output/callback protection; provider subset, no full-parity claim. See AUDIO-INVENTORIES.md."
+    },
+    {
+      "id": "DownloadOptions.PlaylistEnd",
+      "category": "DownloadOptions",
+      "dataType": "int",
+      "status": "partial",
+      "nativeEvidence": "Native ordered signed indexes,inclusive/open/stepped colon and legacy ranges,first-occurrence deduplication,explicit-item precedence,empty successful skips and preflight validation are tested. Original indexes and selected-order autonumbers persist in templates/JSON. Typed/global/job adapter overrides and live negative stepped selection passed. Lazy/large-inventory and remaining production interactions pending. Version 0.190.0: supported core search/collection metadata-only inventory and selected fresh playback, scoped API/cookie account contexts, OAuth renewal, identity/pagination/membership and archive/output protection. Provider-declared subset; no global account/full-parity claim. See CORE-PLATFORM-INVENTORIES.md. Version 0.192.0: SoundCloud metadata-only public upload/related/search inventories, selected membership/identity refresh and clear progressive/HLS renewal with archive/output/callback protection; provider subset, no full-parity claim. See AUDIO-INVENTORIES.md."
+    },
+    {
+      "id": "DownloadOptions.CookiesFile",
+      "category": "DownloadOptions",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Bounded Netscape imports preserve host/domain/path/Secure/HttpOnly/expiry/session/empty values, omit expired cookies, retain capacity and fail for invalid/missing inputs. File choice takes precedence and is mapped from the app. See AUTH-COOKIES.md; full export/update semantics and production parity remain pending. Independent CLI file/browser cookie resets survive native analysis and downloading. See CONTROL-PLANE-BATCH.md."
+    },
+    {
+      "id": "DownloadOptions.CookiesFromBrowser",
+      "category": "DownloadOptions",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Native Windows Firefox profiles/containers and Chromium-family plaintext/DPAPI/v10 AES-GCM imports,read-only WAL snapshots,host/scope/expiry checks,diagnostics and authenticated local HTTP verified with generated profiles. App selection/override mapping checked. Application-bound encryption,partitions,live account workflows and complete parity remain pending;see AUTH-COOKIES.md."
+    },
+    {
+      "id": "DownloadOptions.RateLimit",
+      "category": "DownloadOptions",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Positive byte/K/M/G parsing and aggregate cancellation-aware reservations across parallel media workers verified,including pending work across clock windows. Invalid rates fail before HTTP. Remaining metadata/caption paths,precision/performance and complete legacy semantics pending;see PARALLEL-FRAGMENTS.md. Browser-backed YouTube now supports validated HTTP/HTTPS proxies,aggregate rate limits and explicit certificate overrides;local browser and full live proxy/rate verification passed. See BROWSER-NETWORK.md."
+    },
+    {
+      "id": "DownloadOptions.Retries",
+      "category": "DownloadOptions",
+      "dataType": "int",
+      "status": "partial",
+      "nativeEvidence": "Native mapping preserves validated per-job0-1000retry counts instead of clamping to10; supported extra arguments retain precedence. Values0,23,1000and pre-HTTP invalid-value rejection are app-tested; a live Mixcloud adapter job with23passed. Full legacy interactions and production integration remain pending;see APP-ADAPTER-INTEGRATION.md. Version0.140.0:static HLS/DASH completed-fragment recovery with fresh identity/authorization and exact strong validators,local SHA integrity,ordered concurrency,process termination,caption failure,original retention and atomic callback/archive protection;restart mode does not reuse saved fragments. Partial scope;see ADAPTIVE-RECOVERY.md."
+    },
+    {
+      "id": "DownloadOptions.ConcurrentFragments",
+      "category": "DownloadOptions",
+      "dataType": "int",
+      "status": "partial",
+      "nativeEvidence": "Bounded1-32 active/buffered HLS and segmented/indexed DASH transfers preserve order,initialization,crypto,range identity and failure cleanup;app mapping,generated media and publicN4 HLS/DASH verified. Remaining caption/live scheduling and exact legacy interactions pending;see PARALLEL-FRAGMENTS.md. Version0.140.0:static HLS/DASH completed-fragment recovery with fresh identity/authorization and exact strong validators,local SHA integrity,ordered concurrency,process termination,caption failure,original retention and atomic callback/archive protection;restart mode does not reuse saved fragments. Partial scope;see ADAPTIVE-RECOVERY.md."
+    },
+    {
+      "id": "DownloadOptions.ExtraArgs",
+      "category": "DownloadOptions",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Supported tokens map to typed native fields without executing a CLI;global arguments precede job overrides. Simulation,skip-download,no-formats metadata,force-archive,standalone-file flags and selected existing fields are verified. Unknown options/positional URLs fail explicitly. Full grammar/options and production integration remain pending;see METADATA-ONLY.md. All-thumbnail saving is now supported;see THUMBNAILS.md. Shared audio/tool/inverse arguments and arity-aware native analysis, ordered saved/job overrides, preflight, six cross-provider live workflows and conversion timing are verified; complete argument/default/alias semantics remain pending. See CONTROL-PLANE-BATCH.md. Authentication controls and native HLS live-duration/from-start controls preserve typed saved/job argument order and analysis scope. Complete upstream grammar/default parity remains pending. See AUTHENTICATION-SESSIONS.md and LIVE-RECORDING.md. Existing live controls now drive common-clock separate HLS and bounded dynamic DASH windows; decoder/retention/callback/archive effects verified. Advanced period/caption/grammar/default interactions remain pending. See ADAPTIVE-LIVE-RENEWAL.md. Version0.122.0 adds compatible multi-period clear MP4 live DASH, timed/ranged SegmentList, shifted fixed-template origins and pending timelines; generated paired playback and actual72s two-period public video with retained packet inventory verified. Overlapping-boundary clipping and advanced live/caption/default parity remain pending. See DASH-CONTINUITY.md. Version0.124.0 captures program-mapped live HLS WebVTT and clear DASH wvtt/stpp, then saves/converts/embeds recording-relative captions across periods; bounded/ranged/encrypted resources and shared budgets. H264/AAC/ALAC period/window clipping retains complete source periods and AAC timing through remux. Generated exact video/lossless-audio and actual public two-period subtitle workflows verified. Further clock/codec/style/private/default/parity cases remain pending. See LIVE-CAPTIONS-CLIPPING.md. Version0.126.0 adds provider-scoped YouTube cookie account selection and API hashes/private Web playback, Vimeo video-password and issuer API file tokens, exact progressive/caption signed-link renewal and matching SABR context refresh. Account identities/redirects/retries/denial/cancellation are bounded and verified. Real private accounts remain user-deferred; login/OAuth grant, adaptive graph and full account/option parity remain pending. See ACCOUNT-RENEWAL.md. Version0.128.0 adds publisher-identity HLS/DASH signed graph renewal, canonical/effective URL handling, selected track/key/init/range/caption/period preservation, external-browser loopback consent, Google PKCE/refresh/account API playlists, Vimeo scoped code exchange/adaptive API/captions. Complete generated-media and public playback/archive/packet verification passed. Google API login still needs separate playback cookies for private media; real account/remote grant evidence remains user-deferred, with additional layouts and full parity open. See ADAPTIVE-ACCOUNT-RENEWAL.md. Version0.130.0 adds provider/account/media-scoped hosting credentials and generic exact-embed delegation, Wistia API bearer, JW publisher-supplied signing, Brightcove JWT, Kaltura login/netrc/initial OTP/session identity renewal and clear shared progressive/caption/HLS/DASH leases. Materialized JW/Brightcove playlists carry membership-bound renewal. Complete media/source packet and public playback evidence passed; real account/signing/remote renewal remains user-deferred. No full provider or option parity claim. See SHARED-HOSTING-RENEWAL.md. Version0.134.0:complete hosting inventories retain source positions and repeated membership;selected item controls fetch only fresh required child metadata/media,expected hosted archives skip transfer/callbacks, and complete originals/ordered packets survive publication. Partial scope;see HOSTING-COLLECTIONS.md. Version0.136.0:complete public/legacy playlist selection and inspected identities,publisher-specific mixed hosting,stable Wistia caption language/format identities,source-preserving saving/conversion/embedding,exact scoped API caption bodies,caption-only transfer and protected failure/renewal checks. Partial scope;see PLAYLIST-CAPTIONS.md. Version0.138.0: inspected collection membership/occurrence revalidation, unavailable/member-host changes, fresh scoped materialized leases, clear Vimeo JSON adaptive initialization and graph renewal, packet/original/archive/callback/failure protection. Partial scope; see MIXED-COLLECTIONS.md."
+    },
+    {
+      "id": "AnalysisOptions.Mode",
+      "category": "AnalysisOptions",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Native quick/full watch inspection avoids unintended linked-playlist expansion; playlist mode requests a complete inventory and retains its inspected snapshot. First-entry format inspection disables further linked expansion, bounds nesting and drains cancellation. App fixtures and live Mixcloud creator/single workflows pass. Quick/full availability-probe and latency parity, remaining sites and production integration remain pending;see APP-ADAPTER-INTEGRATION.md."
+    },
+    {
+      "id": "AnalysisOptions.CookiesFile",
+      "category": "AnalysisOptions",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Bounded Netscape imports preserve host/domain/path/Secure/HttpOnly/expiry/session/empty values, omit expired cookies, retain capacity and fail for invalid/missing inputs. File choice takes precedence and is mapped from the app. See AUTH-COOKIES.md; full export/update semantics and production parity remain pending. Independent CLI file/browser cookie resets survive native analysis and downloading. See CONTROL-PLANE-BATCH.md."
+    },
+    {
+      "id": "AnalysisOptions.CookiesFromBrowser",
+      "category": "AnalysisOptions",
+      "dataType": "string",
+      "status": "partial",
+      "nativeEvidence": "Native Windows Firefox profiles/containers and Chromium-family plaintext/DPAPI/v10 AES-GCM imports,read-only WAL snapshots,host/scope/expiry checks,diagnostics and authenticated local HTTP verified with generated profiles. App selection/override mapping checked. Application-bound encryption,partitions,live account workflows and complete parity remain pending;see AUTH-COOKIES.md."
+    }
+  ],
+  "nativeWpfExtensions": [
+    {
+      "id": "Formats.NativeLiveDash",
+      "introducedIn": "0.172.0",
+      "status": "implemented_verified_native_subset",
+      "scope": "Opt-in native live DASH settings with validated/persisted WPF bindings and immutable request policy; not upstream CLI parity",
+      "document": "COLOR-AUDIO.md"
+    },
+    {
+      "id": "Formats.LiveAudioLanguages",
+      "introducedIn": "0.172.0",
+      "status": "implemented_verified_native_subset",
+      "scope": "Opt-in native live DASH settings with validated/persisted WPF bindings and immutable request policy; not upstream CLI parity",
+      "document": "COLOR-AUDIO.md"
+    },
+    {
+      "id": "Formats.LiveAudioRoles",
+      "introducedIn": "0.172.0",
+      "status": "implemented_verified_native_subset",
+      "scope": "Opt-in native live DASH settings with validated/persisted WPF bindings and immutable request policy; not upstream CLI parity",
+      "document": "COLOR-AUDIO.md"
+    },
+    {
+      "id": "Formats.LiveCaptionRoles",
+      "introducedIn": "0.172.0",
+      "status": "implemented_verified_native_subset",
+      "scope": "Opt-in native live DASH settings with validated/persisted WPF bindings and immutable request policy; not upstream CLI parity",
+      "document": "COLOR-AUDIO.md"
+    },
+    {
+      "id": "Formats.LiveFollowQuality",
+      "introducedIn": "0.172.0",
+      "status": "implemented_verified_native_subset",
+      "scope": "Opt-in native live DASH settings with validated/persisted WPF bindings and immutable request policy; not upstream CLI parity",
+      "document": "COLOR-AUDIO.md"
+    },
+    {
+      "id": "Formats.LiveConvertCaptions",
+      "introducedIn": "0.172.0",
+      "status": "implemented_verified_native_subset",
+      "scope": "Opt-in native live DASH settings with validated/persisted WPF bindings and immutable request policy; not upstream CLI parity",
+      "document": "COLOR-AUDIO.md"
+    },
+    {
+      "id": "Formats.LiveNormalizeTransitions",
+      "introducedIn": "0.172.0",
+      "status": "implemented_verified_native_subset",
+      "scope": "Opt-in native live DASH settings with validated/persisted WPF bindings and immutable request policy; not upstream CLI parity",
+      "document": "COLOR-AUDIO.md"
+    },
+    {
+      "id": "Formats.LiveAdaptiveLadder",
+      "introducedIn": "0.172.0",
+      "status": "implemented_verified_native_subset",
+      "scope": "Opt-in native live DASH settings with validated/persisted WPF bindings and immutable request policy; not upstream CLI parity",
+      "document": "COLOR-AUDIO.md"
+    },
+    {
+      "id": "Formats.LiveTransitionHeight",
+      "introducedIn": "0.172.0",
+      "status": "implemented_verified_native_subset",
+      "scope": "Opt-in native live DASH settings with validated/persisted WPF bindings and immutable request policy; not upstream CLI parity",
+      "document": "COLOR-AUDIO.md"
+    },
+    {
+      "id": "Formats.LiveTransitionVideoCodec",
+      "introducedIn": "0.174.0",
+      "status": "implemented_verified_native_subset",
+      "scope": "Opt-in native live DASH settings with validated/persisted WPF bindings and immutable request policy; not upstream CLI parity",
+      "document": "COLOR-AUDIO.md"
+    },
+    {
+      "id": "Formats.LiveTransitionAudioCodec",
+      "introducedIn": "0.174.0",
+      "status": "implemented_verified_native_subset",
+      "scope": "Opt-in native live DASH settings with validated/persisted WPF bindings and immutable request policy; not upstream CLI parity",
+      "document": "COLOR-AUDIO.md"
+    },
+    {
+      "id": "Formats.LiveTransitionAudioLayout",
+      "introducedIn": "0.174.0",
+      "status": "implemented_verified_native_subset",
+      "scope": "Opt-in native live DASH settings with validated/persisted WPF bindings and immutable request policy; not upstream CLI parity",
+      "document": "COLOR-AUDIO.md"
+    },
+    {
+      "id": "Formats.LiveTransitionAudioSampleRate",
+      "introducedIn": "0.174.0",
+      "status": "implemented_verified_native_subset",
+      "scope": "Opt-in native live DASH settings with validated/persisted WPF bindings and immutable request policy; not upstream CLI parity",
+      "document": "COLOR-AUDIO.md"
+    },
+    {
+      "id": "Formats.LiveNormalizeGeometry",
+      "introducedIn": "0.174.0",
+      "status": "implemented_verified_native_subset",
+      "scope": "Opt-in native live DASH settings with validated/persisted WPF bindings and immutable request policy; not upstream CLI parity",
+      "document": "COLOR-AUDIO.md"
+    },
+    {
+      "id": "Formats.LiveTransitionColorPolicy",
+      "introducedIn": "0.174.0",
+      "status": "implemented_verified_native_subset",
+      "scope": "Opt-in native live DASH settings with validated/persisted WPF bindings and immutable request policy; not upstream CLI parity Version 0.182.0 adds explicit hdr-transform padding/statistics, source display transforms and neutral MEL conversion; unsupported residuals and nonrepresentable windows remain refused. Version 0.184.0 adds explicit reconstruction, measured full-frame histograms and bounded native FEL support. Version 0.186.0 extends reconstruction with supported compressed Dolby/PQ domains, perspective and exact multiwindow statistics. Version 0.188.0 adds supported HEVC/AV1 compression and HLG/relative-light conversion.",
+      "document": "HDR-SELECTORS.md"
+    },
+    {
+      "id": "Formats.LiveHdrPeakNits",
+      "introducedIn": "0.174.0",
+      "status": "implemented_verified_native_subset",
+      "scope": "Opt-in native live DASH settings with validated/persisted WPF bindings and immutable request policy; not upstream CLI parity",
+      "document": "COLOR-AUDIO.md"
+    },
+    {
+      "id": "Formats.LiveTransitionCrop",
+      "introducedIn": "0.184.0",
+      "status": "implemented_verified_native_subset",
+      "scope": "Four validated source pixel margins used by explicit reconstruction, persisted in WPF and isolated in immutable queued policy/recovery identity; empty default omitted from native request JSON. Separate from frozen classic CLI scope.",
+      "document": "HDR-RECONSTRUCTION.md"
+    },
+    {
+      "id": "Formats.LiveHdrSelectorPolicy",
+      "introducedIn": "0.188.0",
+      "status": "implemented_verified_native_subset",
+      "scope": "Strict default; explicit ellipse-envelope authoring under HDR reconstruction preserves supported unclipped ellipses and measures new processing rectangles. Persisted WPF choice and immutable request/recovery intent; null default omitted from native policy JSON. Separate from frozen classic CLI scope.",
+      "document": "HDR-SELECTORS.md"
+    }
+  ],
+  "updatedOn": "2026-10-17"
+}
