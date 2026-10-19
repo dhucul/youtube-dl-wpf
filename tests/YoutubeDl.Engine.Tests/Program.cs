@@ -79,6 +79,7 @@ Check("Rate limit accepts the classic suffixes", Rate);
 Check("DASH parser reads progressive representations", Dash);
 Check("Page capture reads script URLs and refuses DRM", Capture);
 var nativeTests = EngineFoundationChecks.All.Concat(YouTubeChecks.All).Concat(PlayerRuntimeChecks.All).Concat(AttestationChecks.All).Concat(WaaChecks.All).Concat(FfmpegChecks.ProcessChecks).Concat(ProtocolChecks.All).Concat(SabrChecks.All).Concat(SabrStateChecks.All).Concat(HlsTransferChecks.All).Concat(HlsCaptionChecks.All).Concat(SabrHttpChecks.All).Concat(DashTransferChecks.All).Concat(DashIndexChecks.All).Concat(DashCaptionChecks.All).Concat(VimeoChecks.All).Concat(ChapterChecks.All).Concat(ArchiveChecks.All).Concat(PeerTubeChecks.All).Concat(PlaylistChecks.All).Concat(CaptionChecks.All).Concat(PublicationChecks.All).Concat(OutputTemplateChecks.All).Concat(FormatSelectorChecks.All).Concat(DailymotionChecks.All).Concat(HttpSessionChecks.All).Concat(HostingChecks.All).Concat(BrightcoveChecks.All).Concat(BandcampChecks.All).Concat(KalturaChecks.All).Concat(DownloadArchiveChecks.All);
+nativeTests = nativeTests.Concat(StreamQualityChecks.All);
 var ffmpegArgument = Array.IndexOf(args, "--ffmpeg");
 var legacyNativeArgument=Array.IndexOf(args,"--legacy-native-tests");
 if(legacyNativeArgument>=0){if(legacyNativeArgument+1>=args.Length||!File.Exists(args[legacyNativeArgument+1]))throw new ArgumentException("Provide the preserved legacy native test assembly.");FfmpegChecks.LegacyNativeAssembly=Path.GetFullPath(args[legacyNativeArgument+1]);}
@@ -188,6 +189,7 @@ if (ffmpegArgument >= 0)
 {
     if (ffmpegArgument + 1 >= args.Length) throw new ArgumentException("Provide a path after --ffmpeg.");
     nativeTests = nativeTests.Concat(FfmpegChecks.MediaChecks(args[ffmpegArgument + 1]));
+    nativeTests = nativeTests.Concat(FfmpegChecks.StreamQualityMediaChecks(args[ffmpegArgument + 1]));
     nativeTests = nativeTests.Concat(FfmpegChecks.MixedCollectionMediaChecks(args[ffmpegArgument + 1]));
     nativeTests = nativeTests.Concat(FfmpegChecks.AdaptiveRecoveryMediaChecks(args[ffmpegArgument + 1]));
     nativeTests = nativeTests.Concat(FfmpegChecks.LiveSabrRecoveryMediaChecks(args[ffmpegArgument + 1]));

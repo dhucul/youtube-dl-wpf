@@ -23,11 +23,6 @@ public static partial class FfmpegTool
             "mp3" => "libmp3lame", "aac" or "m4a" => "aac", "opus" => "libopus", "vorbis" or "ogg" => "libvorbis",
             "flac" => "flac", "alac" => "alac", "wav" => WaveCodec(audio), _ => throw new ArgumentException("Unsupported audio format.")
         };
-        if (automatic && extension == "wav" && audio.Codec is not ("pcm_s16le" or "pcm_s24le" or "pcm_s32le" or "pcm_f32le" or "pcm_f64le" or "pcm_u8" or "pcm_alaw" or "pcm_mulaw"))
-        {
-            if (requested == "copy") extension = "mka";
-            else encoder = WaveCodec(audio);
-        }
         var expectedCodec = encoder switch { "copy" => audio.Codec, "libmp3lame" => "mp3", "libopus" => "opus", "libvorbis" => "vorbis", _ => encoder };
         return new(audio.Index, extension, encoder, expectedCodec, audio.Channels, audio.SampleRate,
             AudioOutputPlan.EncoderQuality(encoder, quality, audio.Channels));

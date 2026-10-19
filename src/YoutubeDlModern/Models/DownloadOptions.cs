@@ -14,8 +14,8 @@ public sealed class DownloadOptions
     public string VideoCodec { get; set; } = "any";
     public int MaxFps { get; set; }
     public string Container { get; set; } = "auto";
-    public string AudioFormat { get; set; } = "mp3";
-    public string AudioQuality { get; set; } = "192K";
+    public string AudioFormat { get; set; } = "best";
+    public string AudioQuality { get; set; } = "0";
     public bool WriteSubs { get; set; }
     public bool WriteAutoSubs { get; set; }
     public bool EmbedSubs { get; set; }

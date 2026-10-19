@@ -636,6 +636,7 @@ public sealed partial class NativeEngine : IMediaEngine
                 .ThenBy(static item => item.Bandwidth ?? int.MaxValue).First();
 
         return variants.OrderByDescending(static item => item.Height ?? 0)
+            .ThenByDescending(static item => item.FramesPerSecond ?? 0)
             .ThenByDescending(static item => item.Bandwidth ?? 0)
             .First();
     }

@@ -19,7 +19,7 @@ internal static class YouTubeChecks
         ("Unresolved signature and throttling challenges never expose ready URLs", () => Sync(Challenges)),
         ("SABR-only responses preserve formats without claiming download support", () => Sync(Sabr)),
         ("Unavailable and mismatched YouTube responses fail explicitly", () => Sync(Unavailable)),
-        ("Adaptive video plans pair default audio and compatible containers", () => Sync(Planning)),
+        ("Adaptive video plans pair best original audio and a compatible container", () => Sync(Planning)),
         ("Native video height and media-type constraints are enforced", () => Sync(Constraints)),
         ("The YouTube provider canonicalizes Shorts without executing player code", Provider),
         ("The C# YouTube path completes an exposed combined-stream download", Download),
@@ -140,7 +140,7 @@ internal static class YouTubeChecks
         var page = YouTubePlayerParser.ParsePage(FixtureHtml, VideoId);
         var request = new NativeDownloadRequest { Url = new Uri("https://youtube.com/watch?v=" + VideoId), OutputDirectory = Path.GetTempPath() };
         var plan = MediaDownloadPlan.Create(page, request);
-        Assert(plan.Primary.Id == "137" && plan.Audio!.Id == "140:en.0" && plan.Extension == "mp4", "Default compatible audio was not paired.");
+        Assert(plan.Primary.Id == "137" && plan.Audio!.Id == "251:en.0" && plan.Extension == "mkv", "Best original audio was not paired in a container that preserves both codecs.");
         var videoOnly = MediaDownloadPlan.Create(page, new NativeDownloadRequest { Url = request.Url, OutputDirectory = request.OutputDirectory, VideoOnly = true });
         Assert(videoOnly.Primary.Id == "137" && !videoOnly.NeedsMerge, "Video-only planned audio.");
         var audioOnly = MediaDownloadPlan.Create(page, new NativeDownloadRequest { Url = request.Url, OutputDirectory = request.OutputDirectory, AudioOnly = true });

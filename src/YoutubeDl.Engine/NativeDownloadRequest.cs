@@ -84,8 +84,8 @@ public sealed record NativeDownloadRequest
     public IReadOnlyList<string> MatchFilters { get; init; } = [];
     [System.Text.Json.Serialization.JsonIgnore]
     internal Download.DownloadSelectionState? SelectionState { get; init; }
-    public string AudioFormat { get; init; } = "mp3";
-    public string AudioQuality { get; init; } = "5";
+    public string AudioFormat { get; init; } = "best";
+    public string AudioQuality { get; init; } = "0";
     public string Container { get; init; } = "";
     /// <summary>Ordered container choices used only when joining separate video and audio.</summary>
     public string MergeOutputFormat { get; init; } = "";

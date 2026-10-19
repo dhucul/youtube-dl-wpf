@@ -13,6 +13,7 @@ public sealed class AppSettings
 {
     public GeneralSettings General { get; set; } = new();
     public FormatSettings Formats { get; set; } = new();
+    public int StreamPreservingDefaultsVersion { get; set; } = 1;
     public SubtitleSettings Subtitles { get; set; } = new();
     public NetworkSettings Network { get; set; } = new();
     public SelectionSettings Selection { get; set; } = new();
@@ -61,8 +62,8 @@ public partial class FormatSettings : ObservableObject
     [ObservableProperty] private string _defaultQuality = "best";
     [ObservableProperty] private string _mergeOutputFormat = "";   // mkv, mp4, webm... (classic --merge-output-format)
     [ObservableProperty] private bool _preferFreeFormats;
-    [ObservableProperty] private string _audioFormat = "mp3";      // classic --audio-format
-    [ObservableProperty] private string _audioQuality = "192K";    // classic --audio-quality
+    [ObservableProperty] private string _audioFormat = "best";      // classic --audio-format
+    [ObservableProperty] private string _audioQuality = "0";    // classic --audio-quality
     [ObservableProperty] private string _recodeVideo = "";         // classic --recode-video
     [ObservableProperty] private bool _keepVideo;                  // classic -k
     [ObservableProperty] private bool _noPostOverwrites;

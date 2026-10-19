@@ -33,6 +33,12 @@ public static class QualitySelector
             if (pool.Count == 0) throw new InvalidOperationException("No stream satisfies the maximum video height.");
         }
 
+        if (audioOnly)
+        {
+            var defaults = pool.Where(item => item.IsDefaultAudio).ToList();
+            if (defaults.Count > 0) pool = defaults;
+        }
+
         if (preferFreeFormats)
         {
             var ordered = pool.OrderByDescending(item => item.Height ?? 0).ThenByDescending(item => item.FramesPerSecond ?? 0)
@@ -42,6 +48,15 @@ public static class QualitySelector
         if (preference == QualityPreference.Worst)
             return pool.OrderBy(static item => item.IsFallback).ThenBy(static item => item.Rank).First();
 
-        return pool.OrderBy(static item => item.IsFallback).ThenByDescending(static item => item.Rank).First();
+        return pool.OrderBy(static item => item.IsFallback)
+            .ThenByDescending(static item => item.Height ?? 0)
+            .ThenByDescending(static item => item.FramesPerSecond ?? 0)
+            .ThenByDescending(item => audioOnly && IsLosslessAudio(item))
+            .ThenByDescending(static item => item.Bandwidth ?? 0)
+            .ThenByDescending(static item => item.Rank).First();
     }
+
+    private static bool IsLosslessAudio(MediaCandidate candidate) => candidate.AudioCodec?.ToLowerInvariant() is { } codec &&
+        (codec is "flac" or "alac" || codec.StartsWith("pcm_", StringComparison.Ordinal)) ||
+        candidate.Extension?.ToLowerInvariant() is "flac" or "wav";
 }

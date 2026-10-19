@@ -51,10 +51,8 @@ public sealed record MediaDownloadPlan(MediaCandidate Primary, MediaCandidate? A
             if (tracks.Length == 0) throw new NotSupportedException("No downloadable audio track is available for the selected video. A player challenge or transport may still need support.");
             var defaultTracks = tracks.Where(track => track.IsDefaultAudio).ToArray();
             if (defaultTracks.Length > 0) tracks = defaultTracks;
-            var compatible = tracks.Where(track => Compatible(selected.Extension, track.Extension)).ToArray();
-            if (!request.PreferFreeFormats && compatible.Length > 0) tracks = compatible;
-            audio = request.PreferFreeFormats ? tracks.OrderByDescending(FreeFormatPreference.Rank).ThenByDescending(track => track.Bandwidth ?? 0).First() :
-                tracks.OrderByDescending(track => track.Bandwidth ?? 0).First();
+            // Preserve the best audio, even when a different container is needed to copy both streams.
+            audio = QualitySelector.Select(tracks, QualityPreference.Best, null, true, request.PreferFreeFormats);
         }
         var extension = selected.Kind == MediaKind.Hls ? "ts" : selected.Extension ?? "mp4";
         if (audio is not null && !Compatible(selected.Extension, audio.Extension)) extension = "mkv";

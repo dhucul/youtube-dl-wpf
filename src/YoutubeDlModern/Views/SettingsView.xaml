@@ -144,7 +144,7 @@
 
                         <TextBlock Style="{StaticResource GroupHeader}" Text="Audio extraction (-x)" Margin="0,10,0,10" />
                         <StackPanel Style="{StaticResource FieldRow}">
-                            <TextBlock Style="{StaticResource FieldLabel}" Text="Audio format (--audio-format)" />
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Audio format (--audio-format)" ToolTip="Best preserves the original audio without re-encoding. Other formats convert the audio." />
                             <ComboBox Style="{StaticResource FieldCombo}" SelectedValuePath="Content" SelectedValue="{Binding S.Formats.AudioFormat}">
                                 <ComboBoxItem Content="mp3" /><ComboBoxItem Content="m4a" /><ComboBoxItem Content="opus" />
                                 <ComboBoxItem Content="flac" /><ComboBoxItem Content="wav" /><ComboBoxItem Content="vorbis" />
@@ -152,7 +152,7 @@
                             </ComboBox>
                         </StackPanel>
                         <StackPanel Style="{StaticResource FieldRow}">
-                            <TextBlock Style="{StaticResource FieldLabel}" Text="Audio quality (--audio-quality)" ToolTip="0 = best VBR, 9 = worst; or a bitrate like 192K" />
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Audio quality (--audio-quality)" ToolTip="Used only when converting audio. Best format copies the original stream and ignores this value." />
                             <ComboBox Style="{StaticResource FieldCombo}" SelectedValuePath="Content" SelectedValue="{Binding S.Formats.AudioQuality}">
                                 <ComboBoxItem Content="0" /><ComboBoxItem Content="2" /><ComboBoxItem Content="5" />
                                 <ComboBoxItem Content="128K" /><ComboBoxItem Content="192K" /><ComboBoxItem Content="256K" />

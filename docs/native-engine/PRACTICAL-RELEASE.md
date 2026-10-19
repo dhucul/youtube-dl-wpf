@@ -1,6 +1,12 @@
 # Practical native downloader release
 
-Version 1.1.5, native engine 0.228.0. This reliability patch retains the 1.1.4 YouTube, public Facebook and common video-page workflows. The earlier live-site evidence is preserved below; this patch adds complete automated regression verification rather than new live-site or private-account coverage.
+Version 1.1.6, native engine 0.228.0. This release defaults to the best available video and original audio without re-encoding, and includes the 1.1.5 reliability fixes. The earlier YouTube, public Facebook and common video-page evidence is preserved below; these quality changes do not add new live-site or private-account coverage.
+
+## 1.1.6 quality defaults
+
+New downloads use unrestricted Best video, any codec, no frame-rate cap, automatic containers and Best audio. Best video compares resolution, frame rate and full bitrate. Best audio retains the default language and prefers available lossless sources. Pairing no longer lowers audio quality to keep the video container: mixed codecs can use Matroska while copying both streams. Audio extraction copies the source codec, including unusual PCM layouts, without silently re-encoding.
+
+The former shipped MP3/192K preset migrates once when saved settings load. Explicit custom conversion choices remain available and later saves preserve them. Existing queued jobs retain their chosen options.
 
 ## 1.1.5 reliability fixes
 
@@ -52,7 +58,9 @@ The common reader handles selected JW/Video.js/flashvars/html5player sources and
 
 ## Verification and packaging
 
-All 5,022 checks in the full optional native engine/media suite pass: 3,607 core checks and 1,415 generated-media checks, including the catalog and HDR cases. All 200 application regression checks pass, and the Release build has zero warnings and errors. Seven added engine regressions cover publication overlap, receipt sharing/delete-pending conflicts, cancellation, read-only protection, worker drainage and console-independent UTF-8 decoding. The original intermittent cases also pass repeated focused runs. These generated and fixture-based checks do not expand the earlier live-site or real-account claims.
+For the 1.1.6 quality changes, all 3,616 core native engine checks and all 204 application regression checks pass. A targeted native/media run passes 20 checks, including compressed-packet preservation for default AAC, Opus, FLAC and H.264/Opus output; 25 focused Best-selection and audio extraction checks also pass, including decoded-sample comparisons. The Release build has zero warnings and errors.
+
+The preceding 1.1.5 full optional native engine/media run passed all 5,022 checks: 3,607 core checks and 1,415 generated-media checks, including the catalog and HDR cases. Its 200 application regression checks also passed. Seven added engine regressions cover publication overlap, receipt sharing/delete-pending conflicts, cancellation, read-only protection, worker drainage and console-independent UTF-8 decoding. The original intermittent cases also pass repeated focused runs. These generated and fixture-based checks do not expand the earlier live-site or real-account claims.
 
 The preceding 0.224 two-site batch strictly decodes nine complete reference/source/output files and passes eleven independent comparisons across four successful workflows. Both xHamster qualities and the Pornhub video match independently fetched full publisher bytes and coded pictures. Pornhub’s kept high-resolution audio packets match the independently fetched rendition’s complete audio; MP3 packets and PCM match an independent 192-kbit conversion reference. MP3 conversion is not described as lossless. No preview or partial source counts as success.
 
@@ -64,4 +72,4 @@ The preceding 0.226 normal app-networking matrix verified complete public non-ex
 
 The self-contained Windows package is checked with a fresh isolated data folder and only Windows directories on PATH. Native readiness, empty history and the rendered main screen are verified. No yt-dlp or Python installation is needed. ffmpeg remains the media-processing tool, and YouTube browser acquisition uses Microsoft Edge WebView2. Existing settings/history remain in their normal locations. Earlier installer packages are preserved.
 
-The earlier live-site batch audited pre-existing uncommitted files against its start-of-batch hashes and retained exact original snapshots. Its detailed evidence remains in the workspace's work/simple-e2e-batch folder. The 1.1.5 reliability and packaging updates preserve existing work and do not reset, stash, commit or push changes.
+The earlier live-site batch audited pre-existing uncommitted files against its start-of-batch hashes and retained exact original snapshots. Its detailed evidence remains in the workspace's work/simple-e2e-batch folder. The 1.1.6 quality and packaging updates preserve existing work. Earlier verification remains historical evidence for its recorded release.

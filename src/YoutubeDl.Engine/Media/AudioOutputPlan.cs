@@ -6,7 +6,7 @@ namespace YoutubeDl.Engine.Media;
 internal sealed record AudioOutputPlan(int StreamIndex, string Extension, string Encoder, string ExpectedCodec,
     int Channels, int SampleRate, IReadOnlyList<string> QualityArguments)
 {
-    internal static string Normalize(string? format) => string.IsNullOrWhiteSpace(format) ? "mp3" : format.Trim().ToLowerInvariant();
+    internal static string Normalize(string? format) => string.IsNullOrWhiteSpace(format) ? "best" : format.Trim().ToLowerInvariant();
     internal static string? ExtensionFor(string? format) => Normalize(format) switch
     {
         "best" or "copy" => null,
@@ -24,7 +24,7 @@ internal sealed record AudioOutputPlan(int StreamIndex, string Extension, string
     internal static string AutomaticExtension(string codec,string container,string requested)=>container.Split(',').Any(value=>value is "matroska" or "webm")&&codec is "aac" or "opus" or "vorbis"?"mka":codec switch
     {
         "aac" or "alac"=>"m4a","mp3"=>"mp3","opus"=>"opus","vorbis"=>"ogg","flac"=>"flac",
-        var value when value.StartsWith("pcm_",StringComparison.Ordinal)=>requested=="copy"&&value is not ("pcm_s16le" or "pcm_s24le" or "pcm_s32le" or "pcm_f32le" or "pcm_f64le" or "pcm_u8" or "pcm_alaw" or "pcm_mulaw")?"mka":"wav",
+        var value when value.StartsWith("pcm_",StringComparison.Ordinal)=>value is not ("pcm_s16le" or "pcm_s24le" or "pcm_s32le" or "pcm_f32le" or "pcm_f64le" or "pcm_u8" or "pcm_alaw" or "pcm_mulaw")?"mka":"wav",
         _=>"mka"
     };
     internal static (decimal? Level, int? Bitrate) ParseQuality(string? quality)

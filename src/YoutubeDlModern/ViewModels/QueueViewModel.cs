@@ -87,8 +87,8 @@ public partial class QueueViewModel : ObservableObject, IDisposable
     [ObservableProperty] private string _addVideoCodec = "any";
     [ObservableProperty] private string _addMaxFps = "0";
     [ObservableProperty] private string _addContainer = "auto";
-    [ObservableProperty] private string _addAudioFormat = "mp3";
-    [ObservableProperty] private string _addAudioQuality = "192K";
+    [ObservableProperty] private string _addAudioFormat = "best";
+    [ObservableProperty] private string _addAudioQuality = "0";
     [ObservableProperty] private bool _addWriteSubs;
     [ObservableProperty] private bool _addWriteAutoSubs;
     [ObservableProperty] private bool _addEmbedSubs;

@@ -177,7 +177,7 @@ public static class ArgsBuilder
         if (o.DownloadMode == "audio-only" || o.QualityPreset == "audio")
         {
             a.Add("-x");
-            a.Add("--audio-format"); a.Add(string.IsNullOrWhiteSpace(o.AudioFormat) ? "mp3" : o.AudioFormat);
+            a.Add("--audio-format"); a.Add(string.IsNullOrWhiteSpace(o.AudioFormat) ? "best" : o.AudioFormat);
             if (!string.IsNullOrWhiteSpace(o.AudioQuality)) { a.Add("--audio-quality"); a.Add(o.AudioQuality); }
         }
 

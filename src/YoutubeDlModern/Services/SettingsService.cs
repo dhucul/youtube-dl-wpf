@@ -87,7 +87,11 @@ public sealed class SettingsService
 
         try
         {
-            settings = JsonSerializer.Deserialize<AppSettings>(AtomicFile.ReadAllText(path, MaximumSettingsBytes));
+            var json = AtomicFile.ReadAllText(path, MaximumSettingsBytes);
+            settings = JsonSerializer.Deserialize<AppSettings>(json);
+            using var document = JsonDocument.Parse(json);
+            if (settings is not null && !document.RootElement.TryGetProperty(nameof(AppSettings.StreamPreservingDefaultsVersion), out _))
+                settings.StreamPreservingDefaultsVersion = 0;
             if (settings is not null)
             {
                 EnsureSections(settings);
@@ -143,6 +147,18 @@ public sealed class SettingsService
                 if (property.PropertyType == typeof(string) && property.CanWrite && property.GetValue(section) is null)
                     property.SetValue(section, string.Empty);
             }
+        }
+
+        if (settings.StreamPreservingDefaultsVersion < 1)
+        {
+            // Upgrade the former shipped preset once; later explicit conversion choices survive reloads.
+            if (settings.Formats.AudioFormat.Equals("mp3", StringComparison.OrdinalIgnoreCase) &&
+                settings.Formats.AudioQuality.Equals("192K", StringComparison.OrdinalIgnoreCase))
+            {
+                settings.Formats.AudioFormat = "best";
+                settings.Formats.AudioQuality = "0";
+            }
+            settings.StreamPreservingDefaultsVersion = 1;
         }
 
         var defaults = new GeneralSettings();

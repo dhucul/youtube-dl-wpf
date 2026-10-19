@@ -25,6 +25,7 @@ internal static partial class Program
         {
             try
             {
+                if (args.Contains("--stream-quality-only")) { foreach (var (name, test) in StreamQualityDefaultChecks) await Check(name, test); return; }
                 if (args.Contains("--runtime-regressions-only")) { foreach (var (name, test) in RuntimeRegressionChecks) await Check(name, test); return; }
                 if(args.Contains("--wpf-ladders-only")){foreach(var (name,test) in WpfLadderAppChecks)await Check(name,test);return;}
                 if(args.Contains("--hdr-selectors-only")){foreach(var (name,test) in HdrSelectorAppChecks)await Check(name,test);return;}
@@ -35,6 +36,7 @@ internal static partial class Program
                 if(args.Contains("--hdr-gamut-only")){foreach(var (name,test) in HdrGamutAppChecks)await Check(name,test);return;}
                 if(args.Contains("--color-audio-only")){foreach(var (name,test) in ColorAudioAppChecks)await Check(name,test);return;}
                 foreach (var (name, test) in RuntimeRegressionChecks) await Check(name, test);
+                foreach (var (name, test) in StreamQualityDefaultChecks) await Check(name, test);
                 await Check("Format selectors honor offered heights and VP9 spellings", Selectors);
                 await Check("Analysis excludes download side effects", AnalysisArguments);
                 await Check("Fragment retries can be disabled and estimated sizes have a namespace", DownloadArguments);
