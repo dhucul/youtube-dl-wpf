@@ -16,18 +16,23 @@ internal sealed class ProviderPlaybackSession:IDisposable
     internal async Task<PageMetadata> ReadAsync(CancellationToken ct)
     {
         using var operation=_lifetime.Begin(ct);ct=operation.Token;await _lifetime.Gate.WaitAsync(ct).ConfigureAwait(false);
-        try{ct.ThrowIfCancellationRequested();return BindInitial(_initial??await FreshCoreAsync(ct).ConfigureAwait(false));}finally{_lifetime.Gate.Release();}
+        try
+        {
+            var page=_lifetime.Read(ct,()=>_initial)??await FreshCoreAsync(ct).ConfigureAwait(false);
+            return _lifetime.Read(ct,()=>BindCore(page));
+        }finally{_lifetime.Gate.Release();}
     }
     internal PageMetadata BindInitial(PageMetadata page)
     {
-        return _lifetime.Read(()=>
-        {
+        return _lifetime.Read(()=>BindCore(page));
+    }
+    private PageMetadata BindCore(PageMetadata page)
+    {
         var secure=page.Media.All(m=>Secure(m.Url))&&page.Subtitles.All(s=>Secure(s.Url));
         if(!secure&&_request.Authentication.IsConfigured)throw new NotSupportedException("Authenticated hosting playback requires secure declared resources.");
         _initial??=page;
         if(_owner.CanControlRedirects&&secure&&(page.Media.Count>0||page.Subtitles.Count>0))_lease??=new(page,FreshAsync,Redirect,(url,token)=>_controlled.ReadPlaybackManifestAsync(url,Redirect,Referer,token));
         return page with {IsLive=_lease?.IsLive??page.IsLive,SourcePageUrl=_request.Url,PlaybackAuthorization=_lease,PlaybackHeaders=new Dictionary<string,string>{["Referer"]=Referer}};
-        });
     }
     private string Referer=>_provider=="kaltura"?Kaltura.KalturaAddress.PublicReferer(_request):string.IsNullOrWhiteSpace(_request.Referer)?_request.Url.AbsoluteUri:_request.Referer;
     private async Task<PageMetadata> FreshAsync(CancellationToken ct)
@@ -39,23 +44,24 @@ internal sealed class ProviderPlaybackSession:IDisposable
     {
         ct.ThrowIfCancellationRequested();
         PageMetadata page;using(NativeExtractionDelay.Extracting())page=await _read(_controlled,ct).ConfigureAwait(false);ct.ThrowIfCancellationRequested();
-        if(_initial is null)return page;
-        if(page.Id!=_initial.Id||page.Extractor!=_initial.Extractor||page.IsPlaylist||page.DrmRefused||!_initial.IsLive&&page.IsLive)throw new InvalidDataException("Hosting renewal changed its media identity or access.");
+        var initial=_lifetime.Read(ct,()=>_initial);
+        if(initial is null)return page;
+        if(page.Id!=initial.Id||page.Extractor!=initial.Extractor||page.IsPlaylist||page.DrmRefused||!initial.IsLive&&page.IsLive)throw new InvalidDataException("Hosting renewal changed its media identity or access.");
         if(!_reorderedFormats)return page;
         var used=new HashSet<MediaCandidate>(ReferenceEqualityComparer.Instance);var formats=new List<MediaCandidate>();
-        foreach(var old in _initial.Media)
+        foreach(var old in initial.Media)
         {
             var offered=page.Media.Where(m=>Fingerprint(m)==Fingerprint(old)).ToArray();
             if(offered.Length!=1||!used.Add(offered[0]))
             {
-                if(_lease?.IsActive("format:"+old.Id)==true)throw new InvalidDataException("A used hosting format changed, disappeared or became ambiguous during renewal.");
+                if(_lifetime.Read(ct,()=>_lease?.IsActive("format:"+old.Id)==true))throw new InvalidDataException("A used hosting format changed, disappeared or became ambiguous during renewal.");
                 continue;
             }
             formats.Add(offered[0].WithIdentity(old.Id!));
         }
         return page with {Media=formats};
     }
-    private static string Fingerprint(MediaCandidate m)=>JsonSerializer.Serialize(new object?[]{m.Kind,m.Extension,m.MimeType,m.Height,m.Width,m.Bandwidth,m.FramesPerSecond,m.FileSize,m.VideoCodec,m.AudioCodec,m.HasAudio,m.HasVideo,m.AudioLanguage,m.IsDefaultAudio,m.Label});
+    private static string Fingerprint(MediaCandidate m)=>JsonSerializer.Serialize(new object?[]{m.Kind,m.Extension,m.MimeType,m.Height,m.Width,m.Bandwidth,m.FramesPerSecond,m.FileSize,m.VideoCodec,m.AudioCodec,m.HasAudio,m.HasVideo,m.IsCompleteMedia,m.AudioLanguage,m.IsDefaultAudio,m.Label});
     private static bool Secure(Uri u)=>u.Scheme=="https"&&u.IsDefaultPort&&u.UserInfo.Length==0&&u.Fragment.Length==0;
     private bool Redirect(Uri u)
     {

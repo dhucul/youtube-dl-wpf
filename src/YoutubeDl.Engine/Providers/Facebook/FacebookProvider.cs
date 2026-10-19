@@ -2,6 +2,7 @@ using System.Net;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using YoutubeDl.Engine.Discovery;
+using YoutubeDl.Engine.Download;
 using YoutubeDl.Engine.Http;
 using static YoutubeDl.Engine.Providers.ProviderJson;
 using static YoutubeDl.Engine.Providers.PublicProviderApi;
@@ -39,7 +40,7 @@ public sealed class FacebookProvider : IMediaProvider
     public async Task<PageMetadata> ExtractAsync(NativeDownloadRequest request, MediaHttp http, CancellationToken ct)
     {
         var address = request.Url.Host == "fb.watch" ? await ResolveShortLink(request.Url, http, ct).ConfigureAwait(false) : FacebookAddress.Parse(request.Url);
-        long? asset = null; double? duration = null;
+        (long? Asset, double? Duration, double? DashTimeline)? initialIdentity = null;
         async Task<PageMetadata> Current(MediaHttp owner, CancellationToken token)
         {
             using var clean = owner.CreatePublicServiceSession();
@@ -54,27 +55,81 @@ public sealed class FacebookProvider : IMediaProvider
             var config = configs[0]; var videos = Rows(config, "videoData", 8);
             if (Text(config, "video_id") != address.Id || videos.Length != 1 || Text(videos[0], "video_id") != address.Id) throw new InvalidDataException("Facebook returned another selected video.");
             var video = videos[0]; var canonical = Text(video, "video_url"); if (canonical is null || FacebookAddress.Parse(new(canonical)).Id != address.Id) throw new InvalidDataException("Facebook changed the selected video's canonical link.");
-            if (True(video, "is_live_stream") || True(video, "is_broadcast") || True(video, "is_hls") || Text(video, "stream_type") != "progressive") return page with { Warnings = ["This Facebook player needs an additional live or adaptive playback integration."] };
+            if (True(video, "is_live_stream") || True(video, "is_broadcast") || True(video, "is_hls") || Text(video, "stream_type") is not ("progressive" or "dash")) return page with { Warnings = ["This Facebook player needs an additional live or adaptive playback integration."] };
             if (Present(config, "videoLicenseUriMap") || Present(config, "graphApiVideoLicenseUri") || Drm(config) || Drm(video)) return page with { DrmRefused = true, Warnings = ["Facebook did not offer clear playback for this video."] };
-            var formats = new List<MediaCandidate>(); var urls = new HashSet<string>(StringComparer.Ordinal); long? currentAsset = null; double? currentDuration = null;
+            var formats = new List<MediaCandidate>(); var warnings = new List<string>(); HttpRequestException? unavailable = null;
+            var urls = new HashSet<string>(StringComparer.Ordinal); long? currentAsset = null; double? currentDuration = null;
+            void RenditionFacts(Uri url, bool required = false)
+            {
+                var facts = FacebookAddress.Query(url, "efg");
+                if (facts is null && !required) return;
+                if (facts is not { Length: > 0 and <= 8192 }) throw new InvalidDataException("Facebook omitted its full rendition identity.");
+                JsonElement offered;
+                try { using var json = JsonDocument.Parse(Convert.FromBase64String(facts), new() { MaxDepth = 8 }); offered = json.RootElement.Clone(); }
+                catch (Exception ex) when (ex is FormatException or JsonException) { throw new InvalidDataException("Facebook returned invalid rendition facts.", ex); }
+                var key = Long(offered, "xpv_asset_id"); var seconds = Number(offered, "duration_s");
+                if (key is not > 0 || seconds is not (> 0 and <= 604800) || currentAsset is not null && currentAsset != key || currentDuration is not null && currentDuration != seconds ||
+                    Present(offered, "video_id") && (Text(offered, "video_id") ?? Long(offered, "video_id")?.ToString(System.Globalization.CultureInfo.InvariantCulture)) != address.Id)
+                    throw new InvalidDataException("Facebook returned inconsistent full rendition identities.");
+                currentAsset = key; currentDuration = seconds;
+            }
             foreach (var quality in new[] { "hd", "sd" })
             {
                 if (Text(video, quality + "_src") is not { Length: > 0 } raw) continue;
                 var url = Resource(raw); if (!urls.Add(url.AbsoluteUri)) continue;
-                if (FacebookAddress.Query(url, "efg") is { Length: > 0 and <= 8192 } facts)
-                {
-                    JsonElement offered;
-                    try { using var json = JsonDocument.Parse(Convert.FromBase64String(facts), new() { MaxDepth = 8 }); offered = json.RootElement.Clone(); }
-                    catch (Exception ex) when (ex is FormatException or JsonException) { throw new InvalidDataException("Facebook returned invalid rendition facts.", ex); }
-                    var key = Long(offered, "xpv_asset_id"); var seconds = Number(offered, "duration_s");
-                    if (key is not > 0 || seconds is not (> 0 and <= 604800) || currentAsset is not null && currentAsset != key || currentDuration is not null && currentDuration != seconds) throw new InvalidDataException("Facebook returned inconsistent full rendition identities.");
-                    currentAsset = key; currentDuration = seconds;
-                }
+                RenditionFacts(url);
                 var bitrate = FacebookAddress.Query(url, "bitrate");
-                formats.Add(new() { Id = quality, Label = quality.ToUpperInvariant(), Url = url, Kind = MediaKind.Progressive, Extension = "mp4", MimeType = "video/mp4", HasVideo = true, HasAudio = true, IsCompleteMedia = true, Bandwidth = long.TryParse(bitrate, out var rate) && rate > 0 ? rate : null, ProviderQualityOrder = quality == "hd" ? 2 : 1, VerificationDemuxer = "mov", VerificationDurationSeconds = currentDuration, Source = "facebook" });
+                FacebookMp4Probe.Facts facts;
+                try { facts = await FacebookMp4Probe.ReadAsync(clean, url, address.Page, token).ConfigureAwait(false); }
+                catch (HttpRequestException ex) when (ex.StatusCode is HttpStatusCode.Forbidden or HttpStatusCode.NotFound or HttpStatusCode.Gone)
+                {
+                    token.ThrowIfCancellationRequested();
+                    unavailable ??= ex; warnings.Add("Facebook's " + quality.ToUpperInvariant() + " file is unavailable; another offered format may be used."); continue;
+                }
+                formats.Add(new() { Id = quality, Label = quality.ToUpperInvariant(), Url = url, Kind = MediaKind.Progressive, Extension = "mp4", MimeType = "video/mp4", HasVideo = true, HasAudio = facts.HasAudio, IsCompleteMedia = true,
+                    Width = facts.Width, Height = facts.Height, VideoCodec = facts.VideoCodec, AudioCodec = facts.AudioCodec, FramesPerSecond = facts.FramesPerSecond, FileSize = facts.FileSize,
+                    Bandwidth = long.TryParse(bitrate, out var rate) && rate > 0 ? rate : null, ProviderQualityOrder = quality == "hd" ? 2 : 1, VerificationDemuxer = "mov", VerificationDurationSeconds = currentDuration, VerificationFileSize = facts.FileSize, Source = "facebook" });
             }
-            if (asset is not null && asset != currentAsset || duration is not null && duration != currentDuration) throw new InvalidDataException("Facebook changed the selected media asset during playback renewal."); asset ??= currentAsset; duration ??= currentDuration;
-            return page with { DurationSeconds = currentDuration, Media = formats, Warnings = formats.Count == 0 ? ["Facebook offered no supported public video file."] : [] };
+            double? dashDuration = null;
+            if (Text(video, "dash_manifest") is { Length: > 0 } xml)
+            {
+                // Facebook's static SegmentBase players offer complete MP4 track files.
+                // Download the whole files and let the existing selector/muxer pair them.
+                var manifest = DashManifestParser.Parse(xml, issuer);
+                if (manifest.IsDynamic || manifest.Representations.Count is 0 or > 128 || manifest.CaptionTracks.Count > 0)
+                    throw new NotSupportedException("This Facebook DASH player does not offer supported static MP4 tracks.");
+                var identities = new HashSet<string>(StringComparer.Ordinal);
+                var hasOfferedAudio = formats.Any(format => format.HasAudio == true) || manifest.Representations.Any(representation => representation.IsAudio);
+                foreach (var representation in manifest.Representations)
+                {
+                    token.ThrowIfCancellationRequested();
+                    if (representation.Id.Length is 0 or > 128 || !identities.Add(representation.Id) || representation.MimeType is not ("video/mp4" or "audio/mp4") ||
+                        representation.UnavailableReason is not null || representation.Segments.Count > 0 || representation.SegmentBase is not { PeriodDurationSeconds: > 0 and <= 604800 } indexed ||
+                        representation.Initialization != representation.Url)
+                        throw new NotSupportedException("This Facebook DASH player does not offer complete indexed MP4 tracks.");
+                    if (dashDuration is not null && dashDuration != indexed.PeriodDurationSeconds) throw new InvalidDataException("Facebook returned inconsistent DASH track durations.");
+                    dashDuration = indexed.PeriodDurationSeconds;
+                    var url = Resource(representation.Url.AbsoluteUri);
+                    RenditionFacts(url, required: true);
+                    if (!urls.Add(url.AbsoluteUri)) throw new InvalidDataException("Facebook returned ambiguous DASH track addresses.");
+                    formats.Add(new() { Id = "dash-" + representation.Id, Label = representation.IsAudio ? "DASH audio" : "DASH " + representation.Height + "p", Url = url,
+                        Kind = MediaKind.Progressive, Extension = representation.IsAudio ? "m4a" : "mp4", MimeType = representation.MimeType,
+                        HasVideo = representation.IsVideo, HasAudio = representation.IsAudio, IsCompleteMedia = representation.IsVideo && !hasOfferedAudio, Height = representation.Height, Width = representation.Width, Bandwidth = representation.Bandwidth,
+                        FramesPerSecond = representation.FramesPerSecond, VideoCodec = representation.IsVideo ? representation.Codecs : null,
+                        AudioCodec = representation.IsAudio ? representation.Codecs : null, TimelineId = "facebook:" + address.Id,
+                        VerificationDemuxer = "mov", VerificationDurationSeconds = dashDuration, Source = "facebook" });
+                }
+                if (dashDuration is not { } completeDuration || currentDuration is not { } declaredDuration || Math.Abs(completeDuration - declaredDuration) > 1)
+                    throw new InvalidDataException("Facebook changed the full video duration in its DASH player.");
+                if (initialIdentity?.DashTimeline is { } timeline && timeline != dashDuration) throw new InvalidDataException("Facebook changed its DASH timeline during playback renewal.");
+            }
+            if (formats.Count == 0 && unavailable is not null) System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(unavailable).Throw();
+            if (initialIdentity is { } initial && (initial.Asset is not null && initial.Asset != currentAsset || initial.Duration is not null && initial.Duration != currentDuration))
+                throw new InvalidDataException("Facebook changed the selected media asset during playback renewal.");
+            // Only the initial offered inventory can be selected by this lease.
+            // A proposed renewal must never extend or overwrite its identity pins.
+            if (formats.Count > 0) initialIdentity ??= (currentAsset, currentDuration, dashDuration);
+            return page with { DurationSeconds = dashDuration ?? currentDuration, Media = formats, Warnings = formats.Count == 0 ? ["Facebook offered no supported public video file."] : warnings };
         }
         return await http.SessionState(Key(Info.Id, request), () => new ProviderPlaybackSession(http, request with { Url = address.Page }, Info.Id, Current, reorderedFormats: false, publicSession: true)).ReadAsync(ct).ConfigureAwait(false);
     }

@@ -36,7 +36,15 @@ public sealed record MediaDownloadPlan(MediaCandidate Primary, MediaCandidate? A
             // Classify the source before filtering. A height/codec constraint that
             // removes its video must not turn a video request into audio-only success.
             var audioContent = !request.VideoOnly && page.Media.Count > 0 && page.Media.All(candidate => candidate.IsAudioOnly) && !page.ReportedFormats.Any(format => format.HasVideo == true);
-            selected = QualitySelector.Select(candidates, request.Quality, request.MaximumHeight, request.AudioOnly || audioContent, request.PreferFreeFormats);
+            var playable = candidates;
+            if (!request.AudioOnly && !request.VideoOnly && !candidates.Any(candidate => candidate.IsAudioOnly) &&
+                candidates.Any(candidate => FormatFacts.Video(candidate) && (candidate.IsCompleteMedia || candidate.HasAudio == true)))
+            {
+                // Rank complete playback choices when separate video has no audio
+                // partner. Explicit formats and video-only choices keep their intent.
+                playable = candidates.Where(candidate => candidate.HasVideo != true || candidate.HasAudio != false || candidate.IsCompleteMedia).ToArray();
+            }
+            selected = QualitySelector.Select(playable, request.Quality, request.MaximumHeight, request.AudioOnly || audioContent, request.PreferFreeFormats);
             if (!request.AudioOnly && !audioContent && selected.IsAudioOnly)
                 throw new InvalidOperationException("No video format satisfies the requested constraints.");
         }

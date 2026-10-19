@@ -12,6 +12,17 @@ internal sealed class SessionLifetime : IDisposable
         lock(_sync){ObjectDisposedException.ThrowIf(_disposed,this);ct.ThrowIfCancellationRequested();var linked=CancellationTokenSource.CreateLinkedTokenSource(ct,_shutdown.Token);_active++;return new(this,linked);}
     }
     internal T Read<T>(Func<T> action){lock(_sync){ObjectDisposedException.ThrowIf(_disposed,this);return action();}}
+    // An admitted async operation must finish as cancellation when disposal wins
+    // the handoff to this lock, including before shutdown callbacks have run.
+    internal T Read<T>(CancellationToken ct,Func<T> action)
+    {
+        lock(_sync){CheckOperation(ct);return action();}
+    }
+    private void CheckOperation(CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        if(_disposed)throw new OperationCanceledException("The playback session was disposed.",ct);
+    }
     internal void Commit(CancellationToken ct,Action action){lock(_sync){ct.ThrowIfCancellationRequested();ObjectDisposedException.ThrowIf(_disposed,this);action();}}
     private void End(){lock(_sync){_active--;Retire();}}
     private void Retire(){if(_disposed&&!_canceling&&_active==0){Gate.Dispose();_shutdown.Dispose();}}

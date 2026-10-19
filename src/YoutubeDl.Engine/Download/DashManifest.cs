@@ -131,7 +131,7 @@ public static partial class DashManifestParser
                 {
                     if (mime is not ("video/mp4" or "audio/mp4"))
                     {
-                        representations.Add(new() { Id = id, Url = url, MimeType = mime, Height = Integer(Inherited(representation, "height")), Bandwidth = bandwidth,
+                        representations.Add(new() { Id = id, Url = url, MimeType = mime, Height = Integer(Inherited(representation, "height")), Width = Integer(Inherited(representation, "width")), Bandwidth = bandwidth,
                             Codecs = codecs, FramesPerSecond = ReadFrameRate(Inherited(representation, "frameRate")), UnavailableReason = "Native indexed DASH currently requires an MP4 representation." });
                         continue;
                     }
@@ -159,7 +159,7 @@ public static partial class DashManifestParser
                 }
                 representations.Add(new DashRepresentation
                 {
-                    Id = id, Url = url, MimeType = mime, Height = Integer(Inherited(representation, "height")), Bandwidth = bandwidth,
+                    Id = id, Url = url, MimeType = mime, Height = Integer(Inherited(representation, "height")), Width = Integer(Inherited(representation, "width")), Bandwidth = bandwidth,
                     Codecs = Inherited(representation, "codecs"), FramesPerSecond = ReadFrameRate(Inherited(representation, "frameRate")),
                     Initialization = initialization, InitializationRange = initializationRange, Segments = segments, SegmentBase = segmentBase
                 });

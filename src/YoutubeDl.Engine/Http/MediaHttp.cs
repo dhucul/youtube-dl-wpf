@@ -225,6 +225,17 @@ public sealed class MediaHttp : IDisposable
 
     private async Task<HttpResponseMessage> SendCoreAsync(HttpRequestMessage request, HttpClient client, CancellationToken ct)
     {
+        try { return await SendCoreRequestAsync(request, client, ct).ConfigureAwait(false); }
+        catch (ObjectDisposedException exception) when (ct.IsCancellationRequested)
+        {
+            // Cancellation can dispose authorization between its synchronous
+            // scope/canonical/redirect checks, before the next async admission.
+            throw new OperationCanceledException("The media request was canceled.", exception, ct);
+        }
+    }
+
+    private async Task<HttpResponseMessage> SendCoreRequestAsync(HttpRequestMessage request, HttpClient client, CancellationToken ct)
+    {
         await NativeExtractionDelay.BeforeRequestAsync(ct).ConfigureAwait(false);
         if (request.RequestUri is { } uri)
         {
@@ -238,10 +249,11 @@ public sealed class MediaHttp : IDisposable
             if (!request.Content.Headers.TryAddWithoutValidation(name, value)) throw new NotSupportedException("This custom content header requires additional native support.");
         }
         var authorization=_configuration.PlaybackAuthorization;
-        PlaybackLease? lease=null;var original=request.RequestUri;
+        PlaybackLease? lease=null;var original=request.RequestUri;Uri? canonical=null;
         if(original is not null&&authorization?.AppliesTo(original)==true)
         {
             if(request.Method!=HttpMethod.Get&&request.Method!=HttpMethod.Head)throw new NotSupportedException("Private resource renewal requires a read-only request.");
+            canonical=authorization.Canonicalize(original);
             lease=await authorization.AuthorizeAsync(original,ct).ConfigureAwait(false);request.RequestUri=lease.Value.Url;
         }
         if(lease is not null)
@@ -253,6 +265,9 @@ public sealed class MediaHttp : IDisposable
                 {
                     authorization!.ApplyRequestHeaders(current);
                     var response=await client.SendAsync(current,HttpCompletionOption.ResponseHeadersRead,ct).ConfigureAwait(false);
+                    try
+                    {
+                    ct.ThrowIfCancellationRequested();
                     Uri? next=null;
                     if((int)response.StatusCode is >=300 and <400)
                     {
@@ -264,15 +279,17 @@ public sealed class MediaHttp : IDisposable
                     if(next is null)
                     {
                         response.RequestMessage??=current;var message=response.RequestMessage;var final=message.RequestUri??current.RequestUri!;
-                        message.Options.Set(EffectivePlaybackUri,final);message.RequestUri=authorization!.Canonicalize(final);
+                        message.Options.Set(EffectivePlaybackUri,final);message.RequestUri=canonical;
                         return response;
                     }
                     response.Dispose();if(!ReferenceEquals(current,request))current.Dispose();
                     current=new HttpRequestMessage(request.Method,next){Version=request.Version,VersionPolicy=request.VersionPolicy};
                     foreach(var header in request.Headers)current.Headers.TryAddWithoutValidation(header.Key,header.Value);
+                    }
+                    catch{response.Dispose();throw;}
                 }
             }
-            finally{if(!ReferenceEquals(current,request))current.Dispose();request.RequestUri=authorization!.Canonicalize(request.RequestUri!);}
+            finally{if(!ReferenceEquals(current,request))current.Dispose();request.RequestUri=canonical;}
         }
         return await client.SendAsync(request,HttpCompletionOption.ResponseHeadersRead,ct).ConfigureAwait(false);
     }

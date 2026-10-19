@@ -4,7 +4,7 @@ YoutubeDL Modern is a Windows desktop downloader with a built-in C# engine. It k
 
 > Only download media that you are allowed to save. This project is not affiliated with youtube-dl, yt-dlp, or ffmpeg.
 
-Version 1.1.6 defaults to the best available video and original audio without re-encoding. Automatic container selection preserves higher-quality audio, and the former MP3/192K default migrates on startup. The quality changes pass all 3,616 core engine checks, all 204 application checks, and focused media packet/sample preservation checks. It includes the 1.1.5 reliability fixes and retains the earlier YouTube, public Facebook and non-explicit common-site workflows. Other sites and advanced legacy options have partial coverage; see [release scope and verification](docs/native-engine/PRACTICAL-RELEASE.md).
+Version 1.1.7 includes the Facebook static DASH playback and session renewal fixes, with all 3,713 core engine checks, 204 application checks and 109 focused Facebook checks passing. It keeps the best available video and original audio defaults without re-encoding. Automatic container selection preserves higher-quality audio, and the former MP3/192K default migrates on startup. It includes the earlier reliability fixes and retains the YouTube, public Facebook and non-explicit common-site workflows. Other sites and advanced legacy options have partial coverage; see [release scope and verification](docs/native-engine/PRACTICAL-RELEASE.md).
 
 ## Features
 

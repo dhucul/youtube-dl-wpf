@@ -36,7 +36,9 @@ internal sealed class RenewableMediaAuthorization: IPlaybackAuthorization,IDispo
     public async Task ObserveManifestAsync(MediaDocument document,CancellationToken ct)
     {
         using var operation=Begin(ct);ct=operation.Token;
-        await _gate.WaitAsync(ct).ConfigureAwait(false);try{var resource=Use(document.Url);var root=_resources[resource.Key];_graph.Observe(root.Key,root.Format!.Kind,document.Url,document.EffectiveUrl??document.Url,document.Text);}finally{_gate.Release();}
+        await _gate.WaitAsync(ct).ConfigureAwait(false);
+        try{lock(_aliases){CheckOperation(ct);var resource=Use(document.Url);var root=_resources[resource.Key];_graph.Observe(root.Key,root.Format!.Kind,document.Url,document.EffectiveUrl??document.Url,document.Text);}}
+        finally{_gate.Release();}
     }
     public bool TryRedirect(Uri source,Uri destination)
     {
@@ -52,12 +54,28 @@ internal sealed class RenewableMediaAuthorization: IPlaybackAuthorization,IDispo
     public async Task<PlaybackLease> AuthorizeAsync(Uri url,CancellationToken ct)
     {
         using var operation=Begin(ct);ct=operation.Token;
-        await _gate.WaitAsync(ct).ConfigureAwait(false);try{var resource=Use(url);if(resource.Expires is { } expires&&expires<=DateTimeOffset.UtcNow.AddSeconds(5))await RefreshAsync(ct).ConfigureAwait(false);return new(Get(url).Current,_generation);}finally{_gate.Release();}
+        await _gate.WaitAsync(ct).ConfigureAwait(false);
+        try
+        {
+            Resource resource;lock(_aliases){CheckOperation(ct);resource=Use(url);}
+            if(resource.Expires is { } expires&&expires<=DateTimeOffset.UtcNow.AddSeconds(5))await RefreshAsync(ct).ConfigureAwait(false);
+            lock(_aliases){CheckOperation(ct);return new(Get(url).Current,_generation);}
+        }
+        catch(ObjectDisposedException){lock(_aliases){CheckOperation(ct);}throw;}
+        finally{_gate.Release();}
     }
     public async Task<PlaybackLease> RenewAsync(Uri url,long rejectedGeneration,CancellationToken ct)
     {
         using var operation=Begin(ct);ct=operation.Token;
-        await _gate.WaitAsync(ct).ConfigureAwait(false);try{_ =Use(url);if(_generation==rejectedGeneration)await RefreshAsync(ct).ConfigureAwait(false);return new(Get(url).Current,_generation);}finally{_gate.Release();}
+        await _gate.WaitAsync(ct).ConfigureAwait(false);
+        try
+        {
+            bool refresh;lock(_aliases){CheckOperation(ct);var resource=Use(url);refresh=_generation==rejectedGeneration||resource.Expires is { } expires&&expires<=DateTimeOffset.UtcNow.AddSeconds(5);}
+            if(refresh)await RefreshAsync(ct).ConfigureAwait(false);
+            lock(_aliases){CheckOperation(ct);return new(Get(url).Current,_generation);}
+        }
+        catch(ObjectDisposedException){lock(_aliases){CheckOperation(ct);}throw;}
+        finally{_gate.Release();}
     }
     private Resource Use(Uri url){lock(_aliases){var resource=Get(url);_active.Add(resource.Key);return resource;}}
     private Resource Get(Uri url)
@@ -66,10 +84,11 @@ internal sealed class RenewableMediaAuthorization: IPlaybackAuthorization,IDispo
     }
     private async Task RefreshAsync(CancellationToken ct)
     {
-        if(++_renewals>_maximumRenewals)throw new NotSupportedException("This job exceeded its bounded playback refresh count.");
+        lock(_aliases){CheckOperation(ct);if(++_renewals>_maximumRenewals)throw new NotSupportedException("This job exceeded its bounded playback refresh count.");}
         var page=await _refresh(ct).ConfigureAwait(false);ct.ThrowIfCancellationRequested();if(page.Id!=_videoId||page.Extractor!=_extractor||!_live&&page.IsLive||page.IsPlaylist||page.DrmRefused)throw new InvalidDataException("Playback renewal changed identity or denied access.");
         var entries=Entries(page).ToDictionary(r=>r.Key,StringComparer.Ordinal);var next=new Dictionary<string,Resource>(StringComparer.Ordinal);
-        Resource[] previous;HashSet<string> active;lock(_aliases){previous=_resources.Values.ToArray();active=new(_active,StringComparer.Ordinal);}
+        if(entries.Values.Select(resource=>resource.Current).Distinct().Count()!=entries.Count)throw new InvalidDataException("Renewed playback resources share an ambiguous address.");
+        Resource[] previous;HashSet<string> active;lock(_aliases){CheckOperation(ct);previous=_resources.Values.ToArray();active=new(_active,StringComparer.Ordinal);}
         foreach(var old in previous)
         {
             var valid=entries.TryGetValue(old.Key,out var entry)&&Same(old.Format,entry.Format)&&(old.Caption is not { } caption||entry.Caption is not null&&caption.Language==entry.Caption.Language&&caption.Extension==entry.Caption.Extension&&caption.Automatic==entry.Caption.Automatic)&&!(entry.Expires is { } expires&&expires<=DateTimeOffset.UtcNow);
@@ -90,7 +109,7 @@ internal sealed class RenewableMediaAuthorization: IPlaybackAuthorization,IDispo
         var commitGraph=await _graph.PrepareRefreshAsync(next.Where(p=>!p.Value.Retired).ToDictionary(p=>p.Key,p=>p.Value.Current,StringComparer.Ordinal),_readManifest,ct,ended).ConfigureAwait(false);
         lock(_aliases)
         {
-            ct.ThrowIfCancellationRequested();ObjectDisposedException.ThrowIf(_disposed,this);
+            CheckOperation(ct);
             if(_aliases.Count+next.Count>4096)throw new InvalidDataException("The playback alias inventory exceeds its limit.");
             foreach(var entry in next.Values.Where(resource=>!resource.Retired)){if(_aliases.TryGetValue(entry.Current,out var key)&&key!=entry.Key)throw new InvalidDataException("A renewed URL changed its resource identity.");}
             // Root URLs and adaptive mappings become visible under the same owner lock.
@@ -99,7 +118,7 @@ internal sealed class RenewableMediaAuthorization: IPlaybackAuthorization,IDispo
             foreach(var entry in next.Values){_resources[entry.Key]=entry;if(!entry.Retired)_aliases[entry.Current]=entry.Key;}_live=page.IsLive;_generation++;
         }
     }
-    private static bool Same(MediaCandidate? a,MediaCandidate? b)=>a is null?b is null:b is not null&&a.Kind==b.Kind&&a.Extension==b.Extension&&a.MimeType==b.MimeType&&a.Height==b.Height&&a.Width==b.Width&&a.VideoCodec==b.VideoCodec&&a.AudioCodec==b.AudioCodec&&a.HasAudio==b.HasAudio&&a.HasVideo==b.HasVideo&&a.FramesPerSecond==b.FramesPerSecond&&a.FileSize==b.FileSize&&a.AudioLanguage==b.AudioLanguage&&a.IsDefaultAudio==b.IsDefaultAudio;
+    private static bool Same(MediaCandidate? a,MediaCandidate? b)=>a is null?b is null:b is not null&&a.Kind==b.Kind&&a.Extension==b.Extension&&a.MimeType==b.MimeType&&a.Height==b.Height&&a.Width==b.Width&&a.VideoCodec==b.VideoCodec&&a.AudioCodec==b.AudioCodec&&a.HasAudio==b.HasAudio&&a.HasVideo==b.HasVideo&&a.IsCompleteMedia==b.IsCompleteMedia&&a.FramesPerSecond==b.FramesPerSecond&&a.FileSize==b.FileSize&&a.AudioLanguage==b.AudioLanguage&&a.IsDefaultAudio==b.IsDefaultAudio;
     private static IEnumerable<Resource> Entries(PageMetadata page)
     {
         foreach(var format in page.Media.Where(m=>m.Kind is MediaKind.Progressive or MediaKind.Hls or MediaKind.Dash))
@@ -111,9 +130,17 @@ internal sealed class RenewableMediaAuthorization: IPlaybackAuthorization,IDispo
         return PlaybackResourceExpiry.Read(url);
     }
     private static void Valid(Uri url){if(url.Scheme!="https"||!url.IsDefaultPort||url.UserInfo.Length>0||url.Fragment.Length>0)throw new InvalidDataException("A renewable playback resource requires a secure ordinary address.");}
+    // Called under _aliases for already admitted operations. A semaphore waiter
+    // can acquire its permit while cancellation races the previous holder's exit.
+    // Disposal can also be marked before shutdown callbacks have canceled ct.
+    private void CheckOperation(CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        if(_disposed)throw new OperationCanceledException("The playback session was disposed.",ct);
+    }
     private Operation Begin(CancellationToken ct)
     {
-        lock(_aliases){ObjectDisposedException.ThrowIf(_disposed,this);_operations++;return new(this,CancellationTokenSource.CreateLinkedTokenSource(ct,_shutdown.Token));}
+        lock(_aliases){ObjectDisposedException.ThrowIf(_disposed,this);ct.ThrowIfCancellationRequested();var linked=CancellationTokenSource.CreateLinkedTokenSource(ct,_shutdown.Token);_operations++;return new(this,linked);}
     }
     private void End()
     {
