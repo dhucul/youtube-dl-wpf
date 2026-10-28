@@ -68,6 +68,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         settings.Changed+=OnEngineSettingsChanged;
         StartEngineStatusRefresh();
+
+        if (settings.LoadWarning is not null || history.LoadWarning is not null)
+            Notify(string.Join(" ", new[] { settings.LoadWarning, history.LoadWarning }.OfType<string>()));
     }
     private void OnEngineSettingsChanged()
     {

@@ -20,15 +20,33 @@ internal static class SettingsSecrets
         settings.Network.CustomHeaders = ProtectValue(settings.Network.CustomHeaders);
     }
 
-    public static void Unprotect(AppSettings settings)
+    /// <summary>Decrypts every protected setting, clearing any this account cannot read.</summary>
+    /// <returns>The number of values that were cleared.</returns>
+    public static int Unprotect(AppSettings settings)
     {
-        settings.Auth.Password = UnprotectValue(settings.Auth.Password);
-        settings.Auth.TwoFactor = UnprotectValue(settings.Auth.TwoFactor);
-        settings.Auth.VideoPassword = UnprotectValue(settings.Auth.VideoPassword);
-        settings.Auth.ApPassword = UnprotectValue(settings.Auth.ApPassword);
-        settings.Network.Proxy = UnprotectValue(settings.Network.Proxy);
-        settings.Network.GeoVerificationProxy = UnprotectValue(settings.Network.GeoVerificationProxy);
-        settings.Network.CustomHeaders = UnprotectValue(settings.Network.CustomHeaders);
+        var cleared = 0;
+        settings.Auth.Password = RecoverValue(settings.Auth.Password, ref cleared);
+        settings.Auth.TwoFactor = RecoverValue(settings.Auth.TwoFactor, ref cleared);
+        settings.Auth.VideoPassword = RecoverValue(settings.Auth.VideoPassword, ref cleared);
+        settings.Auth.ApPassword = RecoverValue(settings.Auth.ApPassword, ref cleared);
+        settings.Network.Proxy = RecoverValue(settings.Network.Proxy, ref cleared);
+        settings.Network.GeoVerificationProxy = RecoverValue(settings.Network.GeoVerificationProxy, ref cleared);
+        settings.Network.CustomHeaders = RecoverValue(settings.Network.CustomHeaders, ref cleared);
+        return cleared;
+    }
+
+    /// <summary>
+    /// Decrypts one value. A value protected for another Windows account or machine can never
+    /// be read here, so it is cleared rather than discarding every other stored setting or entry.
+    /// </summary>
+    internal static string RecoverValue(string value, ref int cleared)
+    {
+        try { return UnprotectValue(value); }
+        catch (Exception ex) when (ex is CryptographicException or FormatException)
+        {
+            cleared++;
+            return string.Empty;
+        }
     }
 
     internal static string ProtectValue(string value)

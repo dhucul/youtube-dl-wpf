@@ -117,7 +117,7 @@ public sealed partial class NativeEngine : IMediaEngine
             return metadataResult;
         }
         using var archive = string.IsNullOrWhiteSpace(request.DownloadArchiveFile) ? null :
-            await DownloadArchive.OpenAsync(request.DownloadArchiveFile, DownloadArchiveIdentity.FromMetadata(page, request.Url), ct).ConfigureAwait(false);
+            await DownloadArchive.OpenAsync(request.DownloadArchiveFile, DownloadArchiveIdentity.FromMetadata(page, request.Url), ct, log).ConfigureAwait(false);
         if (archive?.AlreadyRecorded == true)
         {
             await DownloadWorkspace.FinalizeRecordedAsync(request).ConfigureAwait(false);
@@ -478,7 +478,7 @@ public sealed partial class NativeEngine : IMediaEngine
             var downloadedVideo = await DownloadTrackAsync(http, files, plan.Primary, video, request with { VideoOnly = true, AudioOnly = false }, limiter, progress, ct, existingSubtitles,manifests).ConfigureAwait(false);
             video = downloadedVideo.Path;
             await new NativeDownloadDelay(request).WaitAsync(request.DownloadDelayLog, ct).ConfigureAwait(false);
-            audio = (await DownloadTrackAsync(http, files, plan.Audio, audio, request with { AudioOnly = true, VideoOnly = false, WriteSubs = false, WriteAutoSubs = false, EmbedSubs = false }, limiter, null, ct, [],manifests).ConfigureAwait(false)).Path;
+            audio = (await DownloadTrackAsync(http, files, plan.Audio, audio, request with { AudioOnly = true, VideoOnly = false, WriteSubs = false, WriteAutoSubs = false, EmbedSubs = false }, limiter, progress, ct, [],manifests).ConfigureAwait(false)).Path;
             if (!string.IsNullOrWhiteSpace(request.MergeOutputFormat))
             {
                 var extension = await FfmpegTool.SelectMergeExtensionAsync(request.FfmpegPath!, video, audio, request.MergeOutputFormat, plan.Extension, ct).ConfigureAwait(false);
@@ -513,7 +513,7 @@ public sealed partial class NativeEngine : IMediaEngine
         NativeProcessingOptions.Validate(request.Fixup, request.PostprocessorArguments);
         _ = VideoRecodeProfile.Parse(request.RecodeVideo);
         if(request.LiveDurationSeconds is { } liveDuration&&(!double.IsFinite(liveDuration)||liveDuration<=0||liveDuration>86400))
-            throw new ArgumentException("Choose a finite live recording duration greater than zero and at most24 hours.");
+            throw new ArgumentException("Choose a finite live recording duration greater than zero and at most 24 hours.");
         NativeMetadataParser.Validate(request.MetadataParseRules);
         _ = new NativeFileSizeLimits(request);
         _ = new NativeDownloadDelay(request);

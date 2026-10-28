@@ -87,9 +87,7 @@ public static class NativeExec
         try { await PublicationFaults.AtAsync("exec-started").ConfigureAwait(false); await process.WaitForExitAsync(ct).ConfigureAwait(false); }
         catch
         {
-            try { if (!process.HasExited) process.Kill(true); } catch (InvalidOperationException) { }
-            await process.WaitForExitAsync(CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false); lifetime.Dispose();
-            await Task.WhenAll(output, error).WaitAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false); throw;
+            await ProcessLifetime.KillAndDrainAsync(process, lifetime, output, error).ConfigureAwait(false); throw;
         }
         lifetime.Dispose(); await Task.WhenAll(output, error).WaitAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
         if (process.ExitCode != 0) throw new InvalidOperationException("The configured exec command failed with exit code " + process.ExitCode.ToString(CultureInfo.InvariantCulture) + ". Its intent was retained to prevent accidental replay.");

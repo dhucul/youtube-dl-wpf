@@ -35,7 +35,9 @@ internal static partial class Program
                 if(args.Contains("--hdr-metadata-only")){foreach(var (name,test) in HdrMetadataAppChecks)await Check(name,test);return;}
                 if(args.Contains("--hdr-gamut-only")){foreach(var (name,test) in HdrGamutAppChecks)await Check(name,test);return;}
                 if(args.Contains("--color-audio-only")){foreach(var (name,test) in ColorAudioAppChecks)await Check(name,test);return;}
+                if (args.Contains("--audit-regressions-only")) { foreach (var (name, test) in AuditRegressionChecks) await Check(name, test); return; }
                 foreach (var (name, test) in RuntimeRegressionChecks) await Check(name, test);
+                foreach (var (name, test) in AuditRegressionChecks) await Check(name, test);
                 foreach (var (name, test) in StreamQualityDefaultChecks) await Check(name, test);
                 await Check("Format selectors honor offered heights and VP9 spellings", Selectors);
                 await Check("Analysis excludes download side effects", AnalysisArguments);

@@ -12,6 +12,7 @@ internal static class RestartChecks
     internal static IEnumerable<(string Name, Func<Task> Test)> All =>
     [
         ("Restart policy ignores validated partial bytes and resumes again when re-enabled", Restart),
+        ("Resume revalidates a completely written part by its final byte", CompletePart),
         ("Restart policy applies to in-job HTTP retries", Retry),
         ("Restart policy preserves saved and partial files on denial or pre-cancellation", Failure),
         ("Restart policy rejects unsolicited incomplete range responses", InvalidRange),
@@ -41,6 +42,26 @@ internal static class RestartChecks
         await new FileDownloader(http).DownloadAsync(Url, files.Output, null, null, default, 0);
         Assert(requests[2] == (3, "\"fixture\"") && File.ReadAllText(files.Output) == "newest", "Re-enabled resume did not use the new partial entity.");
         Assert(!File.Exists(files.Output + ".part.json"), "A completed restart retained its resume receipt.");
+    }
+
+    private static async Task CompletePart()
+    {
+        using var files = new Files();
+        var ranges = new List<long?>();
+        using var http = Http(request =>
+        {
+            var from = request.Headers.Range?.Ranges.Single().From;
+            ranges.Add(from);
+            if (ranges.Count == 1) return Response("abcde", 6);
+            if (from is >= 6) return new(HttpStatusCode.RequestedRangeNotSatisfiable);
+            return from == 5 ? Partial("f", 5, 5, 6) : Response("abcdef");
+        });
+        await Expect<IOException>(() => new FileDownloader(http).DownloadAsync(Url, files.Output, null, null, default, 0));
+        // Every byte reached the part, but the job stopped before publishing it.
+        File.AppendAllText(files.Output + ".part", "f");
+        await new FileDownloader(http).DownloadAsync(Url, files.Output, null, null, default, 0);
+        Assert(ranges.Count == 2 && ranges[1] == 5 && File.ReadAllText(files.Output) == "abcdef",
+            "A complete part was transferred again instead of revalidating its final byte.");
     }
 
     private static async Task Retry()

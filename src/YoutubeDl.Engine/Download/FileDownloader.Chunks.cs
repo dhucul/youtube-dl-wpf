@@ -11,6 +11,7 @@ public sealed partial class FileDownloader
         var existing = !NoContinue && File.Exists(part) ? new FileInfo(part).Length : 0L;
         var receipt = NoContinue ? null : ReadReceipt(receiptPath, url);
         if (receipt is null || !ChunkValidator(receipt) || receipt.Length is { } total && existing > total) { existing = 0; receipt = null; }
+        else existing = ReopenCompletePart(part, existing, receipt);
         while (true)
         {
             ct.ThrowIfCancellationRequested();

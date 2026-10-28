@@ -27,10 +27,10 @@ internal static class DestinationLock
         }
         catch { foreach (var lease in leases.AsEnumerable().Reverse()) lease.Dispose(); throw; }
     }
-    public static Task<IDisposable> AcquireArchiveAsync(string path, CancellationToken ct) =>
-        AcquireKeyAsync("archive:" + Path.GetFullPath(path), ct);
+    public static Task<IDisposable> AcquireArchiveAsync(string path, CancellationToken ct, Action? waiting = null) =>
+        AcquireKeyAsync("archive:" + Path.GetFullPath(path), ct, waiting);
 
-    private static async Task<IDisposable> AcquireKeyAsync(string key, CancellationToken ct)
+    private static async Task<IDisposable> AcquireKeyAsync(string key, CancellationToken ct, Action? waiting = null)
     {
         Gate gate;
         lock (Gates)
@@ -38,7 +38,15 @@ internal static class DestinationLock
             if (!Gates.TryGetValue(key, out gate!)) Gates[key] = gate = new();
             gate.References++;
         }
-        try { await gate.Semaphore.WaitAsync(ct).ConfigureAwait(false); }
+        try
+        {
+            ct.ThrowIfCancellationRequested();
+            if (!gate.Semaphore.Wait(0))
+            {
+                waiting?.Invoke();
+                await gate.Semaphore.WaitAsync(ct).ConfigureAwait(false);
+            }
+        }
         catch { ReleaseReference(key, gate); throw; }
         return new Lease(key, gate);
     }

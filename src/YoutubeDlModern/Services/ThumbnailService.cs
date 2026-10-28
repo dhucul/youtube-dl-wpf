@@ -48,21 +48,7 @@ internal static class ThumbnailService
                 await memory.WriteAsync(buffer.AsMemory(0, count), token).ConfigureAwait(false);
             }
 
-            if (memory.Length == 0)
-                return null;
-            memory.Position = 0;
-            var image = new BitmapImage();
-            image.BeginInit();
-            image.CacheOption = BitmapCacheOption.OnLoad;
-            image.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
-            image.DecodePixelWidth = 512;
-            image.DecodePixelHeight = 512;
-            image.StreamSource = memory;
-            image.EndInit();
-            if (image.PixelWidth is <= 0 or > 4096 || image.PixelHeight is <= 0 or > 4096)
-                return null;
-            image.Freeze();
-            return image;
+            return memory.Length == 0 ? null : Decode(memory);
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
@@ -72,6 +58,23 @@ internal static class ThumbnailService
         {
             return null;
         }
+    }
+
+    internal static ImageSource? Decode(Stream data)
+    {
+        data.Position = 0;
+        var image = new BitmapImage();
+        image.BeginInit();
+        image.CacheOption = BitmapCacheOption.OnLoad;
+        image.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
+        // Setting only one decode dimension preserves the image's aspect ratio.
+        image.DecodePixelWidth = 512;
+        image.StreamSource = data;
+        image.EndInit();
+        if (image.PixelWidth is <= 0 or > 4096 || image.PixelHeight is <= 0 or > 4096)
+            return null;
+        image.Freeze();
+        return image;
     }
 
     private static async Task<HttpResponseMessage> SendWithValidatedRedirectsAsync(Uri initialUri, CancellationToken ct)

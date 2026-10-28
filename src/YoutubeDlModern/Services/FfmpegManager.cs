@@ -42,10 +42,16 @@ public sealed class FfmpegManager : IFfmpegLocator
 
     public async Task<string?> LocateAsync(AppSettings settingsSnapshot, CancellationToken ct = default)
     {
+        // A configured folder never changes during a managed install, so downloads that
+        // use it need not wait for one to finish.
+        var configured = settingsSnapshot.PostProcess.FfmpegLocation;
+        if (!string.IsNullOrWhiteSpace(configured) && HasCompleteInstall(configured))
+            return configured;
+
         await _installGate.WaitAsync(ct).ConfigureAwait(false);
         try
         {
-            return await LocateCoreAsync(settingsSnapshot, ct).ConfigureAwait(false);
+            return await LocateCoreAsync(ct).ConfigureAwait(false);
         }
         finally
         {
@@ -53,12 +59,8 @@ public sealed class FfmpegManager : IFfmpegLocator
         }
     }
 
-    private async Task<string?> LocateCoreAsync(AppSettings settingsSnapshot, CancellationToken ct)
+    private async Task<string?> LocateCoreAsync(CancellationToken ct)
     {
-        var configured = settingsSnapshot.PostProcess.FfmpegLocation;
-        if (!string.IsNullOrWhiteSpace(configured) && HasCompleteInstall(configured))
-            return configured;
-
         if (await Task.Run(IsManagedInstallComplete, ct).ConfigureAwait(false))
             return FfmpegDir;
 

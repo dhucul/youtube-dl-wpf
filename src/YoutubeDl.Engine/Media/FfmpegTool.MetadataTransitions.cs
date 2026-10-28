@@ -37,7 +37,7 @@ public static partial class FfmpegTool
             }
             await process.WaitForExitAsync(ct).ConfigureAwait(false);var diagnostic=await errors.ConfigureAwait(false);if(process.ExitCode!=0||diagnostic.Length>0||frames.Count==0)throw new InvalidDataException("HDR frame inspection failed: "+Trim(diagnostic));return frames;
         }
-        catch{try{if(!process.HasExited)process.Kill(true);}catch(InvalidOperationException){}await process.WaitForExitAsync(CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false);await errors.WaitAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false);ct.ThrowIfCancellationRequested();throw;}
+        catch{await ProcessLifetime.KillAndDrainAsync(process,null,errors).ConfigureAwait(false);ct.ThrowIfCancellationRequested();throw;}
     }
     private static async Task ReadHdrPayloadsAsync(string ffmpeg,string input,string raw,IReadOnlyList<HdrTimedFrame> frames,ProbedStream stream,bool plus,CancellationToken ct)
     {

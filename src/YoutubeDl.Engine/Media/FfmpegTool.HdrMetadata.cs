@@ -39,8 +39,7 @@ public static partial class FfmpegTool
         }
         catch
         {
-            try{if(!process.HasExited)process.Kill(true);}catch(InvalidOperationException){}
-            await process.WaitForExitAsync(CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false);await error.WaitAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false);ct.ThrowIfCancellationRequested();throw;
+            await ProcessLifetime.KillAndDrainAsync(process,null,error).ConfigureAwait(false);ct.ThrowIfCancellationRequested();throw;
         }
     }
 }

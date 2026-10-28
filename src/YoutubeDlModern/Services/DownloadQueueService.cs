@@ -1,7 +1,6 @@
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Threading.Channels;
 using System.Windows.Media;
 using YoutubeDlModern.Models;
 using YoutubeDlModern.ViewModels;
@@ -17,7 +16,6 @@ public sealed class DownloadQueueService : IAsyncDisposable
 {
     private const int WorkerCount = 8;
     private const int MaximumQueueItems = 10_000;
-    private const int MaximumScheduledItems = 20_000;
     private sealed class ConcurrencyWaiter
     {
         public TaskCompletionSource<bool> Completion { get; } =
@@ -42,14 +40,13 @@ public sealed class DownloadQueueService : IAsyncDisposable
 
     private readonly object _concurrencySync = new();
     private readonly object _runsSync = new();
-    private readonly Channel<ScheduledRun> _workQueue = Channel.CreateBounded<ScheduledRun>(
-        new BoundedChannelOptions(MaximumScheduledItems)
-        {
-            SingleReader = false,
-            SingleWriter = true,
-            AllowSynchronousContinuations = false,
-            FullMode = BoundedChannelFullMode.Wait
-        });
+    // Runs not yet taken by a worker. Pausing or canceling one removes it here, so the
+    // schedule never holds more than one run per queued item, however often it is toggled.
+    private readonly object _scheduleSync = new();
+    private readonly LinkedList<ScheduledRun> _pendingRuns = new();
+    private readonly Dictionary<CancellationTokenSource, LinkedListNode<ScheduledRun>> _pendingByCts = new();
+    private readonly SemaphoreSlim _pendingSignal = new(0);
+    private bool _schedulingCompleted;
     private readonly LinkedList<ConcurrencyWaiter> _concurrencyWaiters = new();
     private readonly HashSet<Task> _activeRuns = new();
     private int _concurrencyLimit;
@@ -129,15 +126,42 @@ public sealed class DownloadQueueService : IAsyncDisposable
 
         item.Reset();
         var runCts = item.Cts ?? throw new InvalidOperationException("A scheduled download requires cancellation state.");
-        if (!_workQueue.Writer.TryWrite(new ScheduledRun(item, runCts)))
+        lock (_scheduleSync)
         {
-            var message = _isDisposed
-                ? "The download queue is shutting down."
-                : "The download scheduler is full. Wait for queued work to start, then retry.";
-            item.MarkFailed(message);
-            runCts.Dispose();
-            QueueError?.Invoke(message);
+            var node = _pendingRuns.AddLast(new ScheduledRun(item, runCts));
+            _pendingByCts.Add(runCts, node);
         }
+        _pendingSignal.Release();
+    }
+
+    internal int PendingRunCount
+    {
+        get { lock (_scheduleSync) return _pendingRuns.Count; }
+    }
+
+    /// <summary>Removes a run no worker has taken yet. The caller then owns its source.</summary>
+    private bool TryUnschedule(CancellationTokenSource runCts)
+    {
+        lock (_scheduleSync)
+        {
+            if (!_pendingByCts.Remove(runCts, out var node))
+                return false;
+            _pendingRuns.Remove(node);
+        }
+        _pendingSignal.Wait(0); // Keep the signal count in step; a miss only costs a spurious wake.
+        return true;
+    }
+
+    private void StopQueuedRun(DownloadItemViewModel item, bool userCanceled)
+    {
+        var runCts = item.Cts;
+        var unscheduled = runCts is not null && TryUnschedule(runCts);
+        item.UserCanceled = userCanceled;
+        runCts?.Cancel();
+        if (userCanceled) item.MarkCanceled();
+        else item.MarkPaused();
+        // A run a worker already holds is disposed by that worker.
+        if (unscheduled) runCts!.Dispose();
     }
 
     public void Pause(DownloadItemViewModel item)
@@ -145,9 +169,7 @@ public sealed class DownloadQueueService : IAsyncDisposable
         if (item.Status == DownloadStatus.Queued)
         {
             // Never started — just take it out of the schedule.
-            item.UserCanceled = false;
-            item.Cts?.Cancel();
-            item.MarkPaused();
+            StopQueuedRun(item, userCanceled: false);
             return;
         }
         if (item.Status is DownloadStatus.Downloading or DownloadStatus.Processing)
@@ -158,9 +180,7 @@ public sealed class DownloadQueueService : IAsyncDisposable
     {
         if (item.Status == DownloadStatus.Queued)
         {
-            item.UserCanceled = true;
-            item.Cts?.Cancel();
-            item.MarkCanceled();
+            StopQueuedRun(item, userCanceled: true);
             return;
         }
         if (item.Status is DownloadStatus.Downloading or DownloadStatus.Processing)
@@ -297,15 +317,17 @@ public sealed class DownloadQueueService : IAsyncDisposable
             await OnUiAsync(() =>
             {
                 if (!ReferenceEquals(item.Cts, runCts)) return;
+                // An item the user removed mid-run still records its files, but is not announced.
+                var stillListed = Items.Contains(item);
                 if (result.ExitCode == 0)
                 {
                     item.MarkCompleted(result.FinalFilePaths);
-                    ItemCompleted?.Invoke(this, item);
+                    if (stillListed) ItemCompleted?.Invoke(this, item);
                 }
                 else
                 {
                     item.MarkFailed(result.ErrorSummary);
-                    ItemFailed?.Invoke(this, item);
+                    if (stillListed) ItemFailed?.Invoke(this, item);
                 }
             }).ConfigureAwait(false);
         }
@@ -331,8 +353,8 @@ public sealed class DownloadQueueService : IAsyncDisposable
         {
             try
             {
-                // ProcessRunner drains both pipes before returning or throwing, so no
-                // producer can append another file commit after this point.
+                // The engine awaits every file-completion callback before DownloadAsync
+                // returns or throws, so no producer can append another commit after this point.
                 await Task.WhenAll(fileCommits).ConfigureAwait(false);
             }
             finally
@@ -449,9 +471,27 @@ public sealed class DownloadQueueService : IAsyncDisposable
         }
     }
 
+    private async Task<ScheduledRun?> TakeNextRunAsync()
+    {
+        while (true)
+        {
+            await _pendingSignal.WaitAsync().ConfigureAwait(false);
+            lock (_scheduleSync)
+            {
+                if (_pendingRuns.First is { } node)
+                {
+                    _pendingRuns.RemoveFirst();
+                    _pendingByCts.Remove(node.Value.Cts);
+                    return node.Value;
+                }
+                if (_schedulingCompleted) return null;
+            }
+        }
+    }
+
     private async Task WorkerLoopAsync()
     {
-        await foreach (var scheduled in _workQueue.Reader.ReadAllAsync().ConfigureAwait(false))
+        while (await TakeNextRunAsync().ConfigureAwait(false) is { } scheduled)
         {
             try
             {
@@ -503,7 +543,10 @@ public sealed class DownloadQueueService : IAsyncDisposable
 
         if (beginShutdown)
         {
-            _workQueue.Writer.TryComplete();
+            lock (_scheduleSync)
+                _schedulingCompleted = true;
+            // One wake per worker lets each observe completion once the remaining runs drain.
+            _pendingSignal.Release(WorkerCount);
             CancelAll();
             foreach (var waiter in waiting)
                 waiter.Completion.TrySetCanceled();

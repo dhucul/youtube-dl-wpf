@@ -9,6 +9,28 @@ internal static class AtomicFile
 
     public static string BackupPath(string path) => path + ".bak";
 
+    /// <summary>
+    /// Copies an existing store that could not be read aside before a later save replaces it
+    /// and its backup, so its contents remain recoverable by hand.
+    /// </summary>
+    /// <returns>The preserved copy, or null when nothing exists or the copy failed.</returns>
+    public static string? PreserveUnreadable(string path)
+    {
+        var source = File.Exists(path) ? path : File.Exists(BackupPath(path)) ? BackupPath(path) : null;
+        if (source is null)
+            return null;
+        var target = path + ".unreadable-" + DateTime.Now.ToString("yyyyMMdd-HHmmss", System.Globalization.CultureInfo.InvariantCulture);
+        try
+        {
+            File.Copy(source, target, overwrite: false);
+            return target;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return File.Exists(target) ? target : null;
+        }
+    }
+
     public static string ReadAllText(string path, int maximumBytes)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maximumBytes);

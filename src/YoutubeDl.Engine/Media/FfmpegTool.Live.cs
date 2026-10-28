@@ -28,7 +28,7 @@ public static partial class FfmpegTool
         using var process=new System.Diagnostics.Process{StartInfo=start};if(!process.Start())throw new InvalidOperationException("Could not inspect audio priming.");
         var output=ReadTailAsync(process.StandardOutput);var errors=ReadTailAsync(process.StandardError);
         try{await process.WaitForExitAsync(ct).ConfigureAwait(false);}
-        catch(OperationCanceledException){try{if(!process.HasExited)process.Kill(true);}catch(InvalidOperationException){}await process.WaitForExitAsync(CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false);await Task.WhenAll(output,errors).WaitAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false);throw;}
+        catch(OperationCanceledException){await ProcessLifetime.KillAndDrainAsync(process,null,output,errors).ConfigureAwait(false);throw;}
         var json=await output.ConfigureAwait(false);var diagnostics=await errors.ConfigureAwait(false);if(process.ExitCode!=0||diagnostics.Length>0)throw new InvalidDataException("Could not inspect complete source audio priming.");return json;
     }
     internal static async Task VerifyLivePairAsync(string ffmpeg,string path,string extension,double duration,CancellationToken ct)

@@ -52,12 +52,14 @@ internal sealed class DownloadArchive : IDisposable
         var full = ResolvePath(path); return [full, full + ".native.lock"];
     }
 
-    public static async Task<DownloadArchive> OpenAsync(string path, DownloadArchiveIdentity identity, CancellationToken ct)
+    public static async Task<DownloadArchive> OpenAsync(string path, DownloadArchiveIdentity identity, CancellationToken ct, Action<string>? log = null)
     {
         path = ResolvePath(path);
         var record = identity.Record;
         if (Contains(await ReadAsync(path, ct).ConfigureAwait(false), record)) return new(path, record, true, null, null);
-        var gate = await DestinationLock.AcquireArchiveAsync(path, ct).ConfigureAwait(false);
+        // Archive-backed jobs run one at a time; say so rather than appear stalled.
+        var gate = await DestinationLock.AcquireArchiveAsync(path, ct,
+            () => log?.Invoke("[native] Waiting for another download that uses the same download archive.")).ConfigureAwait(false);
         FileStream? fileLock = null;
         try
         {

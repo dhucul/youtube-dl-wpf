@@ -86,6 +86,7 @@ public sealed partial class FileDownloader
         var receipt = NoContinue ? null : ReadReceipt(receiptPath, url);
         if (receipt is null || !receipt.HasValidator || receipt.Length is { } total && existing > total)
             existing = 0;
+        else existing = ReopenCompletePart(part, existing, receipt);
         using var request = CreateRequest(url, existing, receipt);
         using var response = await SendAsync(request, ct).ConfigureAwait(false);
         if (response.StatusCode == HttpStatusCode.RequestedRangeNotSatisfiable && existing > 0 ||
@@ -195,6 +196,16 @@ public sealed partial class FileDownloader
             return receipt?.ResourceKey == ResourceKey(url) && receipt.Length is not < 0 ? receipt : null;
         }
         catch (Exception ex) when (ex is IOException or JsonException or UnauthorizedAccessException) { return null; }
+    }
+
+    // A part interrupted after its last byte but before publication would request a range
+    // past the end, and a 416 restarts the whole transfer. Re-request only the final byte, so
+    // the validator still proves the entity is unchanged before the part is reused.
+    private static long ReopenCompletePart(string part, long existing, ResumeReceipt receipt)
+    {
+        if (receipt.Length is not { } total || total <= 1 || existing != total) return existing;
+        using (var stream = new FileStream(part, FileMode.Open, FileAccess.Write, FileShare.None)) stream.SetLength(total - 1);
+        return total - 1;
     }
 
     private static string ResourceKey(Uri url) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(url.AbsoluteUri)));

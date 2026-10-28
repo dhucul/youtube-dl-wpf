@@ -25,7 +25,7 @@ public static partial class FfmpegTool
             }
             await process.WaitForExitAsync(ct).ConfigureAwait(false);var diagnostic=await error.ConfigureAwait(false);if(process.ExitCode!=0||diagnostic.Length>0||count==0)throw new InvalidDataException("Coded HDR packet inspection failed: "+Trim(diagnostic));
         }
-        catch{try{if(!process.HasExited)process.Kill(true);}catch(InvalidOperationException){}await process.WaitForExitAsync(CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false);await error.WaitAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false);ct.ThrowIfCancellationRequested();throw;}
+        catch{await ProcessLifetime.KillAndDrainAsync(process,null,error).ConfigureAwait(false);ct.ThrowIfCancellationRequested();throw;}
     }
     private static async Task BindSpatialPlusAsync(string ffmpeg,string input,IReadOnlyList<HdrTimedFrame> frames,HdrSpatialGeometry geometry,CancellationToken ct)
         =>await BindSpatialPlusAsync(ffmpeg,input,frames,payload=>HdrPlusSpatial.Map(payload,geometry),ct).ConfigureAwait(false);

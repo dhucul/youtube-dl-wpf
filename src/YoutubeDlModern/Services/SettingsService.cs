@@ -25,22 +25,24 @@ public sealed class SettingsService
 
     public AppSettings Data { get; private set; } = new();
 
+    /// <summary>Set by <see cref="Load"/> when stored settings could not be fully restored.</summary>
+    public string? LoadWarning { get; private set; }
+
     public void Load()
     {
-        if (TryLoad(FilePath, out var loaded))
+        LoadWarning = null;
+        if (TryLoad(FilePath, out var loaded, out var cleared) ||
+            TryLoad(AtomicFile.BackupPath(FilePath), out loaded, out cleared))
         {
+            if (cleared > 0)
+                LoadWarning = $"{cleared} saved password or connection setting(s) were encrypted for another Windows account and were cleared. Enter them again in Settings.";
             Data = Normalize(loaded!);
             TryMigrateProtectedStorage();
             return;
         }
 
-        if (TryLoad(AtomicFile.BackupPath(FilePath), out loaded))
-        {
-            Data = Normalize(loaded!);
-            TryMigrateProtectedStorage();
-            return;
-        }
-
+        if (AtomicFile.PreserveUnreadable(FilePath) is { } preserved)
+            LoadWarning = "Settings could not be read and were reset to defaults. The unreadable file was kept as " + Path.GetFileName(preserved) + ".";
         Data = Normalize(new AppSettings());
     }
 
@@ -80,9 +82,10 @@ public sealed class SettingsService
 
     public static AppSettings CreateDefault() => Normalize(new AppSettings());
 
-    private static bool TryLoad(string path, out AppSettings? settings)
+    private static bool TryLoad(string path, out AppSettings? settings, out int clearedSecrets)
     {
         settings = null;
+        clearedSecrets = 0;
         if (!File.Exists(path)) return false;
 
         try
@@ -95,7 +98,7 @@ public sealed class SettingsService
             if (settings is not null)
             {
                 EnsureSections(settings);
-                SettingsSecrets.Unprotect(settings);
+                clearedSecrets = SettingsSecrets.Unprotect(settings);
                 settings.Auth.TwoFactor = string.Empty;
             }
             return settings is not null;

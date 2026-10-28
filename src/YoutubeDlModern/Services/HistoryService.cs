@@ -26,11 +26,23 @@ public sealed class HistoryService : IDisposable
     public ObservableCollection<HistoryEntry> Entries { get; } = new();
     public event Action<string>? PersistenceFailed;
 
+    /// <summary>Set by <see cref="Load"/> when stored history could not be fully restored.</summary>
+    public string? LoadWarning { get; private set; }
+
     public void Load()
     {
-        List<HistoryEntry>? list = null;
-        if (!TryLoad(FilePath, out list))
-            _ = TryLoad(AtomicFile.BackupPath(FilePath), out list);
+        LoadWarning = null;
+        if (TryLoad(FilePath, out var list, out var cleared) ||
+            TryLoad(AtomicFile.BackupPath(FilePath), out list, out cleared))
+        {
+            if (cleared > 0)
+                LoadWarning = $"{cleared} history link(s) were encrypted for another Windows account and could not be restored. Their files are still listed.";
+        }
+        else if (AtomicFile.PreserveUnreadable(FilePath) is { } preserved)
+        {
+            // The next save replaces both the file and its backup; keep the original first.
+            LoadWarning = "Download history could not be read. The unreadable file was kept as " + Path.GetFileName(preserved) + ".";
+        }
 
         Entries.Clear();
         foreach (var entry in (list ?? new List<HistoryEntry>())
@@ -137,9 +149,10 @@ public sealed class HistoryService : IDisposable
             return _pendingSave;
     }
 
-    private static bool TryLoad(string path, out List<HistoryEntry>? list)
+    private static bool TryLoad(string path, out List<HistoryEntry>? list, out int clearedUrls)
     {
         list = null;
+        clearedUrls = 0;
         if (!File.Exists(path)) return false;
 
         try
@@ -148,7 +161,7 @@ public sealed class HistoryService : IDisposable
             if (list is not null)
             {
                 foreach (var entry in list.Where(static entry => entry is not null))
-                    entry.Url = SettingsSecrets.UnprotectValue(entry.Url ?? string.Empty);
+                    entry.Url = SettingsSecrets.RecoverValue(entry.Url ?? string.Empty, ref clearedUrls);
             }
             return list is not null;
         }

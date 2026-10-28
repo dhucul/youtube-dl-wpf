@@ -17,9 +17,7 @@ public static partial class FfmpegTool
         try { await process.WaitForExitAsync(timeout.Token).ConfigureAwait(false); }
         catch (OperationCanceledException)
         {
-            try { if (!process.HasExited) process.Kill(entireProcessTree: true); } catch (InvalidOperationException) { }
-            await process.WaitForExitAsync(CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
-            await Task.WhenAll(stdout, stderr).WaitAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false); ct.ThrowIfCancellationRequested(); throw new TimeoutException("MP3 boundary inspection timed out.");
+            await ProcessLifetime.KillAndDrainAsync(process, null, stdout, stderr).ConfigureAwait(false); ct.ThrowIfCancellationRequested(); throw new TimeoutException("MP3 boundary inspection timed out.");
         }
         var json = await stdout.ConfigureAwait(false); var error = await stderr.ConfigureAwait(false);
         if (process.ExitCode != 0 || error.Length != 0) throw new InvalidDataException("The MP3 boundary could not be inspected before copying.");

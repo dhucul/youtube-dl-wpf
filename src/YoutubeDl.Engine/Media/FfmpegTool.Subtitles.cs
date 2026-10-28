@@ -60,9 +60,7 @@ public static partial class FfmpegTool
             }
             catch (Exception failure)
             {
-                try { if (!process.HasExited) process.Kill(entireProcessTree: true); } catch (InvalidOperationException) { }
-                await process.WaitForExitAsync(CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
-                await error.WaitAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
+                await ProcessLifetime.KillAndDrainAsync(process, null, error).ConfigureAwait(false);
                 if (failure is OperationCanceledException && !ct.IsCancellationRequested && timeout.IsCancellationRequested)
                     throw new TimeoutException("Subtitle conversion exceeded its time limit.", failure);
                 throw;

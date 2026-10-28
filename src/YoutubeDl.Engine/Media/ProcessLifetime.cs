@@ -26,6 +26,15 @@ internal sealed class ProcessLifetime:IDisposable
         catch{job.Dispose();throw;}
     }
     public void Dispose()=>_job?.Dispose();
+    // Cleanup after a failure or cancellation is best effort. Its own deadline must never
+    // replace the caller's exception, or a user's pause would surface as a timeout failure.
+    internal static async Task KillAndDrainAsync(Process process,IDisposable? lifetime,params Task[] readers)
+    {
+        try{if(!process.HasExited)process.Kill(entireProcessTree:true);}catch(InvalidOperationException){}
+        try{await process.WaitForExitAsync(CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false);}catch(Exception){}
+        lifetime?.Dispose();
+        try{await Task.WhenAll(readers).WaitAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false);}catch(Exception){}
+    }
     [StructLayout(LayoutKind.Sequential)]private struct BasicLimits{public long ProcessTime,JobTime;public uint Flags;public UIntPtr MinimumWorkingSet,MaximumWorkingSet;public uint ActiveProcesses;public UIntPtr Affinity;public uint Priority,Scheduling;}
     [StructLayout(LayoutKind.Sequential)]private struct Counters{public ulong ReadOperations,WriteOperations,OtherOperations,ReadBytes,WriteBytes,OtherBytes;}
     [StructLayout(LayoutKind.Sequential)]private struct ExtendedLimits{public BasicLimits Basic;public Counters Io;public UIntPtr ProcessMemory,JobMemory,PeakProcessMemory,PeakJobMemory;}

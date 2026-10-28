@@ -28,9 +28,7 @@ public static partial class FfmpegTool
         try { await process.WaitForExitAsync(ct).ConfigureAwait(false); }
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
-            try { if (!process.HasExited) process.Kill(entireProcessTree: true); } catch (InvalidOperationException) { }
-            await process.WaitForExitAsync(CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
-            await Task.WhenAll(output, error).WaitAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
+            await ProcessLifetime.KillAndDrainAsync(process, null, output, error).ConfigureAwait(false);
             throw;
         }
         var json = await output.ConfigureAwait(false); var diagnostic = await error.ConfigureAwait(false);
@@ -280,10 +278,7 @@ public static partial class FfmpegTool
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
-            try { if (!process.HasExited) process.Kill(entireProcessTree: true); }
-            catch (InvalidOperationException) { }
-            await process.WaitForExitAsync(CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
-            await Task.WhenAll(errorTask, outputTask).WaitAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
+            await ProcessLifetime.KillAndDrainAsync(process, null, errorTask, outputTask).ConfigureAwait(false);
             throw;
         }
         var error = await errorTask.ConfigureAwait(false);

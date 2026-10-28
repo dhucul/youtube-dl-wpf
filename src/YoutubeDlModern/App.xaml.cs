@@ -7,6 +7,7 @@ namespace YoutubeDlModern;
 
 public partial class App : Application
 {
+    private static readonly TimeSpan ShutdownDeadline = TimeSpan.FromSeconds(30);
     private int _isHandlingUnhandledException;
     private MainViewModel? _mainViewModel;
     private bool _isShuttingDown;
@@ -22,7 +23,13 @@ public partial class App : Application
         {
             var viewModelStop = _mainViewModel?.StopAsync() ?? Task.CompletedTask;
             var queueStop = Queue?.ShutdownAsync() ?? Task.CompletedTask;
-            await Task.WhenAll(viewModelStop, queueStop);
+            var stopping = Task.WhenAll(viewModelStop, queueStop);
+            // Canceled work normally stops at once. Never leave a disabled window open
+            // indefinitely; interrupted transfers resume from their partial files.
+            if (await Task.WhenAny(stopping, Task.Delay(ShutdownDeadline)) == stopping)
+                await stopping;
+            else
+                _ = stopping.ContinueWith(task => _ = task.Exception, TaskContinuationOptions.OnlyOnFaulted);
             if (History is not null) await History.FlushAsync();
         }
         catch (Exception ex)
