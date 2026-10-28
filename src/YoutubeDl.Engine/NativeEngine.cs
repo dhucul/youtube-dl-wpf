@@ -13,7 +13,7 @@ namespace YoutubeDl.Engine;
 /// </summary>
 public sealed partial class NativeEngine : IMediaEngine
 {
-    public const string Version = "0.228.0";
+    public const string Version = "0.228.1";
 
     private static readonly MediaProviderRegistry DefaultProviders = MediaProviderRegistry.CreateDefault();
     private readonly MediaProviderRegistry _providers;

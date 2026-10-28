@@ -1,6 +1,6 @@
 # Practical native downloader release
 
-Version 1.1.8, native engine 0.228.0. This release packages the runtime-audit reliability corrections below with Inno Setup 7. It retains the 1.1.7 Facebook static DASH playback and session renewal corrections, the 1.1.6 best video and original audio defaults and earlier reliability fixes. The earlier YouTube, public Facebook and common video-page evidence is preserved below; private-account coverage has not been expanded.
+Version 1.1.8, native engine 0.228.1. This release packages the runtime-audit reliability corrections below with Inno Setup 7. It retains the 1.1.7 Facebook static DASH playback and session renewal corrections, the 1.1.6 best video and original audio defaults and earlier reliability fixes. The earlier YouTube, public Facebook and common video-page evidence is preserved below; private-account coverage has not been expanded.
 
 ## 1.1.8 runtime-audit corrections (2026-10-27)
 
