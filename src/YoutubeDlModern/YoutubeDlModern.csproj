@@ -9,7 +9,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AssemblyName>YoutubeDlModern</AssemblyName>
     <RootNamespace>YoutubeDlModern</RootNamespace>
-    <Version>1.1.7</Version>
+    <Version>1.1.8</Version>
     <AssemblyTitle>YoutubeDL Modern</AssemblyTitle>
     <Description>A Windows video and audio downloader with a built-in C# engine.</Description>
     <Product>YoutubeDL Modern</Product>
