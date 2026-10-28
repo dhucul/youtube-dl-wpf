@@ -1,6 +1,25 @@
 # Practical native downloader release
 
-Version 1.1.7, native engine 0.228.0. This release packages the Facebook static DASH playback and session renewal corrections below with Inno Setup 7. It retains the 1.1.6 best video and original audio defaults and earlier reliability fixes. The earlier YouTube, public Facebook and common video-page evidence is preserved below; private-account coverage has not been expanded.
+Version 1.1.8, native engine 0.228.0. This release packages the runtime-audit reliability corrections below with Inno Setup 7. It retains the 1.1.7 Facebook static DASH playback and session renewal corrections, the 1.1.6 best video and original audio defaults and earlier reliability fixes. The earlier YouTube, public Facebook and common video-page evidence is preserved below; private-account coverage has not been expanded.
+
+## 1.1.8 runtime-audit corrections (2026-10-27)
+
+Saved settings and download history protect credentials, proxies, headers and history links with Windows DPAPI. A single value protected for another Windows account or machine previously made the whole file unreadable: history loaded empty and the next completed download replaced both `history.json` and its backup, while settings silently reset to defaults. Each protected value is now recovered on its own. A value that cannot be decrypted is cleared and reported at startup, and every other setting or history entry is kept. A file that cannot be read at all is copied aside as `*.unreadable-<timestamp>` before a later save replaces it.
+
+Paused and canceled queued runs previously stayed in the 20,000-entry scheduler until a worker drained them. Because waiting workers can hold every slot, repeated Pause All / Start All on a large queue could fill the scheduler and mark items failed. Pending runs are now removed from the schedule as soon as they are paused or canceled, so the schedule never holds more than one run per queued item. Items removed while downloading still record their finished files in history, but no longer announce completion.
+
+After stopping ffmpeg, ffprobe or a configured exec command, cleanup waits up to five seconds for the process and its output. If that wait expired, its timeout previously replaced the cancellation or the original error, so a pause during processing could report "The operation has timed out". The wait is now best effort at all eleven engine sites and the original outcome propagates.
+
+Other corrections:
+
+- Preview and queue thumbnails decode by width only and keep their aspect ratio instead of being stretched to 512×512.
+- A partial file whose last byte was written before an interruption is revalidated by requesting only that byte with its validator, instead of failing the past-the-end range request and restarting the whole transfer.
+- The audio track of a separately downloaded video/audio pair now reports progress.
+- A job waiting for another download that uses the same download archive logs the wait instead of appearing stalled. Archive-backed jobs still run one at a time.
+- A configured ffmpeg folder is used without waiting for an in-progress managed ffmpeg installation.
+- Closing the application stops waiting for downloads after 30 seconds; interrupted transfers resume from their partial files.
+
+All 3,714 core engine checks and 210 application checks pass with zero build warnings or errors. The seven added checks cover per-value secret recovery for settings and history, preservation of unreadable history, bounded scheduling across 25 pause/resume cycles, removed-item completion, thumbnail aspect ratio and final-byte resume revalidation.
 
 ## 1.1.6 quality defaults
 
